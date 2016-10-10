@@ -27,7 +27,7 @@ import java.util.logging.*;
  */
 public class StardictDictionary implements NavigableDictionary{
 	private static final Charset UTF8=Charset.forName("UTF-8");
-	private static final CharsetDecoder UTF8_DECODER=UTF8.newDecoder();
+	private final CharsetDecoder UTF8_DECODER=UTF8.newDecoder();
 	private final HashMap<String,String> info=new HashMap<>();
 	private final TreeMap<String,Interval> dictionary=new TreeMap<>();
 	private byte[] pool;
@@ -88,7 +88,6 @@ public class StardictDictionary implements NavigableDictionary{
 	}
 	@Override
 	public String getMeaning(String word){
-		System.err.print(word);
 		Interval interval=dictionary.get(word);
 		if(interval!=null)
 			try{
@@ -97,7 +96,7 @@ public class StardictDictionary implements NavigableDictionary{
 			}catch(CharacterCodingException ex){
 				Logger.getLogger(StardictDictionary.class.getName()).log(Level.SEVERE,null,ex);
 			}
-		return "";
+		return null;
 	}
 	@Override
 	public String getCurrentWord(String word){

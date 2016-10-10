@@ -26,8 +26,8 @@ import javax.swing.*;
 public class EditableList<E> extends JPanel{
 	private final JButton addItem=new JButton("+");
 	private final JButton removeItem=new JButton("-");
-	private final JButton upItem=new JButton("/\\");
-	private final JButton downItem=new JButton("\\/");
+	private final JButton upItem=new JButton(new ImageIcon(EditableList.class.getResource("arrow-up.png")));
+	private final JButton downItem=new JButton(new ImageIcon(EditableList.class.getResource("arrow-down.png")));
 	private final DefaultListModel<E> model;
 	private final JList<E> list;
 	private final Supplier<E> creator;
@@ -36,8 +36,9 @@ public class EditableList<E> extends JPanel{
 		this.model=model;
 		this.list=new JList(model);
 		this.creator=creator;
-		//list.setDragEnabled(true);
+		list.setDragEnabled(true);
 		Box bar=Box.createVerticalBox();
+		upItem.setPreferredSize(new Dimension(upItem.getIcon().getIconWidth(),upItem.getIcon().getIconHeight()));
 		addItem.addActionListener((e)->addItem());
 		removeItem.addActionListener((e)->removeItem());
 		upItem.addActionListener((e)->upItem());

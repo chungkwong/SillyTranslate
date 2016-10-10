@@ -42,7 +42,7 @@ public class IntegratedDictionary implements NavigableDictionary{
 		for(NavigableDictionary dictionary:dictionarys){
 			String curr=dictionary.getMeaning(word);
 			if(curr!=null)
-				buf.append(curr).append('\n');
+				buf.append(dictionary).append('\n').append(curr).append('\n').append('\n');
 		}
 		return buf.toString();
 	}
@@ -65,6 +65,10 @@ public class IntegratedDictionary implements NavigableDictionary{
 				best=curr;
 		}
 		return best;
+	}
+	@Override
+	public String toString(){
+		return dictionarys.toString();
 	}
 
 }

@@ -28,14 +28,14 @@ import javax.swing.event.*;
  */
 public class DictionaryViewer extends JPanel{
 	private static final int WORD_LIST_MAX_LENGTH=10;
-	private final StardictDictionary dict;
+	private final IntegratedDictionary dict;
 	private final JTextField input=new JTextField();
 	private final DefaultListModel<String> wordsModel=new DefaultListModel<>();
 	private final JList words=new JList(wordsModel);
 	private final JTextArea meaning=new JTextArea();
 	private final JFileChooser fileChooser=new JFileChooser();
-	public DictionaryViewer(StardictDictionary dict){
-		this.dict=dict;
+	public DictionaryViewer(){
+		this.dict=new IntegratedDictionary();
 		setLayout(new BorderLayout());
 		input.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
@@ -62,7 +62,23 @@ public class DictionaryViewer extends JPanel{
 		meaning.setEditable(false);
 		add(new JScrollPane(meaning),BorderLayout.CENTER);
 		DefaultListModel<NavigableDictionary> dicts=new DefaultListModel<>();
-		dicts.addElement(dict);
+		dicts.addListDataListener(new ListDataListener() {
+			@Override
+			public void intervalAdded(ListDataEvent e){
+				for(int i=e.getIndex0();i<=e.getIndex1();i++)
+					dict.addDictionary(dicts.getElementAt(i),i);
+			}
+			@Override
+			public void intervalRemoved(ListDataEvent e){
+				for(int i=e.getIndex1();i>=e.getIndex0();i--)
+					dict.removeDictionary(i);
+			}
+			@Override
+			public void contentsChanged(ListDataEvent e){
+				intervalRemoved(e);
+				intervalAdded(e);
+			}
+		});
 		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		add(new JScrollPane(new EditableList(dicts,this::loadDictionary),
 				JScrollPane.VERTICAL_SCROLLBAR_NEVER,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),BorderLayout.SOUTH);
@@ -84,8 +100,6 @@ public class DictionaryViewer extends JPanel{
 			word=dict.getNextWord(word);
 		}
 		wordUpdated();
-		//words.setSelectedIndex(0);
-		//input.requestFocusInWindow();
 	}
 	private void wordUpdated(){
 		if(words.isSelectionEmpty()){
@@ -98,8 +112,8 @@ public class DictionaryViewer extends JPanel{
 	 * @param args the command line arguments
 	 */
 	public static void main(String[] args) throws IOException {
-		JFrame f=new JFrame("Dictionary Viewer");
-		f.add(new DictionaryViewer(new StardictDictionary(new File("/home/kwong/projects/stardict-kdic-computer-gb-2.4.2"))));
+		JFrame f=new JFrame(java.util.ResourceBundle.getBundle("com/github/sillytranslate/Words").getString("DICTIONARY VIEWER"));
+		f.add(new DictionaryViewer());
 		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
