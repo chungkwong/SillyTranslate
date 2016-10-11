@@ -17,6 +17,10 @@
 
 package com.github.sillytranslate.util;
 import java.awt.*;
+import java.awt.image.*;
+import java.io.*;
+import java.util.logging.*;
+import javax.imageio.*;
 import javax.swing.*;
 /**
  *
@@ -24,22 +28,47 @@ import javax.swing.*;
  */
 public class IconEditor extends JPanel{
 	private final int width,height;
-	private JColorChooser colorChooser=new JColorChooser(Color.WHITE);
+	private static final Color DEFAULT_COLOR=new Color(255,255,255,0);
+	private JColorChooser colorChooser=new JColorChooser(DEFAULT_COLOR);
 	private final JButton[][] pixels;
 	public IconEditor(){
 		width=Integer.parseInt(JOptionPane.showInputDialog("Width:"));
 		height=Integer.parseInt(JOptionPane.showInputDialog("Height:",Integer.toString(width)));
-		pixels=new JButton[HEIGHT][WIDTH];
+		pixels=new JButton[height][width];
 		setLayout(new BorderLayout());
-		JPanel dataArea=new JPanel(new GridLayout(HEIGHT,WIDTH));
-		for(int i=0;i<HEIGHT;i++)
-			for(int j=0;j<WIDTH;j++){
+		JPanel dataArea=new JPanel(new GridLayout(height,width));
+		for(int i=0;i<height;i++)
+			for(int j=0;j<width;j++){
 				pixels[i][j]=new JButton();
-				pixels[i][j].setBackground(Color.WHITE);
+				pixels[i][j].setBackground(DEFAULT_COLOR);
+				pixels[i][j].setActionCommand(i+":"+j);
+				pixels[i][j].addActionListener((e)->{
+					String[] location=e.getActionCommand().split(":");
+					pixels[Integer.parseInt(location[0])][Integer.parseInt(location[1])].setBackground(colorChooser.getColor());
+				});
 				dataArea.add(pixels[i][j]);
 			}
-		add(dataArea,BorderLayout.CENTER);
+		add(new JScrollPane(dataArea),BorderLayout.CENTER);
 		add(colorChooser,BorderLayout.EAST);
+		JButton save=new JButton("Save");
+		save.addActionListener((e)->save());
+		add(save,BorderLayout.SOUTH);
+	}
+	private void save(){
+		JFileChooser fileChooser=new JFileChooser();
+		if(fileChooser.showOpenDialog(this)==JFileChooser.APPROVE_OPTION){
+			File file=fileChooser.getSelectedFile();
+			BufferedImage image=new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB);
+			for(int i=0;i<height;i++)
+				for(int j=0;j<width;j++)
+					image.setRGB(j,i,pixels[i][j].getBackground().getRGB());
+			try{
+				String name=file.getName();
+				ImageIO.write(image,name.substring(name.lastIndexOf('.')+1),file);
+			}catch(IOException ex){
+				Logger.getLogger(IconEditor.class.getName()).log(Level.SEVERE,null,ex);
+			}
+		}
 	}
 	/**
 	 * @param args the command line arguments
@@ -51,5 +80,4 @@ public class IconEditor extends JPanel{
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
 	}
-
 }

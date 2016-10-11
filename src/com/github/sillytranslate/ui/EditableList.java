@@ -16,7 +16,10 @@
  */
 package com.github.sillytranslate.ui;
 import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.dnd.*;
 import java.util.function.*;
+import javax.activation.*;
 import javax.swing.*;
 /**
  *
@@ -24,8 +27,8 @@ import javax.swing.*;
  * @param <E> Element type
  */
 public class EditableList<E> extends JPanel{
-	private final JButton addItem=new JButton("+");
-	private final JButton removeItem=new JButton("-");
+	private final JButton addItem=new JButton(new ImageIcon(EditableList.class.getResource("add.png")));
+	private final JButton removeItem=new JButton(new ImageIcon(EditableList.class.getResource("cross.png")));
 	private final JButton upItem=new JButton(new ImageIcon(EditableList.class.getResource("arrow-up.png")));
 	private final JButton downItem=new JButton(new ImageIcon(EditableList.class.getResource("arrow-down.png")));
 	private final DefaultListModel<E> model;
@@ -37,6 +40,9 @@ public class EditableList<E> extends JPanel{
 		this.list=new JList(model);
 		this.creator=creator;
 		list.setDragEnabled(true);
+		list.setDropMode(DropMode.INSERT);
+		list.setTransferHandler(new ListTransferHandle());
+		list.setDropTarget(new DropTarget(this,new ListDropTargetListener<E>()));
 		Box bar=Box.createVerticalBox();
 		upItem.setPreferredSize(new Dimension(upItem.getIcon().getIconWidth(),upItem.getIcon().getIconHeight()));
 		addItem.addActionListener((e)->addItem());
@@ -57,8 +63,9 @@ public class EditableList<E> extends JPanel{
 		model.addElement(creator.get());
 	}
 	private void removeItem(){
-		if(!list.isSelectionEmpty())
+		if(!list.isSelectionEmpty()){
 			model.removeElementAt(list.getSelectedIndex());
+		}
 	}
 	private void upItem(){
 		int index=list.getSelectedIndex();
@@ -74,6 +81,58 @@ public class EditableList<E> extends JPanel{
 			E obj=model.getElementAt(index);
 			model.removeElementAt(index);
 			model.add(index+1,obj);
+		}
+	}
+	private class ListTransferHandle<E> extends TransferHandler{
+		private int[] indices=null;
+		private int addIndex=-1; //Location where items were added
+		private int addCount=0;  //Number of items added.
+		private final DataFlavor localDataFlavor;
+		public ListTransferHandle(){
+			super(null);
+			localDataFlavor=new ActivationDataFlavor(DataFlavor.javaJVMLocalObjectMimeType,"Dictionary");
+		}
+		@Override
+		public boolean canImport(TransferHandler.TransferSupport info){
+
+			return true;
+		}
+		@Override
+		protected Transferable createTransferable(JComponent c){
+			return new StringSelection(c.toString());
+		}
+		@Override
+		public int getSourceActions(JComponent c){
+			return TransferHandler.MOVE;
+		}
+		@Override
+		public boolean importData(TransferHandler.TransferSupport info){
+			return true;
+		}
+		@Override
+		protected void exportDone(JComponent c,Transferable data,int action){
+		}
+	}
+	private class ListDropTargetListener<E> implements DropTargetListener{
+		@Override
+		public void dragEnter(DropTargetDragEvent dtde){
+			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		}
+		@Override
+		public void dragOver(DropTargetDragEvent dtde){
+			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		}
+		@Override
+		public void dropActionChanged(DropTargetDragEvent dtde){
+			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		}
+		@Override
+		public void dragExit(DropTargetEvent dte){
+			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		}
+		@Override
+		public void drop(DropTargetDropEvent dtde){
+			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 		}
 	}
 }
