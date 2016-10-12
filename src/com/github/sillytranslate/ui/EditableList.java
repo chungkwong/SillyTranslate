@@ -17,8 +17,9 @@
 package com.github.sillytranslate.ui;
 import java.awt.*;
 import java.awt.datatransfer.*;
-import java.awt.dnd.*;
+import java.io.*;
 import java.util.function.*;
+import java.util.logging.*;
 import javax.activation.*;
 import javax.swing.*;
 /**
@@ -42,7 +43,7 @@ public class EditableList<E> extends JPanel{
 		list.setDragEnabled(true);
 		list.setDropMode(DropMode.INSERT);
 		list.setTransferHandler(new ListTransferHandle());
-		list.setDropTarget(new DropTarget(this,new ListDropTargetListener<E>()));
+		//list.setDropTarget(new DropTarget(this,new ListDropTargetListener()));
 		Box bar=Box.createVerticalBox();
 		upItem.setPreferredSize(new Dimension(upItem.getIcon().getIconWidth(),upItem.getIcon().getIconHeight()));
 		addItem.addActionListener((e)->addItem());
@@ -83,23 +84,22 @@ public class EditableList<E> extends JPanel{
 			model.add(index+1,obj);
 		}
 	}
-	private class ListTransferHandle<E> extends TransferHandler{
-		private int[] indices=null;
-		private int addIndex=-1; //Location where items were added
-		private int addCount=0;  //Number of items added.
-		private final DataFlavor localDataFlavor;
+	private class ListTransferHandle extends TransferHandler{
+		private DataFlavor localDataFlavor;
+		private int index=-1;
 		public ListTransferHandle(){
 			super(null);
-			localDataFlavor=new ActivationDataFlavor(DataFlavor.javaJVMLocalObjectMimeType,"Dictionary");
 		}
+
 		@Override
 		public boolean canImport(TransferHandler.TransferSupport info){
-
-			return true;
+			return info.getComponent()==list;
 		}
 		@Override
 		protected Transferable createTransferable(JComponent c){
-			return new StringSelection(c.toString());
+			index=list.getSelectedIndex();
+			localDataFlavor=new ActivationDataFlavor(model.get(index).getClass(),"Object");
+			return new DataHandler(model.get(index),localDataFlavor.getMimeType());
 		}
 		@Override
 		public int getSourceActions(JComponent c){
@@ -107,32 +107,23 @@ public class EditableList<E> extends JPanel{
 		}
 		@Override
 		public boolean importData(TransferHandler.TransferSupport info){
-			return true;
+			if(!canImport(info))
+				return false;
+			try{
+				E data=(E)info.getTransferable().getTransferData(localDataFlavor);
+				int to=((JList.DropLocation)info.getDropLocation()).getIndex();
+				model.add(to,data);
+				if(to<index)
+					++index;
+				return true;
+			}catch(UnsupportedFlavorException|IOException ex){
+				Logger.getLogger(EditableList.class.getName()).log(Level.SEVERE,null,ex);
+			}
+			return false;
 		}
 		@Override
 		protected void exportDone(JComponent c,Transferable data,int action){
-		}
-	}
-	private class ListDropTargetListener<E> implements DropTargetListener{
-		@Override
-		public void dragEnter(DropTargetDragEvent dtde){
-			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-		}
-		@Override
-		public void dragOver(DropTargetDragEvent dtde){
-			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-		}
-		@Override
-		public void dropActionChanged(DropTargetDragEvent dtde){
-			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-		}
-		@Override
-		public void dragExit(DropTargetEvent dte){
-			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-		}
-		@Override
-		public void drop(DropTargetDropEvent dtde){
-			throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+			model.removeElementAt(index);
 		}
 	}
 }
