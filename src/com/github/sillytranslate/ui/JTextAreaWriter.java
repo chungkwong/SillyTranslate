@@ -14,13 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.sillytranslate.surrounding;
+package com.github.sillytranslate.ui;
 import java.io.*;
+import javax.swing.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public interface DocumentFormat{
-	String nextTextToBeTranslated()throws IOException;
-	void insertTranslation(String str)throws IOException;
+public class JTextAreaWriter extends Writer{
+	private final JTextArea area;
+	public JTextAreaWriter(JTextArea area){
+		this.area=area;
+	}
+	@Override
+	public void write(char[] cbuf,int off,int len) throws IOException{
+		area.append(new String(cbuf,off,len));
+	}
+	@Override
+	public void flush() throws IOException{
+
+	}
+	@Override
+	public void close() throws IOException{
+
+	}
 }

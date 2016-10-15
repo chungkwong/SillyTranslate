@@ -25,6 +25,9 @@ import java.util.logging.*;
 public class SimpleLex implements Lex{
 	private final PushbackReader in;
 	private Type type;
+	private static final int DOUBLE_QUOTE_SYMBOL='\"';
+	private static final int REMARK_START_SYMBOL='(';
+	private static final int REMARK_END_SYMBOL=')';
 	public SimpleLex(Reader in){
 		this.in=new PushbackReader(in,1);
 	}
@@ -37,7 +40,7 @@ public class SimpleLex implements Lex{
 		StringBuilder buf=new StringBuilder();
 		int c;
 		try{
-			while((c=in.read())!=-1&&Character.isWhitespace(c)){
+			while((c=in.read())!=-1&&Character.isWhitespace(c)){//FIXME Unicode support
 
 			}
 			while(c!=-1&&Character.isLetterOrDigit(c)){
@@ -45,12 +48,12 @@ public class SimpleLex implements Lex{
 				c=in.read();
 			}
 			if(buf.length()==0){
-				if(c=='('){
+				if(c==REMARK_START_SYMBOL){
 					int lv=1;
 					while((c=in.read())!=-1){
-						if(c=='('){
+						if(c==REMARK_START_SYMBOL){
 							++lv;
-						}else if(c==')'){
+						}else if(c==REMARK_END_SYMBOL){
 							--lv;
 							if(lv==0)
 								break;
@@ -58,9 +61,9 @@ public class SimpleLex implements Lex{
 						buf.appendCodePoint(c);
 					}
 					type=Type.REMARK;
-				}else if(c=='\"'){
+				}else if(c==DOUBLE_QUOTE_SYMBOL){
 					while((c=in.read())!=-1){
-						if(c=='\"'){
+						if(c==DOUBLE_QUOTE_SYMBOL){
 							break;
 						}
 						buf.appendCodePoint(c);

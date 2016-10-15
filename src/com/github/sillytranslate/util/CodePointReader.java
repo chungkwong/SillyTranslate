@@ -14,13 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.sillytranslate.surrounding;
+package com.github.sillytranslate.util;
 import java.io.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public interface DocumentFormat{
-	String nextTextToBeTranslated()throws IOException;
-	void insertTranslation(String str)throws IOException;
+public class CodePointReader{
+	private final PushbackReader in;
+	public CodePointReader(Reader in,int size){
+		this.in=new PushbackReader(in,size*2);
+	}
+	public int read() throws IOException{
+		int c=in.read();
+		if(Character.isHighSurrogate((char)c))
+			return Character.toCodePoint((char)c,(char)in.read());
+		else
+			return c;
+	}
+	public void unread(int c) throws IOException{
+		if(Character.isSupplementaryCodePoint(c)){
+			in.unread(Character.lowSurrogate(c));
+			in.unread(Character.highSurrogate(c));
+		}else{
+			in.unread(c);
+		}
+	}
 }
