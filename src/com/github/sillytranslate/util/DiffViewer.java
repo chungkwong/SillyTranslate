@@ -29,9 +29,9 @@ public class DiffViewer extends JPanel{
 	public DiffViewer(){
 		setLayout(new BorderLayout());
 		JSplitPane split=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		split.setLeftComponent(new JScrollPane(left));
-		split.setRightComponent(new JScrollPane(right));
-		add(split,BorderLayout.CENTER);
+		split.setLeftComponent(left);
+		split.setRightComponent(right);
+		add(new JScrollPane(split),BorderLayout.CENTER);
 		JButton refresh=new JButton("Refresh");
 		refresh.addActionListener((e)->refresh());
 		add(refresh,BorderLayout.SOUTH);
@@ -43,16 +43,18 @@ public class DiffViewer extends JPanel{
 		StringBuilder lbuf=new StringBuilder();
 		StringBuilder rbuf=new StringBuilder();
 		int i=0,j=0,k=0;
-		while(i<leftLines.size()&&j<rightLines.size()){
-			if(i==leftLines.size()||(leftLines.get(i).equals(lcs.get(k))&&!rightLines.get(j).equals(lcs.get(k)))){
+		while(i<leftLines.size()||j<rightLines.size()){
+			if(i==leftLines.size()||(k<lcs.size()&&leftLines.get(i).equals(lcs.get(k))&&!rightLines.get(j).equals(lcs.get(k)))){
 				lbuf.append('\n');
-				rbuf.append(rightLines.get(j++));
-			}else if(j==rightLines.size()||(rightLines.get(j).equals(lcs.get(k))&&!leftLines.get(i).equals(lcs.get(k)))){
+				rbuf.append(rightLines.get(j++)).append('\n');
+			}else if(j==rightLines.size()||(k<lcs.size()&&rightLines.get(j).equals(lcs.get(k))&&!leftLines.get(i).equals(lcs.get(k)))){
 				rbuf.append('\n');
-				lbuf.append(leftLines.get(i++));
+				lbuf.append(leftLines.get(i++)).append('\n');
 			}else{
-				lbuf.append(leftLines.get(i++));
-				rbuf.append(rightLines.get(j++));
+				if(k<lcs.size()&&leftLines.get(i).equals(lcs.get(k)))
+					++k;
+				lbuf.append(leftLines.get(i++)).append('\n');
+				rbuf.append(rightLines.get(j++)).append('\n');
 			}
 		}
 		left.setText(lbuf.toString());

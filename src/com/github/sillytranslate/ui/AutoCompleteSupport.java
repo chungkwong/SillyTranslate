@@ -18,33 +18,29 @@ package com.github.sillytranslate.ui;
 import com.github.sillytranslate.util.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
-import java.util.logging.*;
 import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.text.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class AutoCompleteSupport implements KeyListener{
+public class AutoCompleteSupport implements KeyListener,FocusListener{
 	private final JTextComponent comp;
-	private final Document doc;
 	private final HintProvider hints;
-	private final RealTimeTask<Integer> task;
-	private final PopupHint popupHint;
-	private Popup popup;
+	private static final PopupHint popupHint=new PopupHint();
+	private static final RealTimeTask<HintContext> task=new RealTimeTask<>((o)->{
+		Hint[] hint=o.provider.getHints(o.component.getDocument(),o.position);
+		SwingUtilities.invokeLater(()->popupHint.showHints(o.component,o.position,hint));
+	});
 	public AutoCompleteSupport(JTextComponent comp,HintProvider hints){
 		this.hints=hints;
 		this.comp=comp;
-		this.doc=comp.getDocument();
-		this.popupHint=new PopupHint();
-		this.task=new RealTimeTask<>((pos)->{
-			Hint[] hint=hints.getHints(doc,pos);
-			SwingUtilities.invokeLater(()->popupHint.showHints(pos,hint));
-		});
 		comp.addKeyListener(this);
-		comp.addCaretListener((e)->task.summit(e.getDot()));
+		comp.addFocusListener(this);
+		comp.addCaretListener((e)->updateHint());
+	}
+	private void updateHint(){
+		task.summit(new HintContext(hints,comp,comp.getSelectionStart()));
 	}
 	public static void main(String[] args){
 		JFrame f=new JFrame("Test");
@@ -70,7 +66,7 @@ public class AutoCompleteSupport implements KeyListener{
 	}
 	@Override
 	public void keyPressed(KeyEvent e){
-		if(popup!=null)
+		//if(popup!=null)
 			switch(e.getKeyCode()){
 				case KeyEvent.VK_UP:
 					popupHint.selectPrevious();
@@ -87,106 +83,22 @@ public class AutoCompleteSupport implements KeyListener{
 	public void keyReleased(KeyEvent e){
 
 	}
-	class PopupHint extends JPanel implements MouseInputListener,ListSelectionListener{
-		private DefaultListModel<Hint> vec=new DefaultListModel<>();
-		private JEditorPane note=new JEditorPane();
-		private JList<Hint> loc=new JList<Hint>(vec);
-		private int pos;
-		private final int lineheight=comp.getFontMetrics(comp.getFont()).getHeight();
-		public PopupHint(){
-			setLayout(new BorderLayout());
-		//setUndecorated(true);
-			setSize(400,300);
-			loc.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			loc.setSelectedIndex(0);
-			loc.addMouseListener(this);
-			loc.addListSelectionListener(this);
-			loc.setCellRenderer(new DefaultListCellRenderer(){
-				@Override
-				public Component getListCellRendererComponent(JList arg0,Object arg1,int arg2,boolean arg3,boolean arg4){
-					Component c=super.getListCellRendererComponent(arg0,arg1,arg2,arg3,arg4);
-					((JLabel)c).setText(((Hint)arg1).getDisplayText());
-					((JLabel)c).setIcon(((Hint)arg1).getIcon());
-					((JLabel)c).setHorizontalAlignment(SwingConstants.LEFT);
-					return c;
-				}
-			});
-			loc.setOpaque(false);
-			add(new JScrollPane(loc),BorderLayout.WEST);
-			note.setContentType("text/html");
-			note.setEditable(false);
-			add(new JScrollPane(note),BorderLayout.EAST);
-		}
-		public void showHints(int pos,Hint[] choices){
-			if(popup!=null)
-				hideHints();
-			if(choices.length==0)
-				return;
-			this.pos=pos;
-			vec.ensureCapacity(choices.length);
-			for(int i=0;i<choices.length;i++)
-				vec.add(i,choices[i]);
-				loc.setSelectedIndex(0);
-			try{
-				Point loc=comp.modelToView(pos).getLocation();
-				loc.translate((int)comp.getLocationOnScreen().getX(),(int)comp.getLocationOnScreen().getY()+lineheight);
-				popup=PopupFactory.getSharedInstance().getPopup(comp,this,(int)loc.getX(),(int)loc.getY());
-				popup.show();
-			//popup.show(this,(int)rect.getX(),(int)rect.getY());
-			//popup.requestFocusInWindow();
-			}catch(BadLocationException|NullPointerException ex){
-
-			}
-		}
-		public void hideHints(){
-			vec.removeAllElements();
-			popup.hide();
-			popup=null;
-		}
-		void selectPrevious(){
-			loc.setSelectedIndex((loc.getSelectedIndex()+vec.getSize()-1)%vec.getSize());
-		}
-		void selectNext(){
-			loc.setSelectedIndex((loc.getSelectedIndex()+1)%vec.getSize());
-		}
-		void choose(){
-			choose(vec.getElementAt(loc.getSelectedIndex()).getInputText());
-		}
-		private void choose(String inputText){
-			try{
-				doc.insertString(pos,inputText,null);
-			}catch(Exception ex){
-				Logger.getGlobal().log(Level.FINER,inputText,ex);
-			}
-			popup.hide();
-		}
-		@Override
-		public void mouseClicked(MouseEvent e){
-			if(e.getClickCount()==2){
-				choose(vec.get(loc.locationToIndex(e.getPoint())).getInputText());
-			}
-		}
-		@Override
-		public void mousePressed(MouseEvent e){}
-		@Override
-		public void mouseReleased(MouseEvent e){}
-		@Override
-		public void mouseEntered(MouseEvent e){}
-		@Override
-		public void mouseExited(MouseEvent e){}
-		@Override
-		public void mouseDragged(MouseEvent e){}
-		@Override
-		public void mouseMoved(MouseEvent e){}
-		@Override
-		public void valueChanged(ListSelectionEvent e){
-			try{
-				if(loc.getSelectedValue()!=null){
-					note.read(loc.getSelectedValue().getDocument(),null);
-				}
-			}catch(IOException ex){
-				note.setText("NO_DOCUMENT");
-			}
+	@Override
+	public void focusGained(FocusEvent e){
+		updateHint();
+	}
+	@Override
+	public void focusLost(FocusEvent e){
+		popupHint.hideHints();
+	}
+	static class HintContext{
+		final HintProvider provider;
+		final JTextComponent component;
+		final int position;
+		public HintContext(HintProvider provider,JTextComponent component,int position){
+			this.provider=provider;
+			this.component=component;
+			this.position=position;
 		}
 	}
 }

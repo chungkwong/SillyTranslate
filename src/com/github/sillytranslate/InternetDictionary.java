@@ -42,7 +42,7 @@ public class InternetDictionary implements NavigableDictionary{
 			int size;
 			while((size=in.read(cbuf,0,1024))!=-1)
 				buf.append(cbuf,0,size);
-			return buf.toString();
+			return removeHTMLTag(buf.toString());//.replaceAll("<[^>]*>","");
 		}catch(MalformedURLException ex){
 			Logger.getLogger(InternetDictionary.class.getName()).log(Level.SEVERE,null,ex);
 		}catch(IOException ex){
@@ -57,6 +57,32 @@ public class InternetDictionary implements NavigableDictionary{
 	@Override
 	public String getNextWord(String word){
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
+	private static String removeHTMLTag(String html){
+		StringBuilder buf=new StringBuilder();
+		for(int i=0;i<html.length();i++){
+			char c=html.charAt(i);
+			if(c!='<')
+				buf.append(c);
+			else{
+				boolean instr=false,inEsc=false;
+				boolean isComment=i+3<html.length()&&html.charAt(i+1)=='!'&&html.charAt(i+2)=='-'&&html.charAt(i+3)=='-';
+				while(true){
+					c=html.charAt(++i);
+					if(instr){
+						if(c=='\"'&&!inEsc)
+							instr=false;
+						inEsc=c=='\\';
+					}else if(c=='>'){
+						if(!isComment||(html.charAt(i-1)=='-'&&html.charAt(i-2)=='-'))
+							break;
+					}else if(c=='\"'){
+						instr=true;
+					}
+				}
+			}
+		}
+		return buf.toString();
 	}
 	public static void main(String[] args){
 		System.out.println(new InternetDictionary("http://www.dict.org/bin/Dict?Form=Dict2&Database=*&Query=","").getMeaning("she"));
