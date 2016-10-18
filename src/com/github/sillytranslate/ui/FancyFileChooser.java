@@ -47,7 +47,7 @@ public class FancyFileChooser extends JTextField implements HintProvider{
 			File[] files;
 			if(lastSep>=0){
 				prefix=curr.substring(lastSep+SEPARATOR.length(),pos);
-				files=new File(curr.substring(0,lastSep)).listFiles();
+				files=new File(curr.substring(0,lastSep+SEPARATOR.length())).listFiles();
 			}else{
 				prefix=curr.substring(0,pos);
 				files=File.listRoots();

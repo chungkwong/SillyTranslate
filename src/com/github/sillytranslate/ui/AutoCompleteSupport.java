@@ -66,7 +66,7 @@ public class AutoCompleteSupport implements KeyListener,FocusListener{
 	}
 	@Override
 	public void keyPressed(KeyEvent e){
-		//if(popup!=null)
+		if(popupHint.isShowing())
 			switch(e.getKeyCode()){
 				case KeyEvent.VK_UP:
 					popupHint.selectPrevious();

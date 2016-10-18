@@ -35,7 +35,7 @@ public class PopupHint extends JPanel implements MouseInputListener,ListSelectio
 	private Popup popup;
 	public PopupHint(){
 		setLayout(new BorderLayout());
-		setSize(400,300);
+		setPreferredSize(new Dimension(400,300));
 		loc.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		loc.setSelectedIndex(0);
 		loc.addMouseListener(this);
@@ -57,8 +57,7 @@ public class PopupHint extends JPanel implements MouseInputListener,ListSelectio
 		add(new JScrollPane(note),BorderLayout.EAST);
 	}
 	public void showHints(JTextComponent comp,int pos,Hint[] choices){
-		if(popup!=null)
-			hideHints();
+		hideHints();
 		if(choices.length==0)
 			return;
 		this.pos=pos;
@@ -79,9 +78,13 @@ public class PopupHint extends JPanel implements MouseInputListener,ListSelectio
 	}
 	public void hideHints(){
 		vec.removeAllElements();
-		popup.hide();
+		if(popup!=null)
+			popup.hide();
 		popup=null;
 		doc=null;
+	}
+	public boolean isShowing(){
+		return popup!=null;
 	}
 	void selectPrevious(){
 		if(!vec.isEmpty())
@@ -100,7 +103,7 @@ public class PopupHint extends JPanel implements MouseInputListener,ListSelectio
 		}catch(Exception ex){
 			Logger.getGlobal().log(Level.FINER,inputText,ex);
 		}
-		popup.hide();
+		hideHints();
 	}
 	@Override
 	public void mouseClicked(MouseEvent e){
