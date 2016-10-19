@@ -16,6 +16,9 @@
  */
 
 package com.github.sillytranslate;
+import com.github.sillytranslate.lex.StardictDictionary;
+import com.github.sillytranslate.lex.IntegratedDictionary;
+import com.github.sillytranslate.lex.NavigableDictionary;
 import com.github.sillytranslate.ui.*;
 import java.awt.*;
 import java.io.*;

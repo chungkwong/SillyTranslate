@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.sillytranslate;
+package com.github.sillytranslate.lex;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public interface Lex{
-	enum Type{WORD,QUOTE,REMARK,MARK,END};
+	enum Type{WORD,QUOTE,REMARK,MARK,FORMULA,END};
 	Type tokenType();
 	String next();
 }

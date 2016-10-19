@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.sillytranslate.surrounding;
+import com.github.sillytranslate.lex.SimpleLex;
+import com.github.sillytranslate.lex.StardictDictionary;
+import com.github.sillytranslate.lex.Lex;
 import com.github.sillytranslate.*;
 import com.github.sillytranslate.util.*;
 import java.io.*;

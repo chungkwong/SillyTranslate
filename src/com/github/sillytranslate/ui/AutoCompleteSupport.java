@@ -77,6 +77,9 @@ public class AutoCompleteSupport implements KeyListener,FocusListener{
 				case KeyEvent.VK_ENTER:
 					popupHint.choose();
 					break;
+				case KeyEvent.VK_ESCAPE:
+					popupHint.hideHints();
+					break;
 			}
 	}
 	@Override

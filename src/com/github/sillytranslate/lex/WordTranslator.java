@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.sillytranslate;
+package com.github.sillytranslate.lex;
 import com.github.sillytranslate.ui.*;
 import java.io.*;
 import java.util.*;
@@ -94,6 +94,9 @@ public class WordTranslator extends JPanel{
 				if(mean.startsWith(prefix))
 					hints.add(new SimpleHint(mean,mean.substring(prefixLen),null,""));
 			}
+			String org=currIn.getText();
+			if(org.startsWith(prefix))
+				hints.add(new SimpleHint(org,org.substring(prefixLen),null,""));
 			return hints.toArray(new Hint[0]);
 		}
 	}

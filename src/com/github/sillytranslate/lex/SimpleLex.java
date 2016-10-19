@@ -14,7 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.sillytranslate;
+package com.github.sillytranslate.lex;
+import com.github.sillytranslate.util.*;
 import java.io.*;
 import java.util.*;
 import java.util.logging.*;
@@ -23,13 +24,13 @@ import java.util.logging.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class SimpleLex implements Lex{
-	private final PushbackReader in;
+	private final CodePointReader in;
 	private Type type;
 	private static final int DOUBLE_QUOTE_SYMBOL='\"';
 	private static final int REMARK_START_SYMBOL='(';
 	private static final int REMARK_END_SYMBOL=')';
 	public SimpleLex(Reader in){
-		this.in=new PushbackReader(in,1);
+		this.in=new CodePointReader(in,1);
 	}
 	@Override
 	public Type tokenType(){
@@ -40,7 +41,7 @@ public class SimpleLex implements Lex{
 		StringBuilder buf=new StringBuilder();
 		int c;
 		try{
-			while((c=in.read())!=-1&&Character.isWhitespace(c)){//FIXME Unicode support
+			while((c=in.read())!=-1&&Character.isWhitespace(c)){
 
 			}
 			while(c!=-1&&Character.isLetterOrDigit(c)){

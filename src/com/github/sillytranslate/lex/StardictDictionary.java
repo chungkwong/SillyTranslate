@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.sillytranslate;
+package com.github.sillytranslate.lex;
 import java.io.*;
 import java.nio.*;
 import java.nio.charset.*;
@@ -57,7 +57,7 @@ public class StardictDictionary implements NavigableDictionary{
 		});
 	}
 	private void initIndex(File file) throws IOException{
-		try(DataInputStream in=new DataInputStream(new FileInputStream(file))){
+		try(DataInputStream in=new DataInputStream(new BufferedInputStream(new FileInputStream(file)))){
 			ByteBuffer buf=java.nio.ByteBuffer.allocate(256);
 			CharBuffer cbuf=java.nio.CharBuffer.allocate(256);
 			while(true){
