@@ -21,9 +21,9 @@ import java.util.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class Permutator<T>{
-	private final ArrayList<T> org;
+	private final List<T> org;
 	private int[] curr,spare;
-	public Permutator(ArrayList<T> org){
+	public Permutator(List<T> org){
 		this.org=org;
 		curr=new int[org.size()];
 		spare=new int[org.size()];
@@ -68,12 +68,16 @@ public class Permutator<T>{
 		return Integer.compare(System.identityHashCode(o1),System.identityHashCode(o2));
 	}
 	public static void main(String[] args){
-		ArrayList<Integer> list=new ArrayList<>();
+		ArrayList<String> list=new ArrayList<>();
 		//int n=Integer.valueOf(args[0]);
-		int n=5;
-		for(int i=1;i<=n;i++)
-			list.add(i);
-		Permutator<Integer> p=new Permutator<>(list);
+		Scanner in=new Scanner(System.in);
+		while(in.hasNextLine()){
+			String line=in.nextLine();
+			if(line.isEmpty())
+				break;
+			list.add(line);
+		}
+		Permutator<String> p=new Permutator<>(list);
 		int count=0;
 		while(list!=null){
 			System.out.println(list);
