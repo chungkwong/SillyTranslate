@@ -18,7 +18,6 @@ package com.github.sillytranslate.surrounding;
 import com.github.sillytranslate.lex.SimpleLex;
 import com.github.sillytranslate.lex.StardictDictionary;
 import com.github.sillytranslate.lex.Lex;
-import com.github.sillytranslate.*;
 import com.github.sillytranslate.util.*;
 import java.io.*;
 import java.util.*;
@@ -30,7 +29,7 @@ public class PlainTextFormat implements DocumentFormat{
 	private final CodePointReader in;
 	private final Writer out;
 	public PlainTextFormat(Reader in,Writer out){
-		this.in=new CodePointReader(in,1);
+		this.in=new CodePointReader(in);
 		this.out=out;
 	}
 	@Override

@@ -27,9 +27,9 @@ import javax.swing.text.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class PopupHint extends JPanel implements MouseInputListener,ListSelectionListener{
-	private DefaultListModel<Hint> vec=new DefaultListModel<>();
-	private JEditorPane note=new JEditorPane();
-	private JList<Hint> loc=new JList<Hint>(vec);
+	private final DefaultListModel<Hint> vec=new DefaultListModel<>();
+	private final JEditorPane note=new JEditorPane();
+	private final JList<Hint> loc=new JList<Hint>(vec);
 	private Document doc;
 	private int pos;
 	private Popup popup;

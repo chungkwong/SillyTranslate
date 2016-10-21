@@ -30,7 +30,7 @@ public class SimpleLex implements Lex{
 	private static final int REMARK_START_SYMBOL='(';
 	private static final int REMARK_END_SYMBOL=')';
 	public SimpleLex(Reader in){
-		this.in=new CodePointReader(in,1);
+		this.in=new CodePointReader(in);
 	}
 	@Override
 	public Type tokenType(){

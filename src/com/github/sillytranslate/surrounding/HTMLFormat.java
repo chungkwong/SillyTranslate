@@ -25,7 +25,7 @@ public class HTMLFormat implements DocumentFormat{
 	private final CodePointReader in;
 	private final Writer out;
 	public HTMLFormat(Reader in,Writer out){
-		this.in=new CodePointReader(in,1);
+		this.in=new CodePointReader(in);
 		this.out=out;
 	}
 	@Override

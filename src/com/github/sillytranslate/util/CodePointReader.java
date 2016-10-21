@@ -16,28 +16,34 @@
  */
 package com.github.sillytranslate.util;
 import java.io.*;
+import java.util.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class CodePointReader{
-	private final PushbackReader in;
-	public CodePointReader(Reader in,int size){
-		this.in=new PushbackReader(in,size*2);
+	private final Reader in;
+	private final LinkedList<Integer> buffer;
+	public CodePointReader(Reader in){
+		this.in=in;
+		this.buffer=new LinkedList<>();
 	}
 	public int read() throws IOException{
-		int c=in.read();
-		if(Character.isHighSurrogate((char)c))
-			return Character.toCodePoint((char)c,(char)in.read());
-		else
-			return c;
+		if(buffer.isEmpty()){
+			int c=in.read();
+			if(Character.isHighSurrogate((char)c))
+				return Character.toCodePoint((char)c,(char)in.read());
+			else
+				return c;
+		}else
+			return buffer.poll();
 	}
 	public void unread(int c) throws IOException{
-		if(Character.isSupplementaryCodePoint(c)){
-			in.unread(Character.lowSurrogate(c));
-			in.unread(Character.highSurrogate(c));
-		}else if(c!=-1){
-			in.unread(c);
+		if(c!=-1){
+			buffer.addFirst(c);
 		}
+	}
+	public void unread(List<Integer> cs){
+		buffer.addAll(0,cs);
 	}
 }

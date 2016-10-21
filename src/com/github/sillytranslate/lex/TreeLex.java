@@ -26,7 +26,7 @@ import java.util.logging.*;
 public class TreeLex{
 	private final CodePointReader in;
 	public TreeLex(Reader in){
-		this.in=new CodePointReader(in,1);
+		this.in=new CodePointReader(in);
 	}
 	public String next(){
 		StringBuilder buf=new StringBuilder();
