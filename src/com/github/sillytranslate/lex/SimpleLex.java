@@ -18,81 +18,57 @@ package com.github.sillytranslate.lex;
 import com.github.sillytranslate.util.*;
 import java.io.*;
 import java.util.*;
-import java.util.logging.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class SimpleLex implements Lex{
-	private final CodePointReader in;
-	private Type type;
 	private static final int DOUBLE_QUOTE_SYMBOL='\"';
 	private static final int REMARK_START_SYMBOL='(';
 	private static final int REMARK_END_SYMBOL=')';
+	private static final int FULL_STOP_SYMBOL='.';
+	private final CodePointReader in;
 	public SimpleLex(Reader in){
 		this.in=new CodePointReader(in);
 	}
 	@Override
-	public Type tokenType(){
-		return type;
-	}
-	@Override
-	public String next(){
+	public Token next()throws IOException{
 		StringBuilder buf=new StringBuilder();
 		int c;
-		try{
-			while((c=in.read())!=-1&&Character.isWhitespace(c)){
+		while((c=in.read())!=-1&&Character.isWhitespace(c)){
 
-			}
-			while(c!=-1&&Character.isLetterOrDigit(c)){
-				buf.appendCodePoint(c);
-				c=in.read();
-			}
-			if(buf.length()==0){
-				if(c==REMARK_START_SYMBOL){
-					int lv=1;
-					while((c=in.read())!=-1){
-						if(c==REMARK_START_SYMBOL){
-							++lv;
-						}else if(c==REMARK_END_SYMBOL){
-							--lv;
-							if(lv==0)
-								break;
-						}
-						buf.appendCodePoint(c);
-					}
-					type=Type.REMARK;
-				}else if(c==DOUBLE_QUOTE_SYMBOL){
-					while((c=in.read())!=-1){
-						if(c==DOUBLE_QUOTE_SYMBOL){
-							break;
-						}
-						buf.appendCodePoint(c);
-					}
-					type=type.QUOTE;
-				}else if(c==-1){
-					type=Type.END;
-				}else{
-					buf.appendCodePoint(c);
-					type=Type.MARK;
-				}
-			}else{
-				in.unread(c);
-				type=Type.WORD;
-			}
-		}catch(IOException ex){
-			Logger.getLogger(SimpleLex.class.getName()).log(Level.SEVERE,null,ex);
 		}
-		return buf.toString();
+		while(c!=-1&&Character.isLetterOrDigit(c)){
+			buf.appendCodePoint(c);
+			c=in.read();
+		}
+		if(buf.length()==0){
+			if(c==-1){
+				return null;
+			}else if(c==DOUBLE_QUOTE_SYMBOL){
+				return new Token(Token.Type.QUOTE_TOGGLE,(char)DOUBLE_QUOTE_SYMBOL+"");
+			}else if(c==REMARK_START_SYMBOL){
+				return new Token(Token.Type.REMARK_START,(char)REMARK_START_SYMBOL+"");
+			}else if(c==REMARK_END_SYMBOL){
+				return new Token(Token.Type.REMARK_END,(char)REMARK_END_SYMBOL+"");
+			}else if(c==FULL_STOP_SYMBOL){
+				return new Token(Token.Type.FULL_STOP,(char)FULL_STOP_SYMBOL+"");
+			}else{
+				return new Token(Token.Type.OTHER_MARK,new String(new int[]{c},0,1));
+			}
+		}else{
+			in.unread(c);
+			return new Token(Token.Type.WORD,buf.toString());
+		}
 	}
-	public static void main(String[] args){
+	public static void main(String[] args)throws IOException{
 		Scanner in=new Scanner(System.in);
 		while(in.hasNextLine()){
 			String line=in.nextLine();
 			SimpleLex lex=new SimpleLex(new StringReader(line));
-			String token=lex.next();
-			while(lex.tokenType()!=Lex.Type.END){
-				System.out.println(token+":"+lex.tokenType());
+			Token token=lex.next();
+			while(token!=null){
+				System.out.println(token);
 				token=lex.next();
 			}
 		}

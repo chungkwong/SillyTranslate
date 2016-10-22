@@ -25,15 +25,15 @@ import javax.swing.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class PrefixLex{
+public class PrefixLex implements Lex{
 	private final CodePointReader in;
-	private Lex.Type type;
 	private NavigableDictionary dict;
 	public PrefixLex(Reader in,NavigableDictionary dict){
 		this.in=new CodePointReader(in);
 		this.dict=dict;
 	}
-	public String next() throws IOException{
+	@Override
+	public Token next() throws IOException{
 		StringBuilder buf=new StringBuilder();
 		int c;
 		String last=null;
@@ -51,11 +51,14 @@ public class PrefixLex{
 		if(buf.length()==0)
 			return null;
 		else{
-			if(last==null)
+			Token.Type type=Token.Type.WORD;
+			if(last==null){
 				last=new String(new int[]{buf.codePointAt(0)},0,1);
+				type=Token.Type.OTHER_MARK;
+			}
 			String curr=buf.toString().substring(last.length());
 			in.unread(curr.codePoints().mapToObj((i)->i).collect(Collectors.toList()));
-			return last;
+			return new Token(Token.Type.WORD,last);
 		}
 	}
 	public static void main(String[] args) throws IOException{
@@ -75,10 +78,12 @@ public class PrefixLex{
 		in.addActionListener((e)->{
 			out.removeAll();
 			PrefixLex lex=new PrefixLex(new StringReader(in.getText()),zhDict);
-			String word;
+			Token word;
 			try{
 				while((word=lex.next())!=null){
-					out.add(new JButton(word));
+					JButton b=new JButton(word.getText());
+					b.setToolTipText(word.getType().toString());
+					out.add(b);
 				}
 				out.invalidate();
 				f.revalidate();

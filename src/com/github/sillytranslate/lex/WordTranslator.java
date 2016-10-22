@@ -18,6 +18,7 @@ package com.github.sillytranslate.lex;
 import com.github.sillytranslate.ui.*;
 import java.io.*;
 import java.util.*;
+import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.text.*;
 /**
@@ -49,20 +50,24 @@ public class WordTranslator extends JPanel{
 		next();
 	}
 	private void next(){
-		String token=lex.next();
-		buf.append(currOut.getText());
-		if(lex.tokenType()==Lex.Type.END){
-			field.setText(buf.toString());
-			field.setEditable(true);
-			begin.setEnabled(true);
-			lex=null;
-			buf=null;
-			currOut.setText("");
-			currOut.removeActionListener(currOut.getActionListeners()[0]);
-		}else{
-			currIn.setText(token);
-			currOut.setText("");
-			currOut.requestFocusInWindow();
+		try{
+			Token token=lex.next();
+			buf.append(currOut.getText());
+			if(token==null){
+				field.setText(buf.toString());
+				field.setEditable(true);
+				begin.setEnabled(true);
+				lex=null;
+				buf=null;
+				currOut.setText("");
+				currOut.removeActionListener(currOut.getActionListeners()[0]);
+			}else{
+				currIn.setText(token.getText());
+				currOut.setText("");
+				currOut.requestFocusInWindow();
+			}
+		}catch(IOException ex){
+			Logger.getLogger(WordTranslator.class.getName()).log(Level.SEVERE,null,ex);
 		}
 	}
 	public static void main(String[] args) throws IOException{

@@ -36,10 +36,10 @@ public class PrefixLexTest{
 	}
 	private static void assertSplit(NavigableDictionary dict,String sentence,String... words) throws IOException{
 		PrefixLex lex=new PrefixLex(new StringReader(sentence),dict);
-		String word;
+		Token word;
 		ArrayList<String> result=new ArrayList<>();
 		while((word=lex.next())!=null)
-			result.add(word);
+			result.add(word.getText());
 		Assert.assertArrayEquals(result.toArray(),words);
 	}
 }

@@ -17,53 +17,75 @@
 package com.github.sillytranslate.lex;
 import java.awt.*;
 import java.io.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.*;
 import java.util.logging.*;
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.text.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class LexEditor extends JPanel{
-	private final SimpleLex lex;
+	private final Lex lex;
 	private final JTextArea pane=new JTextArea();
 	private final JButton ok=new JButton("OK");
-	public LexEditor(SimpleLex lex,Consumer<List<String>> consumer){
+	private final TreeMap<Integer,Token> tokens=new TreeMap<>();
+	public LexEditor(Lex lex,Consumer<List<String>> consumer){
 		super(new BorderLayout());
 		this.lex=lex;
+		pane.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(DocumentEvent e){
+
+			}
+			@Override
+			public void removeUpdate(DocumentEvent e){
+				Document doc=e.getDocument();
+				if(e.getLength()==1){
+					System.out.println(tokens.get(e.getOffset()));
+				}
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e){
+
+			}
+		});
 		add(pane,BorderLayout.CENTER);
-		ok.addActionListener((e)->{consumer.accept(Arrays.asList(pane.getText().split("\\n")));nextSentence();});
+		ok.addActionListener((e)->{consumer.accept(Arrays.asList(pane.getText().split(" ")));});
 		add(ok,BorderLayout.SOUTH);
 		nextSentence();
 	}
-	private static final Highlighter.HighlightPainter WORD_PAINTER=new DefaultHighlighter.DefaultHighlightPainter(Color.GREEN);
-	private static final Highlighter.HighlightPainter REMARK_PAINTER=new DefaultHighlighter.DefaultHighlightPainter(Color.RED);
-	private static final Highlighter.HighlightPainter MARK_PAINTER=new DefaultHighlighter.DefaultHighlightPainter(Color.BLUE);
-	public void nextSentence(){
-		String next=lex.next();
-		Lex.Type type=lex.tokenType();
-		StringBuilder buf=new StringBuilder();
-		while(type!=Lex.Type.END){
-			pane.append(next+"\n");
-			if(type==Lex.Type.WORD)
+	private static HashMap<Token.Type,Highlighter.HighlightPainter> PAINTER=new HashMap<>();
+	static{
+		for(Token.Type type:Token.Type.values()){
+			PAINTER.put(type,new DefaultHighlighter.DefaultHighlightPainter(type.getColor()));
+		}
+	}
+	private void nextSentence(){
+		try{
+			Token next=lex.next();
+			while(next!=null){
+				int pos=pane.getText().length();
+				pane.append(next.getText()+" ");
+				Token.Type type=next.getType();
+				tokens.put(pos,next);
 				try{
-					pane.getHighlighter().addHighlight(pane.getText().length()-next.length()-1,pane.getText().length()-1,WORD_PAINTER);
+					pane.getHighlighter().addHighlight(pos,pos+next.getText().length(),PAINTER.get(next.getType()));
 				}catch(BadLocationException ex){
 					Logger.getLogger(LexEditor.class.getName()).log(Level.SEVERE,null,ex);
 				}
-			//buf.append(next).append('\n');
-			if(type==Lex.Type.MARK)
-				break;
-			next=lex.next();
-			type=lex.tokenType();
-
+				//buf.append(next).append('\n');
+				next=lex.next();
+			}
+			//pane.setText(buf.toString());
+			//if(buf.length()==0)
+			//	ok.setEnabled(false);
+		}catch(IOException ex){
+			Logger.getLogger(LexEditor.class.getName()).log(Level.SEVERE,null,ex);
 		}
-		//pane.setText(buf.toString());
-		//if(buf.length()==0)
-		//	ok.setEnabled(false);
 	}
 	public static void main(String[] args){
 		JFrame f=new JFrame("Lex editor");

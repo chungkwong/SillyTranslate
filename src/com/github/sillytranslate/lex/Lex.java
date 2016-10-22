@@ -15,12 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.sillytranslate.lex;
+import java.io.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public interface Lex{
-	enum Type{WORD,QUOTE,REMARK,MARK,FORMULA,END};
-	Type tokenType();
-	String next();
+	Token next()throws IOException;
 }

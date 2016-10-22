@@ -15,9 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.sillytranslate.surrounding;
-import com.github.sillytranslate.lex.SimpleLex;
-import com.github.sillytranslate.lex.StardictDictionary;
-import com.github.sillytranslate.lex.Lex;
+import com.github.sillytranslate.lex.*;
 import com.github.sillytranslate.util.*;
 import java.io.*;
 import java.util.*;
@@ -75,9 +73,9 @@ public class PlainTextFormat implements DocumentFormat{
 			//System.out.println("Please translate"+str);
 			//t.insertTranslation(in.nextLine());
 			SimpleLex lex=new SimpleLex(new StringReader(str));
-			String token=lex.next();
-			while(lex.tokenType()!=Lex.Type.END){
-				System.out.println(lex.tokenType()+":"+token+"-"+d.getMeaning(token));
+			Token token=lex.next();
+			while(lex!=null){
+				System.out.println(token+"-"+d.getMeaning(token.getText()));
 				token=lex.next();
 			}
 		}
