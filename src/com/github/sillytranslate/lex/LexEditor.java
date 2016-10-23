@@ -36,27 +36,24 @@ public class LexEditor extends JPanel{
 	public LexEditor(Lex lex,Consumer<List<String>> consumer){
 		super(new BorderLayout());
 		this.lex=lex;
-		pane.getDocument().addDocumentListener(new DocumentListener() {
-			@Override
-			public void insertUpdate(DocumentEvent e){
-
-			}
-			@Override
-			public void removeUpdate(DocumentEvent e){
-				Document doc=e.getDocument();
-				if(e.getLength()==1){
-					System.out.println(tokens.get(e.getOffset()));
-				}
-			}
-			@Override
-			public void changedUpdate(DocumentEvent e){
-
-			}
-		});
 		add(pane,BorderLayout.CENTER);
 		ok.addActionListener((e)->{consumer.accept(Arrays.asList(pane.getText().split(" ")));});
 		add(ok,BorderLayout.SOUTH);
-		nextSentence();
+		nextSentence();pane.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void insertUpdate(DocumentEvent e){
+				insertRange(e.getOffset(),e.getLength());
+			}
+			@Override
+			public void removeUpdate(DocumentEvent e){
+				removeRange(e.getOffset(),e.getLength());
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e){
+				//removeUpdate(e);
+				//insertUpdate(e);
+			}
+		});
 	}
 	private static HashMap<Token.Type,Highlighter.HighlightPainter> PAINTER=new HashMap<>();
 	static{
@@ -70,22 +67,101 @@ public class LexEditor extends JPanel{
 			while(next!=null){
 				int pos=pane.getText().length();
 				pane.append(next.getText()+" ");
-				Token.Type type=next.getType();
 				tokens.put(pos,next);
-				try{
-					pane.getHighlighter().addHighlight(pos,pos+next.getText().length(),PAINTER.get(next.getType()));
-				}catch(BadLocationException ex){
-					Logger.getLogger(LexEditor.class.getName()).log(Level.SEVERE,null,ex);
-				}
-				//buf.append(next).append('\n');
 				next=lex.next();
 			}
+			correctHighlight();
 			//pane.setText(buf.toString());
 			//if(buf.length()==0)
 			//	ok.setEnabled(false);
 		}catch(IOException ex){
 			Logger.getLogger(LexEditor.class.getName()).log(Level.SEVERE,null,ex);
 		}
+	}
+	private void correctHighlight(){
+		tokens.forEach((pos,val)->{
+			try{
+				pane.getHighlighter().addHighlight(pos,pos+val.getText().length(),PAINTER.get(val.getType()));
+			}catch(BadLocationException ex){
+				Logger.getLogger(LexEditor.class.getName()).log(Level.SEVERE,null,ex);
+			}
+		});
+	}
+	private void insertRange(int begin,int size){
+		Document doc=pane.getDocument();
+		int end=begin+size;
+		Integer pos=tokens.lastKey();
+		while(pos!=null&&pos>begin){
+			tokens.put(pos+size,tokens.remove(pos));
+			pos=tokens.lowerKey(pos);
+		}
+		try{
+			String raw=doc.getText(begin,size);
+			int i=0;
+			String left="";
+			if(pos!=null&&pos<begin){
+				if(!raw.isEmpty()){
+					i=raw.indexOf(' ');
+					if(i==-1)
+						i=raw.length();
+					left=tokens.get(pos).getText().substring(Math.min(begin-pos,tokens.get(pos).getText().length()));
+					tokens.put(pos,new Token(Token.Type.WORD,tokens.get(pos).getText().substring(0,begin-pos)+raw.substring(0,i)));
+				}
+			}
+			for(;i<raw.length();i++){
+				if(raw.charAt(i)!=' '){
+					int to=raw.indexOf(' ',i);
+					if(to==-1)
+						to=raw.length();
+					tokens.put(i+begin,new Token(Token.Type.WORD,raw.substring(i,to)));
+					i=to;
+				}
+			}
+			if(!left.isEmpty()){
+				if(raw.endsWith(" ")){
+					tokens.put(end,new Token(Token.Type.WORD,left));
+				}else{
+					pos=tokens.lowerKey(end);
+					tokens.put(pos,new Token(Token.Type.WORD,tokens.get(pos).getText()+left));
+				}
+			}
+		}catch(BadLocationException ex){
+			Logger.getLogger(LexEditor.class.getName()).log(Level.SEVERE,null,ex);
+		}
+		System.out.println(tokens);
+		correctHighlight();
+	}
+	private void removeRange(int begin,int size){
+		Document doc=pane.getDocument();
+		int end=begin+size;
+		Integer pos=tokens.floorKey(begin);
+		if(pos!=null){
+			Token token=tokens.get(pos);
+			String text=token.getText().substring(0,begin-pos)+token.getText().substring(Math.min(end-pos,token.getText().length()));
+			if(text.isEmpty())
+				tokens.remove(pos);
+			else
+				tokens.put(pos,new Token(token.getType(),text));
+			pos=tokens.higherKey(pos);
+		}
+		while(pos!=null&&pos+tokens.get(pos).getText().length()<=end){
+			tokens.remove(pos);
+			pos=tokens.higherKey(pos);
+		}
+		if(pos!=null&&end>=pos){
+			Integer prev=tokens.lowerKey(pos);
+			if(prev!=null){
+				Token t=tokens.get(prev);
+				tokens.put(prev,new Token(t.getType(),t.getText()+tokens.get(pos).getText().substring(end-pos)));
+				tokens.remove(pos);
+				pos=tokens.higherKey(pos);
+			}
+		}
+		while(pos!=null){
+			tokens.put(pos-size,tokens.remove(pos));
+			pos=tokens.higherKey(pos);
+		}
+		correctHighlight();
 	}
 	public static void main(String[] args){
 		JFrame f=new JFrame("Lex editor");
