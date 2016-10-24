@@ -16,9 +16,7 @@
  */
 package com.github.sillytranslate.lex;
 import com.github.sillytranslate.ui.*;
-import java.io.*;
 import java.util.*;
-import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.text.*;
 /**
@@ -26,57 +24,39 @@ import javax.swing.text.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class WordTranslator extends JPanel{
-	private final JTextField field=new JTextField();
-	private final JButton begin=new JButton("start");
 	private final JLabel currIn=new JLabel();
 	private final JTextField currOut=new JTextField();
-	private Lex lex;
-	private StringBuilder buf;
-	public WordTranslator(NavigableDictionary dict){
+	private Iterator<Token> iter;
+	private StringBuilder buf=new StringBuilder();
+	public WordTranslator(NavigableDictionary dict,Iterator<Token> iter){
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-		add(field);
-		add(begin);
-		begin.addActionListener((e)->begin());
 		add(currIn);
 		new AutoCompleteSupport(currOut,new DictionaryHintProvider(dict));
-		add(currOut);
-	}
-	private void begin(){
-		field.setEditable(false);
-		begin.setEnabled(false);
-		lex=new SimpleLex(new StringReader(field.getText()));
-		buf=new StringBuilder();
 		currOut.addActionListener((e)->next());
+		add(currOut);
+		this.iter=iter;
 		next();
 	}
 	private void next(){
-		try{
-			Token token=lex.next();
-			buf.append(currOut.getText());
-			if(token==null){
-				field.setText(buf.toString());
-				field.setEditable(true);
-				begin.setEnabled(true);
-				lex=null;
-				buf=null;
-				currOut.setText("");
-				currOut.removeActionListener(currOut.getActionListeners()[0]);
-			}else{
-				currIn.setText(token.getText());
-				currOut.setText("");
-				currOut.requestFocusInWindow();
-			}
-		}catch(IOException ex){
-			Logger.getLogger(WordTranslator.class.getName()).log(Level.SEVERE,null,ex);
+		buf.append(currOut.getText());
+		if(iter.hasNext()){
+			currIn.setText(iter.next().getText());
+			currOut.setText("");
+			currOut.requestFocusInWindow();
+		}else{
+			iter=null;
+			currOut.setText(buf.toString());
+			buf=null;
+			currOut.setEnabled(false);
 		}
 	}
-	public static void main(String[] args) throws IOException{
+	/*public static void main(String[] args) throws IOException{
 		JFrame f=new JFrame("Translator");
 		f.add(new WordTranslator(new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2"))));
 		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
-	}
+	}*/
 	class DictionaryHintProvider implements HintProvider{
 		private final NavigableDictionary dict;
 		public DictionaryHintProvider(NavigableDictionary dict){
@@ -96,7 +76,7 @@ public class WordTranslator extends JPanel{
 			ArrayList<Hint> hints=new ArrayList<>();
 			int prefixLen=prefix.length();
 			for(String mean:text.split("[\\p{ASCII}]+")){
-				if(mean.startsWith(prefix))
+				if(mean.startsWith(prefix)&&!mean.isEmpty())
 					hints.add(new SimpleHint(mean,mean.substring(prefixLen),null,""));
 			}
 			String org=currIn.getText();

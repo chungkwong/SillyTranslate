@@ -15,12 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.sillytranslate.lex;
+import com.github.sillytranslate.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
 import java.util.List;
 import java.util.*;
 import java.util.function.*;
 import java.util.logging.*;
+import java.util.stream.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
@@ -28,18 +31,21 @@ import javax.swing.text.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class LexEditor extends JPanel{
+public class LexEditor extends JPanel implements ActionListener,TranslatorStage<Lex,List<Token>>{
 	private final Lex lex;
 	private final JTextArea pane=new JTextArea();
 	private final JButton ok=new JButton("OK");
 	private final TreeMap<Integer,Token> tokens=new TreeMap<>();
-	public LexEditor(Lex lex,Consumer<List<String>> consumer){
+	private final JPopupMenu menu=new JPopupMenu();
+	private Consumer<List<Token>> consumer;
+	public LexEditor(Lex lex,Consumer<List<Token>> consumer){
 		super(new BorderLayout());
 		this.lex=lex;
 		add(pane,BorderLayout.CENTER);
-		ok.addActionListener((e)->{consumer.accept(Arrays.asList(pane.getText().split(" ")));});
+		ok.addActionListener((e)->{consumer.accept(tokens.values().stream().collect(Collectors.toList()));});
 		add(ok,BorderLayout.SOUTH);
-		nextSentence();pane.getDocument().addDocumentListener(new DocumentListener() {
+		nextSentence();
+		pane.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e){
 				insertRange(e.getOffset(),e.getLength());
@@ -54,6 +60,19 @@ public class LexEditor extends JPanel{
 				//insertUpdate(e);
 			}
 		});
+		for(Token.Type type:Token.Type.values()){
+			JMenuItem item=new JMenuItem(type.toString());
+			item.setActionCommand(type.name());
+			item.addActionListener(this);
+			menu.add(item);
+		}
+		pane.setComponentPopupMenu(menu);
+	}
+	@Override
+	public JComponent accept(Lex source,Consumer<List<Token>> callback){
+		this.consumer=callback;
+
+		return this;
 	}
 	private static HashMap<Token.Type,Highlighter.HighlightPainter> PAINTER=new HashMap<>();
 	static{
@@ -71,14 +90,12 @@ public class LexEditor extends JPanel{
 				next=lex.next();
 			}
 			correctHighlight();
-			//pane.setText(buf.toString());
-			//if(buf.length()==0)
-			//	ok.setEnabled(false);
 		}catch(IOException ex){
 			Logger.getLogger(LexEditor.class.getName()).log(Level.SEVERE,null,ex);
 		}
 	}
 	private void correctHighlight(){
+		pane.getHighlighter().removeAllHighlights();
 		tokens.forEach((pos,val)->{
 			try{
 				pane.getHighlighter().addHighlight(pos,pos+val.getText().length(),PAINTER.get(val.getType()));
@@ -99,13 +116,15 @@ public class LexEditor extends JPanel{
 			String raw=doc.getText(begin,size);
 			int i=0;
 			String left="";
-			if(pos!=null&&pos<begin){
-				if(!raw.isEmpty()){
+			if(pos!=null&&pos+tokens.get(pos).getText().length()>=begin){
+				if(pos<begin){
 					i=raw.indexOf(' ');
 					if(i==-1)
 						i=raw.length();
 					left=tokens.get(pos).getText().substring(Math.min(begin-pos,tokens.get(pos).getText().length()));
 					tokens.put(pos,new Token(Token.Type.WORD,tokens.get(pos).getText().substring(0,begin-pos)+raw.substring(0,i)));
+				}else{
+					left=tokens.remove(pos).getText();
 				}
 			}
 			for(;i<raw.length();i++){
@@ -118,17 +137,16 @@ public class LexEditor extends JPanel{
 				}
 			}
 			if(!left.isEmpty()){
-				if(raw.endsWith(" ")){
-					tokens.put(end,new Token(Token.Type.WORD,left));
-				}else{
-					pos=tokens.lowerKey(end);
+				pos=tokens.lowerKey(end);
+				if(pos!=null&&pos+tokens.get(pos).getText().length()==end){
 					tokens.put(pos,new Token(Token.Type.WORD,tokens.get(pos).getText()+left));
+				}else{
+					tokens.put(end,new Token(Token.Type.WORD,left));
 				}
 			}
 		}catch(BadLocationException ex){
 			Logger.getLogger(LexEditor.class.getName()).log(Level.SEVERE,null,ex);
 		}
-		System.out.println(tokens);
 		correctHighlight();
 	}
 	private void removeRange(int begin,int size){
@@ -169,5 +187,16 @@ public class LexEditor extends JPanel{
 		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
+	}
+	@Override
+	public void actionPerformed(ActionEvent e){
+		Map.Entry<Integer,Token> entry=tokens.floorEntry(pane.getCaretPosition());
+		if(entry!=null){
+			int start=entry.getKey();
+			String text=entry.getValue().getText();
+			Token.Type type=Token.Type.valueOf(e.getActionCommand());
+			tokens.put(start,new Token(type,text));
+			correctHighlight();
+		}
 	}
 }

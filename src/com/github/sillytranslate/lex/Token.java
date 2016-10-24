@@ -36,7 +36,7 @@ public class Token{
 		private final Color color;
 		private Type(String name,Color color){
 			this.name=name;
-			this.color=color;
+			this.color=new Color(color.getRed(),color.getGreen(),color.getBlue(),128);
 		}
 		public Color getColor(){
 			return color;

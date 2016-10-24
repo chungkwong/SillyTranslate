@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.sillytranslate;
+import com.github.sillytranslate.lex.*;
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
@@ -23,19 +24,28 @@ import javax.swing.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class Translator extends JPanel{
-	public Translator(){
+
+	public Translator(NavigableDictionary dict){
 		setLayout(new BorderLayout());
-		JSplitPane contentPanel=new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		JTextArea from=new JTextArea();
-		JTextArea to=new JTextArea();
-		contentPanel.setLeftComponent(new JScrollPane(from));
-		contentPanel.setRightComponent(new JScrollPane(to));
-		add(contentPanel,BorderLayout.CENTER);
+		JButton ok=new JButton("Start");
+		add(new JScrollPane(from),BorderLayout.CENTER);
+		add(ok,BorderLayout.SOUTH);
+		ok.addActionListener((e)->{
+			removeAll();
+			add(new LexEditor(new SimpleLex(new StringReader(from.getText())),(l)->{
+				removeAll();
+				WordTranslator translator=new WordTranslator(dict,l.iterator());
+				add(translator,BorderLayout.CENTER);
+				validate();
+			}),BorderLayout.CENTER);
+			validate();
+		});
 
 	}
 	public static void main(String[] args) throws IOException {
 		JFrame f=new JFrame("Translator");
-		f.add(new Translator());
+		f.add(new Translator(new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2"))));
 		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);

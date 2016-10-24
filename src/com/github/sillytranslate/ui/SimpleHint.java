@@ -51,4 +51,9 @@ public class SimpleHint implements Hint{
 	public Icon getIcon(){
 		return icon;
 	}
+	@Override
+	public String toString(){
+		return display+"("+input+"):"+document;
+	}
+
 }
