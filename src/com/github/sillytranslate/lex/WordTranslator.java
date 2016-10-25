@@ -15,44 +15,58 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.sillytranslate.lex;
+import com.github.sillytranslate.*;
 import com.github.sillytranslate.ui.*;
 import java.util.*;
+import java.util.function.*;
 import javax.swing.*;
 import javax.swing.text.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class WordTranslator extends JPanel{
+public class WordTranslator extends JPanel implements TranslatorStage<Iterator<Token>,Iterator<Token>>{
 	private final JLabel currIn=new JLabel();
 	private final JTextField currOut=new JTextField();
+	private List<Token> buf;
 	private Iterator<Token> iter;
-	private StringBuilder buf=new StringBuilder();
-	public WordTranslator(NavigableDictionary dict,Iterator<Token> iter){
+	private Token curr;
+	private Consumer<Iterator<Token>> callback;
+	public WordTranslator(NavigableDictionary dict){
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		currIn.setFocusable(false);
 		add(currIn);
 		new AutoCompleteSupport(currOut,new DictionaryHintProvider(dict));
 		currOut.addActionListener((e)->next());
 		add(currOut);
-		this.iter=iter;
-		next();
 	}
 	private void next(){
-		buf.append(currOut.getText());
+		if(curr!=null)
+			buf.add(new Token(curr.getType(),currOut.getText()));
 		if(iter.hasNext()){
-			currIn.setText(iter.next().getText());
+			curr=iter.next();
+			currIn.setText(curr.getText());
 			currOut.setText("");
-			currOut.requestFocusInWindow();
 		}else{
 			iter=null;
-			currOut.setText(buf.toString());
+			curr=null;
+			callback.accept(buf.iterator());
 			buf=null;
-			currOut.setEnabled(false);
+			callback=null;
 		}
+	}
+	@Override
+	public JComponent accept(Iterator<Token> source,Consumer<Iterator<Token>> callback){
+		this.iter=source;
+		this.callback=callback;
+		buf=new ArrayList<>();
+		next();
+		return this;
 	}
 	/*public static void main(String[] args) throws IOException{
 		JFrame f=new JFrame("Translator");
-		f.add(new WordTranslator(new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2"))));
+		WordTranslator translator=new WordTranslator(new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2")));
+		f.add(translator);
 		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);

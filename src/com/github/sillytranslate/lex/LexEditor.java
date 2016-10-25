@@ -19,7 +19,6 @@ import com.github.sillytranslate.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.util.List;
 import java.util.*;
 import java.util.function.*;
 import java.util.logging.*;
@@ -31,35 +30,18 @@ import javax.swing.text.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class LexEditor extends JPanel implements ActionListener,TranslatorStage<Lex,List<Token>>{
-	private final Lex lex;
+public class LexEditor extends JPanel implements ActionListener,DocumentListener,TranslatorStage<Lex,Iterator<Token>>{
 	private final JTextArea pane=new JTextArea();
 	private final JButton ok=new JButton("OK");
 	private final TreeMap<Integer,Token> tokens=new TreeMap<>();
 	private final JPopupMenu menu=new JPopupMenu();
-	private Consumer<List<Token>> consumer;
-	public LexEditor(Lex lex,Consumer<List<Token>> consumer){
+	private Consumer<Iterator<Token>> consumer;
+	public LexEditor(){
 		super(new BorderLayout());
-		this.lex=lex;
 		add(pane,BorderLayout.CENTER);
-		ok.addActionListener((e)->{consumer.accept(tokens.values().stream().collect(Collectors.toList()));});
+		ok.addActionListener((e)->{consumer.accept(tokens.values().stream().collect(Collectors.toList()).iterator());});
 		add(ok,BorderLayout.SOUTH);
-		nextSentence();
-		pane.getDocument().addDocumentListener(new DocumentListener() {
-			@Override
-			public void insertUpdate(DocumentEvent e){
-				insertRange(e.getOffset(),e.getLength());
-			}
-			@Override
-			public void removeUpdate(DocumentEvent e){
-				removeRange(e.getOffset(),e.getLength());
-			}
-			@Override
-			public void changedUpdate(DocumentEvent e){
-				//removeUpdate(e);
-				//insertUpdate(e);
-			}
-		});
+		pane.getDocument().addDocumentListener(this);
 		for(Token.Type type:Token.Type.values()){
 			JMenuItem item=new JMenuItem(type.toString());
 			item.setActionCommand(type.name());
@@ -69,29 +51,28 @@ public class LexEditor extends JPanel implements ActionListener,TranslatorStage<
 		pane.setComponentPopupMenu(menu);
 	}
 	@Override
-	public JComponent accept(Lex source,Consumer<List<Token>> callback){
+	public JComponent accept(Lex source,Consumer<Iterator<Token>> callback){
 		this.consumer=callback;
-
+		pane.getDocument().removeDocumentListener(this);
+		try{
+			Token next=source.next();
+			while(next!=null){
+				int pos=pane.getText().length();
+				pane.append(next.getText()+" ");
+				tokens.put(pos,next);
+				next=source.next();
+			}
+			correctHighlight();
+		}catch(IOException ex){
+			Logger.getLogger(LexEditor.class.getName()).log(Level.SEVERE,null,ex);
+		}
+		pane.getDocument().addDocumentListener(this);
 		return this;
 	}
 	private static HashMap<Token.Type,Highlighter.HighlightPainter> PAINTER=new HashMap<>();
 	static{
 		for(Token.Type type:Token.Type.values()){
 			PAINTER.put(type,new DefaultHighlighter.DefaultHighlightPainter(type.getColor()));
-		}
-	}
-	private void nextSentence(){
-		try{
-			Token next=lex.next();
-			while(next!=null){
-				int pos=pane.getText().length();
-				pane.append(next.getText()+" ");
-				tokens.put(pos,next);
-				next=lex.next();
-			}
-			correctHighlight();
-		}catch(IOException ex){
-			Logger.getLogger(LexEditor.class.getName()).log(Level.SEVERE,null,ex);
 		}
 	}
 	private void correctHighlight(){
@@ -181,13 +162,13 @@ public class LexEditor extends JPanel implements ActionListener,TranslatorStage<
 		}
 		correctHighlight();
 	}
-	public static void main(String[] args){
+	/*public static void main(String[] args){
 		JFrame f=new JFrame("Lex editor");
 		f.add(new LexEditor(new SimpleLex(new StringReader(JOptionPane.showInputDialog(""))),(o)->System.out.println(o)));
 		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
-	}
+	}*/
 	@Override
 	public void actionPerformed(ActionEvent e){
 		Map.Entry<Integer,Token> entry=tokens.floorEntry(pane.getCaretPosition());
@@ -198,5 +179,18 @@ public class LexEditor extends JPanel implements ActionListener,TranslatorStage<
 			tokens.put(start,new Token(type,text));
 			correctHighlight();
 		}
+	}
+	@Override
+	public void insertUpdate(DocumentEvent e){
+		insertRange(e.getOffset(),e.getLength());
+	}
+	@Override
+	public void removeUpdate(DocumentEvent e){
+		removeRange(e.getOffset(),e.getLength());
+	}
+	@Override
+	public void changedUpdate(DocumentEvent e){
+		//removeUpdate(e);
+		//insertUpdate(e);
 	}
 }

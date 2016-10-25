@@ -15,11 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.sillytranslate.sentence;
+import com.github.sillytranslate.lex.*;
 import java.util.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public interface SentenceTranslatorEngine{
-	List<String> getTranslation(List<String> words);
+	List<String> getTranslation(List<Token> words);
 }

@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.sillytranslate.sentence;
+import com.github.sillytranslate.lex.*;
 import com.github.sillytranslate.util.*;
 import java.util.*;
 import java.util.stream.*;
@@ -24,12 +25,12 @@ import java.util.stream.*;
  */
 public class NaiveTranslator implements SentenceTranslatorEngine{
 	@Override
-	public List<String> getTranslation(List<String> words){
+	public List<String> getTranslation(List<Token> words){
 		List<String> list=new ArrayList<>();
-		Permutator<String> perm=new Permutator<>(words);
-		List<String> p=words;
+		Permutator<Token> perm=new Permutator<>(words);
+		List<Token> p=words;
 		while(p!=null){
-			list.add(p.stream().collect(Collectors.joining()));
+			list.add(p.stream().map((t)->t.getText()).collect(Collectors.joining()));
 			p=perm.nextPermutation();
 		}
 		return list;

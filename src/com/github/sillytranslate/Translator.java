@@ -16,32 +16,43 @@
  */
 package com.github.sillytranslate;
 import com.github.sillytranslate.lex.*;
+import com.github.sillytranslate.sentence.*;
 import java.awt.*;
 import java.io.*;
+import java.util.function.*;
+import javax.swing.FocusManager;
 import javax.swing.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class Translator extends JPanel{
-
+	private InputPanel in;
+	private final TranslatorStage[] translators;
 	public Translator(NavigableDictionary dict){
+		FocusManager.getCurrentManager().addPropertyChangeListener((e)->{System.out.println(e.toString());});
 		setLayout(new BorderLayout());
-		JTextArea from=new JTextArea();
-		JButton ok=new JButton("Start");
-		add(new JScrollPane(from),BorderLayout.CENTER);
-		add(ok,BorderLayout.SOUTH);
-		ok.addActionListener((e)->{
+		translators=new TranslatorStage[]{
+			new LexEditor(),new WordTranslator(dict),new SentenceTranslatorView(new NaiveTranslator()),new OutputPanel()
+		};
+		in=new InputPanel((text)->{
 			removeAll();
-			add(new LexEditor(new SimpleLex(new StringReader(from.getText())),(l)->{
-				removeAll();
-				WordTranslator translator=new WordTranslator(dict,l.iterator());
-				add(translator,BorderLayout.CENTER);
-				validate();
-			}),BorderLayout.CENTER);
+			add(translators[0].accept(new SimpleLex(new StringReader(text)),bind(1)));
 			validate();
+			getComponent(0).requestFocusInWindow();
 		});
-
+		add(in,BorderLayout.CENTER);
+	}
+	private <T> Consumer<T> bind(int i){
+		return (t)->{
+			removeAll();
+			if(i+1<translators.length)
+				add(translators[i].accept(t,bind(i+1)),BorderLayout.CENTER);
+			else
+				add(translators[i].accept(t,null),BorderLayout.CENTER);
+			validate();
+			getComponent(0).requestFocusInWindow();
+		};
 	}
 	public static void main(String[] args) throws IOException {
 		JFrame f=new JFrame("Translator");
@@ -49,5 +60,27 @@ public class Translator extends JPanel{
 		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
+	}
+}
+class InputPanel extends JPanel{
+	public InputPanel(Consumer<String> consumer){
+		setLayout(new BorderLayout());
+		JTextArea from=new JTextArea();
+		add(new JScrollPane(from),BorderLayout.CENTER);
+		JButton ok=new JButton("Start");
+		ok.addActionListener((e)->consumer.accept(from.getText()));
+		add(ok,BorderLayout.SOUTH);
+	}
+}
+class OutputPanel extends JPanel implements TranslatorStage<String,String>{
+	private JTextArea to=new JTextArea();
+	public OutputPanel(){
+		setLayout(new BorderLayout());
+		add(new JScrollPane(to),BorderLayout.CENTER);
+	}
+	@Override
+	public JComponent accept(String source,Consumer<String> callback){
+		to.setText(source);
+		return this;
 	}
 }
