@@ -22,53 +22,54 @@ import java.util.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class WordMemory{
-	private final HashMap<String,TreeSet<Meaning>> map=new HashMap<>();
-
-	public static WordMemory createWordMemory(InputStream in){
+	private final HashMap<String,List<Meaning>> map=new HashMap<>();
+	public void registerMeanings(String word,List<Meaning> meanings){
+		map.put(word,meanings);
+	}
+	public List<Meaning> getMeanings(String word){
+		return map.get(word);
+	}
+	public static WordMemory loadWordMemory(InputStream in){
 		WordMemory memory=new WordMemory();
-		Scanner sc=new Scanner(in,"UTF-8");
-		while(sc.hasNextLine()){
-			String word=sc.next();
-			TreeSet<Meaning> meanings=new TreeSet<>();
-			while(sc.hasNext()){
-				meanings.add(new Meaning(sc.next(),sc.nextInt(),sc.next()));
-				if(sc.next().equals("e"))
-					break;
+		DataInputStream sc=new DataInputStream(in);
+		try{
+			while(true){
+				String word=sc.readUTF();
+				List<Meaning> meanings=new ArrayList<>();
+				while(sc.readBoolean()){
+					meanings.add(new Meaning(sc.readUTF(),sc.readUTF(),sc.readInt()));
+				}
+				memory.map.put(word,meanings);
 			}
-			memory.map.put(word,meanings);
+		}catch(IOException ex){
+
 		}
 		return memory;
 	}
 	public void saveTo(OutputStream out) throws UnsupportedEncodingException,IOException{
-		BufferedWriter to=new BufferedWriter(new OutputStreamWriter(out,"UTF-8"));
-		for(Map.Entry<String,TreeSet<Meaning>> entry:map.entrySet()){
-			to.write(entry.getKey());
-			to.newLine();
-			for(Meaning m:entry.getValue()){
-				to.write(m.text);
-				to.write("\t");
-				to.write(m.text);
-				to.write("\t");
-				to.write(m.text);
-				to.write("\t");
-				to.write(c);
-				to.newLine();
-			}
+		DataOutputStream to=new DataOutputStream(out);
+		for(Map.Entry<String,List<Meaning>> entry:map.entrySet()){
+			to.writeUTF(entry.getKey());
+			for(Meaning m:entry.getValue())
+				if(m.getCount()>0){
+					to.writeBoolean(true);
+					to.writeUTF(m.getText());
+					to.writeUTF(m.getTag());
+					to.writeInt(m.getCount());
+				}
+			to.writeBoolean(false);
 		}
 		to.flush();
 	}
-	static class Meaning implements Comparable<Meaning>{
-		private String text;
-		private int count;
-		private String tag;
-		public Meaning(String text,int count,String tag){
-			this.text=text;
-			this.count=count;
-			this.tag=tag;
-		}
-		@Override
-		public int compareTo(Meaning o){
-			return Integer.compare(o.count,count);
-		}
+	@Override
+	public String toString(){
+		return map.toString();
+	}
+	public static void main(String[] args) throws FileNotFoundException, IOException{
+		WordMemory memory=new WordMemory();
+		memory.registerMeanings("k",Arrays.asList());
+		memory.registerMeanings("a",Arrays.asList(new Meaning("一","art",3),new Meaning("个","ru",0),new Meaning("a","al",1)));
+		memory.saveTo(new FileOutputStream("/home/kwong/useless.mem"));
+		System.out.println(loadWordMemory(new FileInputStream("/home/kwong/useless.mem")));
 	}
 }
