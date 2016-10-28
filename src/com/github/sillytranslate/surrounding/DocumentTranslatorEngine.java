@@ -21,6 +21,7 @@ import java.io.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public interface DocumentTranslatorEngine{
-	void setInput(InputStream in);
-	void setOutput(OutputStream out);
+	void setTextTranslator(TextTranslator translator);
+	void start(InputStream in,OutputStream out);
+	void textTranslated(String text);
 }

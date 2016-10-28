@@ -15,26 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.sillytranslate.surrounding;
-import com.github.sillytranslate.util.*;
-import java.io.*;
+
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class HTMLFormat implements DocumentFormat{
-	private final CodePointReader in;
-	private final Writer out;
-	public HTMLFormat(Reader in,Writer out){
-		this.in=new CodePointReader(in);
-		this.out=out;
-	}
-	@Override
-	public String nextTextToBeTranslated() throws IOException{
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-	@Override
-	public void insertTranslation(String str) throws IOException{
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
-
+public interface TextTranslator{
+	void translate(String text,DocumentTranslatorEngine callback);
 }
