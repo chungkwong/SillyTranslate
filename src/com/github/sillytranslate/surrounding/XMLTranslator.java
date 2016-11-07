@@ -22,11 +22,11 @@ import javax.xml.stream.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class HTMLTranslator implements DocumentTranslatorEngine{
+public class XMLTranslator implements DocumentTranslatorEngine{
 	private XMLStreamReader in;
 	private XMLStreamWriter out;
 	private TextTranslator translator;
-	public HTMLTranslator(){
+	public XMLTranslator(){
 
 	}
 	@Override
@@ -36,9 +36,10 @@ public class HTMLTranslator implements DocumentTranslatorEngine{
 			factory.setProperty("javax.xml.stream.isCoalescing",true);
 			this.in=factory.createXMLStreamReader(in);
 			this.out=XMLOutputFactory.newInstance().createXMLStreamWriter(out);
+			this.out.writeStartDocument(this.in.getEncoding(),this.in.getVersion());
 			textTranslated("");
 		}catch(XMLStreamException ex){
-			Logger.getLogger(HTMLTranslator.class.getName()).log(Level.SEVERE,null,ex);
+			Logger.getLogger(XMLTranslator.class.getName()).log(Level.SEVERE,null,ex);
 		}
 	}
 	@Override
@@ -48,6 +49,7 @@ public class HTMLTranslator implements DocumentTranslatorEngine{
 	@Override
 	public void textTranslated(String text){
 		try{
+			out.writeCharacters(text);
 			while(in.hasNext()){
 				switch(in.next()){
 					case XMLStreamReader.ATTRIBUTE:
@@ -59,7 +61,12 @@ public class HTMLTranslator implements DocumentTranslatorEngine{
 						out.writeCData(in.getText());
 						break;
 					case XMLStreamReader.CHARACTERS:
-						translator.translate(in.getText(),this);
+						if(in.getText().matches("\\s*"))
+							out.writeCharacters(in.getText());
+						else{
+							translator.translate(in.getText(),this);
+							return;
+						}
 						break;
 					case XMLStreamReader.COMMENT:
 						out.writeComment(in.getText());
@@ -111,14 +118,14 @@ public class HTMLTranslator implements DocumentTranslatorEngine{
 			}
 			out.flush();
 		}catch(XMLStreamException ex){
-			Logger.getLogger(HTMLTranslator.class.getName()).log(Level.SEVERE,null,ex);
+			Logger.getLogger(XMLTranslator.class.getName()).log(Level.SEVERE,null,ex);
 		}
 	}
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		String file="/etc/gtkmathview/gtkmathview.conf.xml";
-		HTMLTranslator t=new HTMLTranslator();
+		XMLTranslator t=new XMLTranslator();
 		t.setTextTranslator((text,callback)->{
-			callback.textTranslated("#"+text+"#");
+			callback.textTranslated("|"+text+"|");
 		});
 		t.start(new FileInputStream(file),System.out);
 	}
