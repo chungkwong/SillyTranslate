@@ -25,11 +25,11 @@ import javax.swing.*;
 public class SimpleTextTranslator extends JPanel implements TextTranslator{
 	private final JTextArea in=new JTextArea();
 	private final JTextArea out=new JTextArea();
+	private final JSplitPane pane=new JSplitPane(JSplitPane.VERTICAL_SPLIT,new JScrollPane(in),new JScrollPane(out));
 	private DocumentTranslatorEngine callback;
 	public SimpleTextTranslator(){
 		super(new BorderLayout());
 		in.setEditable(false);
-		JSplitPane pane=new JSplitPane(JSplitPane.VERTICAL_SPLIT,new JScrollPane(in),new JScrollPane(out));
 		add(pane,BorderLayout.CENTER);
 		JButton ok=new JButton("OK");
 		add(ok,BorderLayout.SOUTH);
@@ -37,11 +37,13 @@ public class SimpleTextTranslator extends JPanel implements TextTranslator{
 			callback.textTranslated(out.getText());
 			out.setText("");
 		});
+		pane.setDividerLocation(0.5);
 	}
 	@Override
 	public void translate(String text,DocumentTranslatorEngine callback){
 		this.callback=callback;
 		in.setText(text);
+		pane.setDividerLocation(0.5);
 		out.requestFocusInWindow();
 	}
 	public static void main(String[] args) throws FileNotFoundException{
@@ -49,10 +51,10 @@ public class SimpleTextTranslator extends JPanel implements TextTranslator{
 		SimpleTextTranslator translator=new SimpleTextTranslator();
 		PlainTextTranslator t=new PlainTextTranslator();
 		t.setTextTranslator(translator);
-		t.start(new FileInputStream("/home/kwong/NetBeansProjects/JSchemeMin/README.md"),System.out);
 		f.add(translator);
 		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
+		t.start(new FileInputStream("/home/kwong/NetBeansProjects/JSchemeMin/README.md"),System.out);
 	}
 }

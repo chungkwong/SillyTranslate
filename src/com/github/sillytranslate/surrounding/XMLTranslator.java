@@ -116,6 +116,7 @@ public class XMLTranslator implements DocumentTranslatorEngine{
 						break;
 				}
 			}
+			in.close();
 			out.flush();
 		}catch(XMLStreamException ex){
 			Logger.getLogger(XMLTranslator.class.getName()).log(Level.SEVERE,null,ex);

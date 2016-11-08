@@ -77,6 +77,7 @@ public class PlainTextTranslator implements DocumentTranslatorEngine{
 				}while(c!=-1);
 				translator.translate(buf.toString(),this);
 			}else{
+				in.close();
 				out.flush();
 			}
 		}catch(IOException ex){

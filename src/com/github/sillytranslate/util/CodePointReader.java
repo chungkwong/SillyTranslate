@@ -21,7 +21,7 @@ import java.util.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class CodePointReader{
+public class CodePointReader implements AutoCloseable{
 	private final Reader in;
 	private final LinkedList<Integer> buffer;
 	public CodePointReader(Reader in){
@@ -45,5 +45,9 @@ public class CodePointReader{
 	}
 	public void unread(List<Integer> cs){
 		buffer.addAll(0,cs);
+	}
+	@Override
+	public void close() throws IOException{
+		in.close();
 	}
 }
