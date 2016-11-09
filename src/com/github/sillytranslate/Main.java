@@ -15,9 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.sillytranslate;
+import com.github.sillytranslate.surrounding.*;
 import java.awt.*;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.*;
 import java.util.logging.*;
 import javax.swing.*;
 /**
@@ -27,21 +29,29 @@ import javax.swing.*;
 public class Main extends JFrame{
 	private static final String INPUT_CARD_NAME="input";
 	private static final String OUTPUT_CARD_NAME="output";
+	private static final String PROCESS_CARD_NAME="process";
 	private final CardLayout card=new CardLayout();
 	private final JFileChooser fileChooser=new JFileChooser();
 	private final JTextArea out=new JTextArea();
+	private final SimpleTextTranslator translatorView=new SimpleTextTranslator();
 	public Main() throws HeadlessException{
 		super(java.util.ResourceBundle.getBundle("com/github/sillytranslate/Words").getString("TRANSLATOR"));
 		setLayout(card);
 		add(createInputCard(),INPUT_CARD_NAME);
+		add(translatorView,PROCESS_CARD_NAME);
 		add(createOutputCard(),OUTPUT_CARD_NAME);
 		card.show(getContentPane(),INPUT_CARD_NAME);
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 	}
-	private void startTranslation(String input){
-		endTranslation(input);
+	private void startTranslation(String input,DocumentTranslatorEngine engine){
+		card.show(getContentPane(),PROCESS_CARD_NAME);
+		InputStream in=new ByteArrayInputStream(input.getBytes(Charset.forName("UTF-8")));
+		ByteArrayOutputStream out=new ByteArrayOutputStream();
+		engine.setOnFinished(()->endTranslation(new String(out.toByteArray(),Charset.forName("UTF-8"))));
+		engine.setTextTranslator(translatorView);
+		engine.start(in,out);
 	}
 	private void endTranslation(String output){
 		out.setText(output);
@@ -51,12 +61,18 @@ public class Main extends JFrame{
 		JPanel pane=new JPanel(new BorderLayout());
 		JTextArea area=new JTextArea();
 		pane.add(new JScrollPane(area),BorderLayout.CENTER);
+		Box box=Box.createHorizontalBox();
+		box.add(new JLabel("Format"));
+		JComboBox<DocumentTranslatorEngine> formats=new JComboBox<>(new DocumentTranslatorEngine[]{
+			new PlainTextTranslator(),new PropertiesTranslator(),new XMLTranslator()});
+		box.add(formats);
 		JButton ok=new JButton(java.util.ResourceBundle.getBundle("com/github/sillytranslate/Words").getString("START"));
 		ok.addActionListener((e)->{
-			startTranslation(area.getText());
+			startTranslation(area.getText(),(DocumentTranslatorEngine)formats.getSelectedItem());
 			area.setText("");
 		});
-		pane.add(ok,BorderLayout.SOUTH);
+		box.add(ok);
+		pane.add(box,BorderLayout.SOUTH);
 		Box from=Box.createHorizontalBox();
 		JButton fromClip=new JButton(java.util.ResourceBundle.getBundle("com/github/sillytranslate/Words").getString("FROM CLIPBOARD"));
 		JButton fromFile=new JButton(java.util.ResourceBundle.getBundle("com/github/sillytranslate/Words").getString("FROM FILE"));
@@ -95,6 +111,7 @@ public class Main extends JFrame{
 	private JPanel createOutputCard(){
 		JPanel pane=new JPanel(new BorderLayout());
 		pane.add(new JScrollPane(out),BorderLayout.CENTER);
+		Box bar=Box.createHorizontalBox();
 		JButton ok=new JButton(java.util.ResourceBundle.getBundle("com/github/sillytranslate/Words").getString("SAVE"));
 		ok.addActionListener((e)->{
 			if(fileChooser.showSaveDialog(this)==JFileChooser.APPROVE_OPTION){
@@ -105,7 +122,11 @@ public class Main extends JFrame{
 				}
 			}
 		});
-		pane.add(ok,BorderLayout.SOUTH);
+		JButton restart=new JButton("Restart");
+		restart.addActionListener((e)->card.show(getContentPane(),INPUT_CARD_NAME));
+		bar.add(ok);
+		bar.add(restart);
+		pane.add(bar,BorderLayout.SOUTH);
 		return pane;
 	}
 	public static void main(String[] args) {

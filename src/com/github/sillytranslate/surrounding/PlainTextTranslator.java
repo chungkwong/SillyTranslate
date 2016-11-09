@@ -26,15 +26,8 @@ public class PlainTextTranslator implements DocumentTranslatorEngine{
 	private CodePointReader in;
 	private CodePointWriter out;
 	private TextTranslator translator;
+	private Runnable callback;
 	public PlainTextTranslator(){
-	}
-	public static void main(String[] args) throws FileNotFoundException, IOException{
-		String file="/home/kwong/NetBeansProjects/JSchemeMin/README.md";
-		PlainTextTranslator t=new PlainTextTranslator();
-		t.setTextTranslator((text,callback)->{
-			callback.textTranslated("#"+text+"#");
-		});
-		t.start(new FileInputStream(file),System.out);
 	}
 	@Override
 	public void start(InputStream in,OutputStream out){
@@ -45,6 +38,10 @@ public class PlainTextTranslator implements DocumentTranslatorEngine{
 		}catch(IOException ex){
 			Logger.getLogger(PlainTextTranslator.class.getName()).log(Level.SEVERE,null,ex);
 		}
+	}
+	@Override
+	public void setOnFinished(Runnable callback){
+		this.callback=callback;
 	}
 	@Override
 	public void setTextTranslator(TextTranslator translator){
@@ -79,9 +76,22 @@ public class PlainTextTranslator implements DocumentTranslatorEngine{
 			}else{
 				in.close();
 				out.flush();
+				callback.run();
 			}
 		}catch(IOException ex){
 			Logger.getLogger(PlainTextTranslator.class.getName()).log(Level.SEVERE,null,ex);
 		}
+	}
+	@Override
+	public String toString(){
+		return "Plain";
+	}
+	public static void main(String[] args) throws FileNotFoundException, IOException{
+		String file="/home/kwong/NetBeansProjects/JSchemeMin/README.md";
+		PlainTextTranslator t=new PlainTextTranslator();
+		t.setTextTranslator((text,callback)->{
+			callback.textTranslated("#"+text+"#");
+		});
+		t.start(new FileInputStream(file),System.out);
 	}
 }

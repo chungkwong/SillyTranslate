@@ -26,10 +26,15 @@ public class PropertiesTranslator implements DocumentTranslatorEngine{
 	private CodePointReader in;
 	private CodePointWriter out;
 	private TextTranslator translator;
+	private Runnable callback;
 	private final StringBuilder buf=new StringBuilder();
 	@Override
 	public void setTextTranslator(TextTranslator translator){
 		this.translator=translator;
+	}
+	@Override
+	public void setOnFinished(Runnable callback){
+		this.callback=callback;
 	}
 	@Override
 	public void start(InputStream in,OutputStream out){
@@ -96,6 +101,7 @@ public class PropertiesTranslator implements DocumentTranslatorEngine{
 			}
 			in.close();
 			out.flush();
+			callback.run();
 		}catch(IOException ex){
 			Logger.getLogger(PropertiesTranslator.class.getName()).log(Level.SEVERE,null,ex);
 		}
@@ -138,7 +144,11 @@ public class PropertiesTranslator implements DocumentTranslatorEngine{
 		return in.read()*0x1000+in.read()*0x100+in.read()*0x10+in.read();
 	}
 	private String encode(String text){
-		return text.replace("\\","\\\\").replaceAll("\r","\\r").replaceAll("\n","\\n");
+		return text.replace("\\","\\\\").replace("\r","\\r").replace("\n","\\n");
+	}
+	@Override
+	public String toString(){
+		return "Properties";
 	}
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		String file="/home/kwong/NetBeansProjects/JGitGUI/src/com/chungkwong/jgitgui/text.properties";

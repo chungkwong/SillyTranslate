@@ -16,37 +16,29 @@
  */
 package com.github.sillytranslate.surrounding;
 import java.awt.*;
-import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class SimpleTextTranslator extends JPanel implements TextTranslator{
+public class StagedTextTranslator extends JPanel implements TextTranslator{
 	private final JTextArea in=new JTextArea();
 	private final JTextArea out=new JTextArea();
 	private JButton ok=new JButton("OK");
 	private final JSplitPane pane=new JSplitPane(JSplitPane.VERTICAL_SPLIT,new JScrollPane(in),new JScrollPane(out));
 	private DocumentTranslatorEngine callback;
-	public SimpleTextTranslator(){
+	public StagedTextTranslator(){
 		super(new BorderLayout());
 		in.setEditable(false);
+		add(in,BorderLayout.NORTH);
+
 		add(pane,BorderLayout.CENTER);
 		add(ok,BorderLayout.SOUTH);
 		ok.addActionListener((e)->{
 			ok.setEnabled(false);
 			callback.textTranslated(out.getText());
-		});
-		out.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,KeyEvent.CTRL_DOWN_MASK),"commit");
-		out.getActionMap().put("commit",new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e){
-				if(ok.isEnabled()){
-					ok.setEnabled(false);
-					callback.textTranslated(out.getText());
-				}
-			}
+			out.setText("");
 		});
 		pane.setDividerLocation(0.5);
 	}
@@ -55,17 +47,15 @@ public class SimpleTextTranslator extends JPanel implements TextTranslator{
 		this.callback=callback;
 		ok.setEnabled(true);
 		in.setText(text);
-		out.setText(text);
-		out.select(0,text.length());
 		out.requestFocusInWindow();
 		pane.setDividerLocation(0.5);
 	}
 	public static void main(String[] args) throws FileNotFoundException{
 		JFrame f=new JFrame("Translator");
-		SimpleTextTranslator translator=new SimpleTextTranslator();
+		StagedTextTranslator translator=new StagedTextTranslator();
 		PlainTextTranslator t=new PlainTextTranslator();
-		t.setOnFinished(()->{});
 		t.setTextTranslator(translator);
+		t.setOnFinished(()->{});
 		f.add(translator);
 		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

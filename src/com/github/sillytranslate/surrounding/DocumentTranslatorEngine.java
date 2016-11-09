@@ -22,6 +22,7 @@ import java.io.*;
  */
 public interface DocumentTranslatorEngine{
 	void setTextTranslator(TextTranslator translator);
+	void setOnFinished(Runnable callback);
 	void start(InputStream in,OutputStream out);
 	void textTranslated(String text);
 }
