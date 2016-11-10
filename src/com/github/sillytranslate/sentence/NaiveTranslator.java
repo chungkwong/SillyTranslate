@@ -24,12 +24,17 @@ import java.util.stream.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class NaiveTranslator implements SentenceTranslatorEngine{
+	private final int limit;
+	public NaiveTranslator(int limit){
+		this.limit=limit;
+	}
 	@Override
 	public List<String> getTranslation(List<Token> words){
 		List<String> list=new ArrayList<>();
 		Permutator<Token> perm=new Permutator<>(words);
 		List<Token> p=words;
-		while(p!=null){
+		int i=0;
+		while(p!=null&&++i<=limit){
 			list.add(p.stream().map((t)->t.getText()).collect(Collectors.joining()));
 			p=perm.nextPermutation();
 		}

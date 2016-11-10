@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.sillytranslate.surrounding;
+import com.github.sillytranslate.lex.*;
+import com.github.sillytranslate.sentence.*;
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
@@ -23,36 +25,52 @@ import javax.swing.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class StagedTextTranslator extends JPanel implements TextTranslator{
+	private final String LEX="Lex";
+	private final String WORD="Word";
+	private final String SENTENCE="Sentence";
 	private final JTextArea in=new JTextArea();
-	private final JTextArea out=new JTextArea();
-	private JButton ok=new JButton("OK");
-	private final JSplitPane pane=new JSplitPane(JSplitPane.VERTICAL_SPLIT,new JScrollPane(in),new JScrollPane(out));
+	private final CardLayout card=new CardLayout();
+	private final JPanel content=new JPanel(card);
+	private final LexEditor lexEditor=new LexEditor();
+	private final WordTranslator wordTranslator;
+	private final SentenceTranslatorView sentenceTranslator;
 	private DocumentTranslatorEngine callback;
-	public StagedTextTranslator(){
+	public StagedTextTranslator(WordTranslator wordTranslator,SentenceTranslatorView sentenceTranslator){
 		super(new BorderLayout());
+		this.wordTranslator=wordTranslator;
+		this.sentenceTranslator=sentenceTranslator;
 		in.setEditable(false);
 		add(in,BorderLayout.NORTH);
-
-		add(pane,BorderLayout.CENTER);
-		add(ok,BorderLayout.SOUTH);
-		ok.addActionListener((e)->{
-			ok.setEnabled(false);
-			callback.textTranslated(out.getText());
-			out.setText("");
-		});
-		pane.setDividerLocation(0.5);
+		content.add(lexEditor,LEX);
+		content.add(wordTranslator,WORD);
+		content.add(sentenceTranslator,SENTENCE);
+		add(content,BorderLayout.CENTER);
 	}
+
 	@Override
 	public void translate(String text,DocumentTranslatorEngine callback){
 		this.callback=callback;
-		ok.setEnabled(true);
 		in.setText(text);
-		out.requestFocusInWindow();
-		pane.setDividerLocation(0.5);
+		card.show(content,LEX);
+		lexEditor.accept(new SimpleLex(new StringReader(text)),(words)->{
+			card.show(content,WORD);
+			wordTranslator.accept(words,(newWords)->{
+				card.show(content,SENTENCE);
+				sentenceTranslator.accept(newWords,(sentence)->{
+					callback.textTranslated(sentence);
+				});
+			});
+		});
 	}
-	public static void main(String[] args) throws FileNotFoundException{
+	@Override
+	public JComponent getUserInterface(){
+		return this;
+	}
+	public static void main(String[] args) throws FileNotFoundException, IOException{
 		JFrame f=new JFrame("Translator");
-		StagedTextTranslator translator=new StagedTextTranslator();
+		WordTranslator wordTranslator=new WordTranslator(new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2")));
+		SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(new NaiveTranslator(24));
+		StagedTextTranslator translator=new StagedTextTranslator(wordTranslator,sentenceTranslator);
 		PlainTextTranslator t=new PlainTextTranslator();
 		t.setTextTranslator(translator);
 		t.setOnFinished(()->{});

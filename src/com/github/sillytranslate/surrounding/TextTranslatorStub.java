@@ -14,13 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.sillytranslate;
-import java.util.function.*;
+package com.github.sillytranslate.surrounding;
 import javax.swing.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public interface TranslatorStage<F,T>{
-	JComponent accept(F source,Consumer<T> callback);
+public class TextTranslatorStub implements TextTranslator{
+	@Override
+	public void translate(String text,DocumentTranslatorEngine callback){
+		callback.textTranslated("#"+text+"#");
+	}
+	@Override
+	public JComponent getUserInterface(){
+		return new JLabel();
+	}
+
 }

@@ -15,12 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.sillytranslate;
-import java.util.function.*;
-import javax.swing.*;
+
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public interface TranslatorStage<F,T>{
-	JComponent accept(F source,Consumer<T> callback);
+public class Configure{
+
 }

@@ -26,7 +26,7 @@ public class XMLTranslator implements DocumentTranslatorEngine{
 	private XMLStreamReader in;
 	private XMLStreamWriter out;
 	private TextTranslator translator;
-	private Runnable callback;
+	private Runnable callback=()->{};;
 	public XMLTranslator(){
 
 	}
@@ -135,9 +135,7 @@ public class XMLTranslator implements DocumentTranslatorEngine{
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		String file="/etc/gtkmathview/gtkmathview.conf.xml";
 		XMLTranslator t=new XMLTranslator();
-		t.setTextTranslator((text,callback)->{
-			callback.textTranslated("|"+text+"|");
-		});
+		t.setTextTranslator(new TextTranslatorStub());
 		t.start(new FileInputStream(file),System.out);
 	}
 }

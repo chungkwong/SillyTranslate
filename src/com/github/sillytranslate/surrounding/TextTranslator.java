@@ -15,11 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.sillytranslate.surrounding;
-
+import javax.swing.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public interface TextTranslator{
 	void translate(String text,DocumentTranslatorEngine callback);
+	JComponent getUserInterface();
 }

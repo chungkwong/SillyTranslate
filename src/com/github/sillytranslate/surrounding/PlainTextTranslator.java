@@ -26,7 +26,7 @@ public class PlainTextTranslator implements DocumentTranslatorEngine{
 	private CodePointReader in;
 	private CodePointWriter out;
 	private TextTranslator translator;
-	private Runnable callback;
+	private Runnable callback=()->{};
 	public PlainTextTranslator(){
 	}
 	@Override
@@ -89,9 +89,7 @@ public class PlainTextTranslator implements DocumentTranslatorEngine{
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		String file="/home/kwong/NetBeansProjects/JSchemeMin/README.md";
 		PlainTextTranslator t=new PlainTextTranslator();
-		t.setTextTranslator((text,callback)->{
-			callback.textTranslated("#"+text+"#");
-		});
+		t.setTextTranslator(new TextTranslatorStub());
 		t.start(new FileInputStream(file),System.out);
 	}
 }

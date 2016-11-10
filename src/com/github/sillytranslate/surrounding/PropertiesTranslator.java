@@ -26,7 +26,7 @@ public class PropertiesTranslator implements DocumentTranslatorEngine{
 	private CodePointReader in;
 	private CodePointWriter out;
 	private TextTranslator translator;
-	private Runnable callback;
+	private Runnable callback=()->{};
 	private final StringBuilder buf=new StringBuilder();
 	@Override
 	public void setTextTranslator(TextTranslator translator){
@@ -153,9 +153,7 @@ public class PropertiesTranslator implements DocumentTranslatorEngine{
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		String file="/home/kwong/NetBeansProjects/JGitGUI/src/com/chungkwong/jgitgui/text.properties";
 		PropertiesTranslator t=new PropertiesTranslator();
-		t.setTextTranslator((text,callback)->{
-			callback.textTranslated("#"+text+"#");
-		});
+		t.setTextTranslator(new TextTranslatorStub());
 		t.start(new FileInputStream(file),System.out);
 	}
 }

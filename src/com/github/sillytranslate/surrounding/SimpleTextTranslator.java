@@ -60,6 +60,10 @@ public class SimpleTextTranslator extends JPanel implements TextTranslator{
 		out.requestFocusInWindow();
 		pane.setDividerLocation(0.5);
 	}
+	@Override
+	public JComponent getUserInterface(){
+		return this;
+	}
 	public static void main(String[] args) throws FileNotFoundException{
 		JFrame f=new JFrame("Translator");
 		SimpleTextTranslator translator=new SimpleTextTranslator();

@@ -33,7 +33,7 @@ public class Translator extends JPanel{
 		FocusManager.getCurrentManager().addPropertyChangeListener((e)->{System.out.println(e.toString());});
 		setLayout(new BorderLayout());
 		translators=new TranslatorStage[]{
-			new LexEditor(),new WordTranslator(dict),new SentenceTranslatorView(new NaiveTranslator()),new OutputPanel()
+			new LexEditor(),new WordTranslator(dict),new SentenceTranslatorView(new NaiveTranslator(24)),new OutputPanel()
 		};
 		in=new InputPanel((text)->{
 			removeAll();

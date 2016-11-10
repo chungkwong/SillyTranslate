@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.sillytranslate;
+import com.github.sillytranslate.lex.*;
+import com.github.sillytranslate.sentence.*;
 import com.github.sillytranslate.surrounding.*;
 import java.awt.*;
 import java.io.*;
@@ -33,9 +35,10 @@ public class Main extends JFrame{
 	private final CardLayout card=new CardLayout();
 	private final JFileChooser fileChooser=new JFileChooser();
 	private final JTextArea out=new JTextArea();
-	private final SimpleTextTranslator translatorView=new SimpleTextTranslator();
-	public Main() throws HeadlessException{
+	private final StagedTextTranslator translatorView;
+	public Main(StagedTextTranslator translatorView) throws HeadlessException{
 		super(java.util.ResourceBundle.getBundle("com/github/sillytranslate/Words").getString("TRANSLATOR"));
+		this.translatorView=translatorView;
 		setLayout(card);
 		add(createInputCard(),INPUT_CARD_NAME);
 		add(translatorView,PROCESS_CARD_NAME);
@@ -129,7 +132,9 @@ public class Main extends JFrame{
 		pane.add(bar,BorderLayout.SOUTH);
 		return pane;
 	}
-	public static void main(String[] args) {
-		new Main();
+	public static void main(String[] args) throws IOException {
+		WordTranslator wordTranslator=new WordTranslator(new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2")));
+		SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(new NaiveTranslator(24));
+		new Main(new StagedTextTranslator(wordTranslator,sentenceTranslator));
 	}
 }
