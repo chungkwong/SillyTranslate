@@ -35,13 +35,11 @@ public class Main extends JFrame{
 	private final CardLayout card=new CardLayout();
 	private final JFileChooser fileChooser=new JFileChooser();
 	private final JTextArea out=new JTextArea();
-	private final StagedTextTranslator translatorView;
-	public Main(StagedTextTranslator translatorView) throws HeadlessException{
+	private final Configure conf=new Configure();
+	public Main() throws HeadlessException{
 		super(java.util.ResourceBundle.getBundle("com/github/sillytranslate/Words").getString("TRANSLATOR"));
-		this.translatorView=translatorView;
 		setLayout(card);
 		add(createInputCard(),INPUT_CARD_NAME);
-		add(translatorView,PROCESS_CARD_NAME);
 		add(createOutputCard(),OUTPUT_CARD_NAME);
 		card.show(getContentPane(),INPUT_CARD_NAME);
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -49,11 +47,12 @@ public class Main extends JFrame{
 		setVisible(true);
 	}
 	private void startTranslation(String input,DocumentTranslatorEngine engine){
+		add(conf.getTranslator().getUserInterface(),PROCESS_CARD_NAME);
 		card.show(getContentPane(),PROCESS_CARD_NAME);
 		InputStream in=new ByteArrayInputStream(input.getBytes(Charset.forName("UTF-8")));
 		ByteArrayOutputStream out=new ByteArrayOutputStream();
 		engine.setOnFinished(()->endTranslation(new String(out.toByteArray(),Charset.forName("UTF-8"))));
-		engine.setTextTranslator(translatorView);
+		engine.setTextTranslator(conf.getTranslator());
 		engine.start(in,out);
 	}
 	private void endTranslation(String output){
@@ -69,6 +68,9 @@ public class Main extends JFrame{
 		JComboBox<DocumentTranslatorEngine> formats=new JComboBox<>(new DocumentTranslatorEngine[]{
 			new PlainTextTranslator(),new PropertiesTranslator(),new XMLTranslator()});
 		box.add(formats);
+		JButton setting=new JButton("Settings");
+		setting.addActionListener((e)->conf.setVisible(true));
+		box.add(setting);
 		JButton ok=new JButton(java.util.ResourceBundle.getBundle("com/github/sillytranslate/Words").getString("START"));
 		ok.addActionListener((e)->{
 			startTranslation(area.getText(),(DocumentTranslatorEngine)formats.getSelectedItem());
@@ -132,9 +134,10 @@ public class Main extends JFrame{
 		pane.add(bar,BorderLayout.SOUTH);
 		return pane;
 	}
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException{
+		Lex lex=new SimpleLex();
 		WordTranslator wordTranslator=new WordTranslator(new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2")));
 		SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(new NaiveTranslator(24));
-		new Main(new StagedTextTranslator(wordTranslator,sentenceTranslator));
+		new Main();
 	}
 }

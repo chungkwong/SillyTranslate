@@ -24,13 +24,16 @@ import java.util.*;
  */
 public class JavaLex implements Lex{
 	private final BreakIterator iter;
-	private final String text;
 	private final Locale locale;
-	public JavaLex(String text,Locale locale){
+	private String text;
+	public JavaLex(Locale locale){
 		iter=BreakIterator.getWordInstance(locale);
-		iter.setText(text);
-		this.text=text;
 		this.locale=locale;
+	}
+	@Override
+	public void setInput(String text){
+		this.text=text;
+		iter.setText(text);
 		iter.first();
 	}
 	private Token createToken(String word){
@@ -55,8 +58,9 @@ public class JavaLex implements Lex{
 	}
 	public static void main(String[] args) throws IOException{
 		Scanner in=new Scanner(System.in);
+		JavaLex lex=new JavaLex(Locale.US);
 		while(in.hasNext()){
-			JavaLex lex=new JavaLex(in.nextLine(),Locale.US);
+			lex.setInput(in.nextLine());
 			Token t;
 			while((t=lex.next())!=null)
 				System.out.println(t);

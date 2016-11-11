@@ -16,13 +16,8 @@
  */
 
 package com.github.sillytranslate;
-import com.github.sillytranslate.lex.StardictDictionary;
-import com.github.sillytranslate.lex.IntegratedDictionary;
-import com.github.sillytranslate.lex.NavigableDictionary;
-import com.github.sillytranslate.ui.*;
 import java.awt.*;
 import java.io.*;
-import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.event.*;
 /**
@@ -31,14 +26,12 @@ import javax.swing.event.*;
  */
 public class DictionaryViewer extends JPanel{
 	private static final int WORD_LIST_MAX_LENGTH=10;
-	private final IntegratedDictionary dict;
 	private final JTextField input=new JTextField();
 	private final DefaultListModel<String> wordsModel=new DefaultListModel<>();
 	private final JList words=new JList(wordsModel);
 	private final JTextArea meaning=new JTextArea();
-	private final JFileChooser fileChooser=new JFileChooser();
+	private final DictionaryChooser dictionaryChooser=new DictionaryChooser();
 	public DictionaryViewer(){
-		this.dict=new IntegratedDictionary();
 		setLayout(new BorderLayout());
 		input.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
@@ -64,52 +57,23 @@ public class DictionaryViewer extends JPanel{
 		add(words,BorderLayout.WEST);
 		meaning.setEditable(false);
 		add(new JScrollPane(meaning),BorderLayout.CENTER);
-		DefaultListModel<NavigableDictionary> dicts=new DefaultListModel<>();
-		dicts.addListDataListener(new ListDataListener() {
-			@Override
-			public void intervalAdded(ListDataEvent e){
-				for(int i=e.getIndex0();i<=e.getIndex1();i++)
-					dict.addDictionary(dicts.getElementAt(i),i);
-			}
-			@Override
-			public void intervalRemoved(ListDataEvent e){
-				for(int i=e.getIndex1();i>=e.getIndex0();i--)
-					dict.removeDictionary(i);
-			}
-			@Override
-			public void contentsChanged(ListDataEvent e){
-				intervalRemoved(e);
-				intervalAdded(e);
-			}
-		});
-		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		add(new JScrollPane(new EditableList(dicts,this::loadDictionary),
-				JScrollPane.VERTICAL_SCROLLBAR_NEVER,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),BorderLayout.SOUTH);
-	}
-	private NavigableDictionary loadDictionary(){
-		try{
-			fileChooser.showOpenDialog(this);
-			return new StardictDictionary(fileChooser.getSelectedFile());
-		}catch(IOException ex){
-			Logger.getLogger(DictionaryViewer.class.getName()).log(Level.SEVERE,null,ex);
-			return null;
-		}
+		add(dictionaryChooser,BorderLayout.SOUTH);
 	}
 	private void inputUpdated(){
-		String word=dict.getCurrentWord(input.getText());
+		String word=dictionaryChooser.getDictionary().getCurrentWord(input.getText());
 		wordsModel.clear();
 		for(int i=0;i<WORD_LIST_MAX_LENGTH&&word!=null;i++){
 			wordsModel.addElement(word);
-			word=dict.getNextWord(word);
+			word=dictionaryChooser.getDictionary().getNextWord(word);
 		}
 		wordUpdated();
 	}
 	private void wordUpdated(){
 		if(words.isSelectionEmpty()){
 			if(!wordsModel.isEmpty())
-				meaning.setText(dict.getMeaning(wordsModel.get(0)));
+				meaning.setText(dictionaryChooser.getDictionary().getMeaning(wordsModel.get(0)));
 		}else
-			meaning.setText(dict.getMeaning((String)words.getSelectedValue()));
+			meaning.setText(dictionaryChooser.getDictionary().getMeaning((String)words.getSelectedValue()));
 	}
 	/**
 	 * @param args the command line arguments

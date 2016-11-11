@@ -14,13 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.sillytranslate.lex;
-import java.io.*;
+package com.github.sillytranslate.ui;
+import java.util.*;
+import javax.swing.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public interface Lex{
-	void setInput(String text);
-	Token next()throws IOException;
+public class LocaleChooser extends JComboBox<Locale>{
+	public LocaleChooser(){
+		super(getSortedLocales());
+		setSelectedItem(Locale.getDefault());
+	}
+	@Override
+	public Locale getSelectedItem(){
+		return (Locale)super.getSelectedItem();
+	}
+	private static Locale[] getSortedLocales(){
+		Locale[] locales=Locale.getAvailableLocales();
+		Arrays.sort(locales,(x,y)->x.toString().compareTo(y.toString()));
+		return locales;
+	}
 }

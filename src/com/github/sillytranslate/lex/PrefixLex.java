@@ -26,11 +26,14 @@ import javax.swing.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class PrefixLex implements Lex{
-	private final CodePointReader in;
-	private NavigableDictionary dict;
-	public PrefixLex(Reader in,NavigableDictionary dict){
-		this.in=new CodePointReader(in);
+	private CodePointReader in;
+	private final NavigableDictionary dict;
+	public PrefixLex(NavigableDictionary dict){
 		this.dict=dict;
+	}
+	@Override
+	public void setInput(String text){
+		this.in=new CodePointReader(new StringReader(text));
 	}
 	@Override
 	public Token next() throws IOException{
@@ -77,7 +80,8 @@ public class PrefixLex implements Lex{
 		JPanel out=new JPanel();
 		in.addActionListener((e)->{
 			out.removeAll();
-			PrefixLex lex=new PrefixLex(new StringReader(in.getText()),zhDict);
+			PrefixLex lex=new PrefixLex(zhDict);
+			lex.setInput(in.getText());
 			Token word;
 			try{
 				while((word=lex.next())!=null){

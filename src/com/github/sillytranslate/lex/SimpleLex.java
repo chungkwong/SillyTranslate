@@ -27,9 +27,12 @@ public class SimpleLex implements Lex{
 	private static final int REMARK_START_SYMBOL='(';
 	private static final int REMARK_END_SYMBOL=')';
 	private static final int FULL_STOP_SYMBOL='.';
-	private final CodePointReader in;
-	public SimpleLex(Reader in){
-		this.in=new CodePointReader(in);
+	private CodePointReader in;
+	public SimpleLex(){
+	}
+	@Override
+	public void setInput(String text){
+		this.in=new CodePointReader(new StringReader(text));
 	}
 	@Override
 	public Token next()throws IOException{
@@ -65,7 +68,8 @@ public class SimpleLex implements Lex{
 		Scanner in=new Scanner(System.in);
 		while(in.hasNextLine()){
 			String line=in.nextLine();
-			SimpleLex lex=new SimpleLex(new StringReader(line));
+			SimpleLex lex=new SimpleLex();
+			lex.setInput(line);
 			Token token=lex.next();
 			while(token!=null){
 				System.out.println(token);

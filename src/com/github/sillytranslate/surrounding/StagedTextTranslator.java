@@ -32,11 +32,13 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 	private final CardLayout card=new CardLayout();
 	private final JPanel content=new JPanel(card);
 	private final LexEditor lexEditor=new LexEditor();
+	private final Lex lex;
 	private final WordTranslator wordTranslator;
 	private final SentenceTranslatorView sentenceTranslator;
 	private DocumentTranslatorEngine callback;
-	public StagedTextTranslator(WordTranslator wordTranslator,SentenceTranslatorView sentenceTranslator){
+	public StagedTextTranslator(Lex lex,WordTranslator wordTranslator,SentenceTranslatorView sentenceTranslator){
 		super(new BorderLayout());
+		this.lex=lex;
 		this.wordTranslator=wordTranslator;
 		this.sentenceTranslator=sentenceTranslator;
 		in.setEditable(false);
@@ -52,7 +54,8 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 		this.callback=callback;
 		in.setText(text);
 		card.show(content,LEX);
-		lexEditor.accept(new SimpleLex(new StringReader(text)),(words)->{
+		lex.setInput(text);
+		lexEditor.accept(lex,(words)->{
 			card.show(content,WORD);
 			wordTranslator.accept(words,(newWords)->{
 				card.show(content,SENTENCE);
@@ -68,9 +71,10 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 	}
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		JFrame f=new JFrame("Translator");
+		Lex lex=new SimpleLex();
 		WordTranslator wordTranslator=new WordTranslator(new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2")));
 		SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(new NaiveTranslator(24));
-		StagedTextTranslator translator=new StagedTextTranslator(wordTranslator,sentenceTranslator);
+		StagedTextTranslator translator=new StagedTextTranslator(lex,wordTranslator,sentenceTranslator);
 		PlainTextTranslator t=new PlainTextTranslator();
 		t.setTextTranslator(translator);
 		t.setOnFinished(()->{});

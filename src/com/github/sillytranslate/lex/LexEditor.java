@@ -39,7 +39,12 @@ public class LexEditor extends JPanel implements ActionListener,DocumentListener
 	public LexEditor(){
 		super(new BorderLayout());
 		add(pane,BorderLayout.CENTER);
-		ok.addActionListener((e)->{consumer.accept(tokens.values().stream().collect(Collectors.toList()).iterator());});
+		ok.addActionListener((e)->{
+			pane.getDocument().removeDocumentListener(this);
+			pane.setText("");
+			consumer.accept(tokens.values().stream().collect(Collectors.toList()).iterator());
+			tokens.clear();
+		});
 		add(ok,BorderLayout.SOUTH);
 		pane.getDocument().addDocumentListener(this);
 		for(Token.Type type:Token.Type.values()){

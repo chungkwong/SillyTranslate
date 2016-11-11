@@ -55,7 +55,7 @@ public class EditableList<E> extends JPanel{
 		bar.add(upItem);
 		bar.add(downItem);
 		add(bar,BorderLayout.WEST);
-		add(list,BorderLayout.CENTER);
+		add(new JScrollPane(list),BorderLayout.CENTER);
 	}
 	public JList getJList(){
 		return list;
