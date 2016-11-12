@@ -16,7 +16,7 @@
  */
 package com.github.chungkwong.lex;
 
-import com.github.sillytranslate.lex.*;
+import com.github.chungkwong.sillytranslate.lex.*;
 import java.io.*;
 import java.util.*;
 import org.junit.*;
