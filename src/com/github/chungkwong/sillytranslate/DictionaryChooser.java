@@ -67,7 +67,8 @@ public class DictionaryChooser extends JPanel{
 	public void fromPaths(String folders) throws IOException{
 		dicts.clear();
 		for(String path:folders.split(":"))
-			dicts.addElement(new StardictDictionary(new File(path)));
+			if(!path.isEmpty())
+				dicts.addElement(new StardictDictionary(new File(path)));
 	}
 	public String toPaths(){
 		StringBuilder buf=new StringBuilder();

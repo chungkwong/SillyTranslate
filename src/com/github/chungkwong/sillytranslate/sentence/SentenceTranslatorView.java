@@ -17,6 +17,7 @@
 package com.github.chungkwong.sillytranslate.sentence;
 import com.github.chungkwong.sillytranslate.*;
 import com.github.chungkwong.sillytranslate.lex.*;
+import java.awt.event.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
@@ -45,6 +46,13 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 			@Override
 			public void valueChanged(ListSelectionEvent e){
 				result.setText(list.getSelectedValue());
+			}
+		});
+		list.addMouseListener(new MouseAdapter(){
+			@Override
+			public void mouseClicked(MouseEvent e){
+				if(e.getClickCount()==2)
+					next();
 			}
 		});
 		add(list);

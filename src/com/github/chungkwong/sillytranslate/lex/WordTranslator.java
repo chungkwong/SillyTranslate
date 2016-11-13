@@ -19,6 +19,7 @@ import com.github.chungkwong.sillytranslate.*;
 import com.github.chungkwong.sillytranslate.ui.*;
 import java.util.*;
 import java.util.function.*;
+import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.text.*;
 /**
@@ -79,25 +80,12 @@ public class WordTranslator extends JPanel implements TranslatorStage<Iterator<T
 		}
 		@Override
 		public Hint[] getHints(Document doc,int pos){
-			String text=dict.getMeaning(currIn.getText());
-			if(text==null)
-				text=dict.getMeaning(currIn.getText().toLowerCase());
-			if(text!=null)
-				return split(text,currOut.getText());
-			else
+			try{
+				return DictionaryHintExtractor.extractHint(currIn.getText(),doc.getText(0,pos),dict);
+			}catch(BadLocationException ex){
+				Logger.getLogger(WordTranslator.class.getName()).log(Level.SEVERE,null,ex);
 				return new Hint[0];
-		}
-		private Hint[] split(String text,String prefix){
-			ArrayList<Hint> hints=new ArrayList<>();
-			int prefixLen=prefix.length();
-			for(String mean:text.split("[\\p{ASCII}]+")){
-				if(mean.startsWith(prefix)&&!mean.isEmpty())
-					hints.add(new SimpleHint(mean,mean.substring(prefixLen),null,""));
 			}
-			String org=currIn.getText();
-			if(org.startsWith(prefix))
-				hints.add(new SimpleHint(org,org.substring(prefixLen),null,""));
-			return hints.toArray(new Hint[0]);
 		}
 	}
 }

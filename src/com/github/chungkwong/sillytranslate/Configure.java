@@ -28,7 +28,7 @@ import javax.swing.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class Configure extends JDialog{
+public class Configure extends JFrame{
 	private final Preferences pref=Preferences.userNodeForPackage(Configure.class);
 	private final JRadioButton simple=new JRadioButton("Naive");
 	private final JRadioButton staged=new JRadioButton("Staged");
