@@ -1,0 +1,8 @@
+/dist/
+/build/
+/manifest.mf
+/.jacocoverage
+/nbproject/private
+jacoco*
+/secret
+/src/com/github/chungkwong/sillytranslate/sentence/secret.properties
