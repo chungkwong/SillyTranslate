@@ -5,4 +5,5 @@
 /nbproject/private
 jacoco*
 /secret
-/src/com/github/chungkwong/sillytranslate/sentence/secret.properties
+/src/com/github/chungkwong/sillytranslate/sentence/baidu.properties
+/src/com/github/chungkwong/sillytranslate/sentence/yandex.properties

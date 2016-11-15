@@ -51,17 +51,18 @@ public class RealTimeTask<K> implements Runnable{
 				key=currentKey;
 			}
 			try{
-				consumer.accept(key);
+				if(key!=null)
+					consumer.accept(key);
 			}catch(Exception ex){
 				Logger.getGlobal().throwing(null,null,ex);
 			}
 			synchronized(this){
-			if(!Thread.interrupted())
-				try{
-					wait();
-				}catch(InterruptedException ex){
+				if(key==currentKey&&!Thread.interrupted())
+					try{
+						wait();
+					}catch(InterruptedException ex){
 
-				}
+					}
 			}
 		}
 	}
