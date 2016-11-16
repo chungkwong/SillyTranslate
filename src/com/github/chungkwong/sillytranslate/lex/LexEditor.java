@@ -33,16 +33,13 @@ import javax.swing.text.*;
  */
 public class LexEditor extends JPanel implements ActionListener,DocumentListener,TranslatorStage<Lex,Iterator<Token>>{
 	private final ActionTextArea pane;
-	private final JButton ok=new JButton("OK");
 	private final TreeMap<Integer,Token> tokens=new TreeMap<>();
 	private final JPopupMenu menu=new JPopupMenu();
 	private Consumer<Iterator<Token>> consumer;
 	public LexEditor(){
 		super(new BorderLayout());
-		pane=new ActionTextArea(this::commit);
+		pane=new ActionTextArea((text)->commit());
 		add(pane,BorderLayout.CENTER);
-		ok.addActionListener((e)->commit());
-		add(ok,BorderLayout.SOUTH);
 		pane.getDocument().addDocumentListener(this);
 		for(Token.Type type:Token.Type.values()){
 			JMenuItem item=new JMenuItem(type.toString());
@@ -62,6 +59,7 @@ public class LexEditor extends JPanel implements ActionListener,DocumentListener
 	public JComponent accept(Lex source,Consumer<Iterator<Token>> callback){
 		this.consumer=callback;
 		pane.getDocument().removeDocumentListener(this);
+		pane.setText("");
 		try{
 			Token next=source.next();
 			while(next!=null){

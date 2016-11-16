@@ -15,28 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.surrounding;
-import com.github.chungkwong.sillytranslate.ui.*;
-import java.awt.*;
-import java.io.*;
 import javax.swing.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class SimpleTextTranslator extends JPanel implements TextTranslator{
-	private final JTextArea out;
-	private DocumentTranslatorEngine callback;
-	public SimpleTextTranslator(){
-		super(new BorderLayout());
-		out=new ActionTextArea((text)->callback.textTranslated(text));
-		add(out,BorderLayout.CENTER);
+public class CombinedTextTranslator extends JPanel implements TextTranslator{
+	private final TextTranslator[] translators;
+	private final JTextArea in=new JTextArea();
+	public CombinedTextTranslator(TextTranslator... translators){
+		this.translators=translators;
+		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		in.setEditable(false);
+		add(in);
+		for(TextTranslator translator:translators){
+			add(new JLabel(translator.getName()));
+			add(translator.getUserInterface());
+		}
 	}
 	@Override
 	public void translate(String text,DocumentTranslatorEngine callback){
-		this.callback=callback;
-		out.setText(text);
-		out.select(0,text.length());
-		out.requestFocusInWindow();
+		in.setText(text);
+		for(TextTranslator translator:translators){
+			translator.translate(text,callback);
+		}
 	}
 	@Override
 	public JComponent getUserInterface(){
@@ -44,18 +46,6 @@ public class SimpleTextTranslator extends JPanel implements TextTranslator{
 	}
 	@Override
 	public String getName(){
-		return "Manual";
-	}
-	public static void main(String[] args) throws FileNotFoundException{
-		JFrame f=new JFrame("Translator");
-		SimpleTextTranslator translator=new SimpleTextTranslator();
-		PlainTextTranslator t=new PlainTextTranslator();
-		t.setOnFinished(()->{});
-		t.setTextTranslator(translator);
-		f.add(translator);
-		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setVisible(true);
-		t.start(new FileInputStream("/home/kwong/NetBeansProjects/JSchemeMin/README.md"),System.out);
+		return "Integrated";
 	}
 }

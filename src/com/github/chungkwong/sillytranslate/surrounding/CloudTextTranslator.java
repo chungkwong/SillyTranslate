@@ -14,7 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.chungkwong.sillytranslate.sentence;
+package com.github.chungkwong.sillytranslate.surrounding;
+import com.github.chungkwong.sillytranslate.sentence.*;
+import com.github.chungkwong.sillytranslate.ui.*;
 import com.github.chungkwong.sillytranslate.util.*;
 import java.awt.*;
 import java.io.*;
@@ -26,12 +28,11 @@ import javax.swing.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class CloudTranslatorView extends JPanel{
-	private final JTextField input=new JTextField();
+public class CloudTextTranslator extends JPanel implements TextTranslator{
 	private final ArrayList<RealTimeTask<String>> output=new ArrayList<>();
-	public CloudTranslatorView(CloudTranslator... translators){
+	private DocumentTranslatorEngine callback;
+	public CloudTextTranslator(CloudTranslator... translators){
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-		add(input);
 		for(CloudTranslator translator:translators){
 			JButton slogan=new JButton(translator.getSLOGAN());
 			slogan.addActionListener((e)->{
@@ -41,9 +42,10 @@ public class CloudTranslatorView extends JPanel{
 					Logger.getLogger(CloudTranslatorView.class.getName()).log(Level.SEVERE,null,ex);
 				}
 			});
+			slogan.setFocusable(false);
 			slogan.setAlignmentX(0);
 			add(slogan);
-			JTextArea area=new JTextArea();
+			JTextArea area=new ActionTextArea((text)->callback.textTranslated(text));
 			add(area);
 			RealTimeTask<String> task=new RealTimeTask<>((text)->{
 				area.setText(translator.translate(text,Locale.ENGLISH,Locale.CHINA,true));
@@ -51,15 +53,18 @@ public class CloudTranslatorView extends JPanel{
 			new Thread(task).start();
 			output.add(task);
 		}
-		input.addActionListener((e)->{
-			output.forEach((task)->task.summit(input.getText()));
-		});
 	}
-	public static void main(String[] args){
-		JFrame f=new JFrame("Cloud translator");
-		f.add(new JScrollPane(new CloudTranslatorView(new BaiduTranslator(),new YandexTranslator())));
-		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setVisible(true);
+	@Override
+	public void translate(String text,DocumentTranslatorEngine callback){
+		this.callback=callback;
+		output.forEach((task)->task.summit(text));
+	}
+	@Override
+	public JComponent getUserInterface(){
+		return this;
+	}
+	@Override
+	public String getName(){
+		return "Cloud";
 	}
 }

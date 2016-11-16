@@ -37,8 +37,11 @@ public abstract class CloudTranslator{
 		this.HOME=home;
 	}
 	public String translate(String text,Locale from,Locale to){
+		return translate(text,from,to,false);
+	}
+	public String translate(String text,Locale from,Locale to,boolean post){
 		Map<String,String> params=getParams(text,getLanguageCode(from),getLanguageCode(to));
-		return extractTranslation(get(TRANS_API_HOST,params));
+		return extractTranslation(post?post(TRANS_API_HOST,params):get(TRANS_API_HOST,params));
 	}
 	public String getHOME(){
 		return HOME;
@@ -50,7 +53,7 @@ public abstract class CloudTranslator{
 		try{
 			SSLContext sslcontext=SSLContext.getInstance("TLS");
 			sslcontext.init(null,new TrustManager[]{myX509TrustManager},null);
-			String sendUrl=getUrlWithQueryString(host,params);
+			String sendUrl=host+"?"+encodeParams(params);
             // System.out.println("URL:" + sendUrl);
 			URL uri=new URL(sendUrl);
 			HttpURLConnection conn=(HttpURLConnection)uri.openConnection();
@@ -59,6 +62,43 @@ public abstract class CloudTranslator{
 			}
 			conn.setConnectTimeout(SOCKET_TIMEOUT);
 			conn.setRequestMethod("GET");
+			int statusCode=conn.getResponseCode();
+			if(statusCode!=HttpURLConnection.HTTP_OK){
+				System.out.println("Http错误码："+statusCode);
+			}
+			InputStream is=conn.getInputStream();
+			BufferedReader br=new BufferedReader(new InputStreamReader(is));
+			StringBuilder builder=new StringBuilder();
+			String line=null;
+			while((line=br.readLine())!=null){
+				builder.append(line);
+			}
+			String text=builder.toString();
+			close(br);
+			close(is);
+			conn.disconnect();
+			return text;
+		}catch(IOException|KeyManagementException|NoSuchAlgorithmException e){
+			e.printStackTrace();
+		}
+		return null;
+	}
+	private String post(String host,Map<String,String> params){
+		try{
+			SSLContext sslcontext=SSLContext.getInstance("TLS");
+			sslcontext.init(null,new TrustManager[]{myX509TrustManager},null);
+			URL uri=new URL(host);
+			HttpURLConnection conn=(HttpURLConnection)uri.openConnection();
+			if(conn instanceof HttpsURLConnection){
+				((HttpsURLConnection)conn).setSSLSocketFactory(sslcontext.getSocketFactory());
+			}
+			conn.setConnectTimeout(SOCKET_TIMEOUT);
+			conn.setRequestMethod("POST");
+			conn.setDoOutput(true);
+			try(OutputStreamWriter out=new OutputStreamWriter(conn.getOutputStream())) {
+				out.write(encodeParams(params));
+				out.flush();
+			}
 			int statusCode=conn.getResponseCode();
 			if(statusCode!=HttpURLConnection.HTTP_OK){
 				System.out.println("Http错误码："+statusCode);
@@ -89,13 +129,8 @@ public abstract class CloudTranslator{
 			}
 		}
 	}
-	private static String getUrlWithQueryString(String url,Map<String,String> params){
-		StringBuilder builder=new StringBuilder(url);
-		if(url.contains("?")){
-			builder.append("&");
-		}else{
-			builder.append("?");
-		}
+	private static String encodeParams(Map<String,String> params){
+		StringBuilder builder=new StringBuilder();
 		boolean first=true;
 		for(String key:params.keySet()){
 			String value=params.get(key);

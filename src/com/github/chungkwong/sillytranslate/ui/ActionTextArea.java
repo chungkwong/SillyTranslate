@@ -16,20 +16,20 @@
  */
 package com.github.chungkwong.sillytranslate.ui;
 import java.awt.event.*;
+import java.util.function.*;
 import javax.swing.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class ActionTextArea extends JTextArea{
-	public ActionTextArea(Runnable onCommit){
+	public ActionTextArea(Consumer<String> consumer){
 		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,KeyEvent.CTRL_DOWN_MASK),"commit");
 		getActionMap().put("commit",new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e){
-				onCommit.run();
+				consumer.accept(getText());
 			}
 		});
 	}
-
 }

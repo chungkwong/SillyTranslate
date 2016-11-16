@@ -29,5 +29,8 @@ public class TextTranslatorStub implements TextTranslator{
 	public JComponent getUserInterface(){
 		return new JLabel();
 	}
-
+	@Override
+	public String getName(){
+		return "Stub";
+	}
 }

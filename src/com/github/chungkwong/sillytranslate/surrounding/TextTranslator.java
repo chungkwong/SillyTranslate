@@ -23,4 +23,5 @@ import javax.swing.*;
 public interface TextTranslator{
 	void translate(String text,DocumentTranslatorEngine callback);
 	JComponent getUserInterface();
+	String getName();
 }

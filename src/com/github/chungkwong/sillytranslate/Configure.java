@@ -30,8 +30,11 @@ import javax.swing.*;
  */
 public class Configure extends JFrame{
 	private final Preferences pref=Preferences.userNodeForPackage(Configure.class);
-	private final JRadioButton simple=new JRadioButton("Naive");
-	private final JRadioButton staged=new JRadioButton("Staged");
+	private final JCheckBox simple=new JCheckBox("Naive");
+	private final JCheckBox staged=new JCheckBox("Staged");
+	private final JCheckBox cloud=new JCheckBox("Cloud");
+	private final JCheckBox baidu=new JCheckBox("Baidu");
+	private final JCheckBox yandex=new JCheckBox("Yandex");
 	private final JRadioButton simpleLex=new JRadioButton("Simple");
 	private final JRadioButton prefixLex=new JRadioButton("Prefix");
 	private final JRadioButton javaLex=new JRadioButton("Java default");
@@ -41,11 +44,11 @@ public class Configure extends JFrame{
 	private final DictionaryChooser dictionaryChooser=new DictionaryChooser();
 	public Configure(){
 		Box box=Box.createVerticalBox();
-		ButtonGroup translatorType=new ButtonGroup();
-		translatorType.add(simple);
 		box.add(simple);
-		translatorType.add(staged);
 		box.add(staged);
+		box.add(cloud);
+		box.add(baidu);
+		box.add(yandex);
 		Box lexBox=Box.createHorizontalBox();
 		lexBox.add(new JLabel("Lex:"));
 		ButtonGroup lexType=new ButtonGroup();
@@ -133,6 +136,9 @@ public class Configure extends JFrame{
 	private void updatePref(){
 		pref.putBoolean("NaiveTranslator",simple.isSelected());
 		pref.putBoolean("StagedTranslator",staged.isSelected());
+		pref.putBoolean("CloudTranslator",cloud.isSelected());
+		pref.putBoolean("useBaidu",baidu.isSelected());
+		pref.putBoolean("useYandex",yandex.isSelected());
 		pref.putBoolean("SimpleLex",simpleLex.isSelected());
 		pref.putBoolean("PrefixLex",prefixLex.isSelected());
 		pref.putBoolean("JavaLex",javaLex.isSelected());
@@ -142,8 +148,11 @@ public class Configure extends JFrame{
 		pref.put("Dictionary",dictionaryChooser.toPaths());
 	}
 	private void load(){
-		simple.setSelected(pref.getBoolean("NaiveTranslator",false));
+		simple.setSelected(pref.getBoolean("NaiveTranslator",true));
 		staged.setSelected(pref.getBoolean("StagedTranslator",true));
+		staged.setSelected(pref.getBoolean("CloudTranslator",true));
+		staged.setSelected(pref.getBoolean("useBaidu",true));
+		staged.setSelected(pref.getBoolean("useYandex",false));
 		simpleLex.setSelected(pref.getBoolean("SimpleLex",true));
 		prefixLex.setSelected(pref.getBoolean("PrefixLex",false));
 		javaLex.setSelected(pref.getBoolean("JavaLex",false));
@@ -158,7 +167,8 @@ public class Configure extends JFrame{
 		}
 	}
 	public TextTranslator getTranslator(){
-		if(simple.isSelected())
+
+		/*if(simple.isSelected())
 			return new SimpleTextTranslator();
 		else{
 			Lex lex=simpleLex.isSelected()?new SimpleLex():
@@ -166,7 +176,26 @@ public class Configure extends JFrame{
 			WordTranslator wordTranslator=new WordTranslator(dictionaryChooser.getDictionary());
 			SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(new NaiveTranslator(24));
 			return new StagedTextTranslator(lex,wordTranslator,sentenceTranslator);
+		}*/
+		ArrayList<TextTranslator> translators=new ArrayList<>();
+		if(simple.isSelected())
+			translators.add(new SimpleTextTranslator());
+		if(staged.isSelected()){
+			Lex lex=simpleLex.isSelected()?new SimpleLex():
+					(prefixLex.isSelected()?new PrefixLex(dictionaryChooser.getDictionary()):new JavaLex(localeChooser.getSelectedItem()));
+			WordTranslator wordTranslator=new WordTranslator(dictionaryChooser.getDictionary());
+			SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(new NaiveTranslator(24));
+			translators.add(new StagedTextTranslator(lex,wordTranslator,sentenceTranslator));
 		}
+		if(cloud.isSelected()){
+			ArrayList<CloudTranslator> clouds=new ArrayList<>();
+			if(baidu.isSelected())
+				clouds.add(new BaiduTranslator());
+			if(yandex.isSelected())
+				clouds.add(new YandexTranslator());
+			translators.add(new CloudTextTranslator(clouds.toArray(new CloudTranslator[0])));
+		}
+		return new CombinedTextTranslator(translators.toArray(new TextTranslator[0]));
 	}
 }
 

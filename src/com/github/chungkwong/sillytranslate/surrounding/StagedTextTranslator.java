@@ -28,7 +28,6 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 	private final String LEX="Lex";
 	private final String WORD="Word";
 	private final String SENTENCE="Sentence";
-	private final JTextArea in=new JTextArea();
 	private final CardLayout card=new CardLayout();
 	private final JPanel content=new JPanel(card);
 	private final LexEditor lexEditor=new LexEditor();
@@ -41,8 +40,6 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 		this.lex=lex;
 		this.wordTranslator=wordTranslator;
 		this.sentenceTranslator=sentenceTranslator;
-		in.setEditable(false);
-		add(in,BorderLayout.NORTH);
 		content.add(lexEditor,LEX);
 		content.add(wordTranslator,WORD);
 		content.add(sentenceTranslator,SENTENCE);
@@ -52,7 +49,6 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 	@Override
 	public void translate(String text,DocumentTranslatorEngine callback){
 		this.callback=callback;
-		in.setText(text);
 		card.show(content,LEX);
 		lex.setInput(text);
 		lexEditor.accept(lex,(words)->{
@@ -68,6 +64,10 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 	@Override
 	public JComponent getUserInterface(){
 		return this;
+	}
+	@Override
+	public String getName(){
+		return "Guided";
 	}
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		JFrame f=new JFrame("Translator");
