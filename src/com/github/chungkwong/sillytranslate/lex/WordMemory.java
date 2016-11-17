@@ -17,59 +17,79 @@
 package com.github.chungkwong.sillytranslate.lex;
 import java.io.*;
 import java.util.*;
+import java.util.logging.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class WordMemory{
 	private final HashMap<String,List<Meaning>> map=new HashMap<>();
-	public void registerMeanings(String word,List<Meaning> meanings){
-		map.put(word,meanings);
+	private final File cache;
+	public WordMemory(){
+		this.cache=null;
 	}
-	public List<Meaning> getMeanings(String word){
-		return map.get(word);
-	}
-	public static WordMemory loadWordMemory(InputStream in){
-		WordMemory memory=new WordMemory();
-		DataInputStream sc=new DataInputStream(in);
-		try{
+	public WordMemory(String path){
+		this.cache=new File(path);
+		try(DataInputStream sc=new DataInputStream(new BufferedInputStream(new FileInputStream(cache)))){
+			cache.createNewFile();
 			while(true){
 				String word=sc.readUTF();
 				List<Meaning> meanings=new ArrayList<>();
 				while(sc.readBoolean()){
 					meanings.add(new Meaning(sc.readUTF(),sc.readUTF(),sc.readInt()));
 				}
-				memory.map.put(word,meanings);
+				map.put(word,meanings);
 			}
 		}catch(IOException ex){
-
+			Logger.getLogger(WordMemory.class.getName()).log(Level.SEVERE,null,ex);
 		}
-		return memory;
+		Runtime.getRuntime().addShutdownHook(new Thread(this::save));
 	}
-	public void saveTo(OutputStream out) throws UnsupportedEncodingException,IOException{
-		DataOutputStream to=new DataOutputStream(out);
-		for(Map.Entry<String,List<Meaning>> entry:map.entrySet()){
-			to.writeUTF(entry.getKey());
-			for(Meaning m:entry.getValue())
-				if(m.getCount()>0){
+	public void useMeaning(String word,String meaning,String tag){
+		List<Meaning> lst=map.get(word);
+		if(lst==null){
+			lst=new ArrayList<>();
+			map.put(word,lst);
+		}
+		Optional<Meaning> entry=lst.stream().filter((m)->m.getText().equals(meaning)&&m.getTag().equals(tag)).findAny();
+		if(entry.isPresent()){
+			entry.get().used();
+		}else{
+			lst.add(new Meaning(meaning,tag,1));
+		}
+	}
+	public List<Meaning> getMeanings(String word){
+		return map.get(word);
+	}
+	public void save(){
+		try(DataOutputStream to=new DataOutputStream(new BufferedOutputStream(new FileOutputStream(cache)))){
+			for(Map.Entry<String,List<Meaning>> entry:map.entrySet()){
+				to.writeUTF(entry.getKey());
+				for(Meaning m:entry.getValue()){
 					to.writeBoolean(true);
 					to.writeUTF(m.getText());
 					to.writeUTF(m.getTag());
 					to.writeInt(m.getCount());
 				}
-			to.writeBoolean(false);
+				to.writeBoolean(false);
+			}
+			to.flush();
+		}catch(IOException ex){
+			Logger.getLogger(WordMemory.class.getName()).log(Level.SEVERE,null,ex);
 		}
-		to.flush();
 	}
 	@Override
 	public String toString(){
 		return map.toString();
 	}
 	public static void main(String[] args) throws FileNotFoundException, IOException{
-		WordMemory memory=new WordMemory();
-		memory.registerMeanings("k",Arrays.asList());
-		memory.registerMeanings("a",Arrays.asList(new Meaning("一","art",3),new Meaning("个","ru",0),new Meaning("a","al",1)));
-		memory.saveTo(new FileOutputStream("/home/kwong/useless.mem"));
-		System.out.println(loadWordMemory(new FileInputStream("/home/kwong/useless.mem")));
+		WordMemory memory=new WordMemory("/home/kwong/useless.mem");
+		memory.useMeaning("a","一","art");
+		memory.useMeaning("a","一","art");
+		memory.useMeaning("a","一","art");
+		memory.useMeaning("a","个","ru");
+		memory.useMeaning("a","a","al");
+		memory.save();
+		System.out.println(new WordMemory("/home/kwong/useless.mem"));
 	}
 }

@@ -26,11 +26,19 @@ public class CombinedTextTranslator extends JPanel implements TextTranslator{
 	public CombinedTextTranslator(TextTranslator... translators){
 		this.translators=translators;
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		JLabel org=new JLabel("Input");
+		org.setAlignmentX(0);
+		add(org);
 		in.setEditable(false);
+		in.setAlignmentX(0);
 		add(in);
 		for(TextTranslator translator:translators){
-			add(new JLabel(translator.getName()));
-			add(translator.getUserInterface());
+			JLabel label=new JLabel(translator.getName());
+			label.setAlignmentX(0);
+			add(label);
+			JComponent translatorView=translator.getUserInterface();
+			translatorView.setAlignmentX(0);
+			add(translatorView);
 		}
 	}
 	@Override

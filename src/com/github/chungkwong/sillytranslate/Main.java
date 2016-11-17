@@ -15,8 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate;
-import com.github.chungkwong.sillytranslate.lex.*;
-import com.github.chungkwong.sillytranslate.sentence.*;
 import com.github.chungkwong.sillytranslate.surrounding.*;
 import java.awt.*;
 import java.io.*;
@@ -136,9 +134,6 @@ public class Main extends JFrame{
 		return pane;
 	}
 	public static void main(String[] args) throws IOException{
-		Lex lex=new SimpleLex();
-		WordTranslator wordTranslator=new WordTranslator(new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2")));
-		SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(new NaiveTranslator(24));
 		new Main();
 	}
 }

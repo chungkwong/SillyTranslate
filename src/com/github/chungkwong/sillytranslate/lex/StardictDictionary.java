@@ -98,7 +98,7 @@ public class StardictDictionary implements NavigableDictionary{
 			}catch(CharacterCodingException ex){
 				Logger.getLogger(StardictDictionary.class.getName()).log(Level.SEVERE,null,ex);
 			}
-		return null;
+		return "";
 	}
 	@Override
 	public String getCurrentWord(String word){

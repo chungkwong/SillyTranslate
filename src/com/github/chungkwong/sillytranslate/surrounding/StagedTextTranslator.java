@@ -72,7 +72,7 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		JFrame f=new JFrame("Translator");
 		Lex lex=new SimpleLex();
-		WordTranslator wordTranslator=new WordTranslator(new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2")));
+		WordTranslator wordTranslator=new WordTranslator(new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2")),new WordMemory());
 		SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(new NaiveTranslator(24));
 		StagedTextTranslator translator=new StagedTextTranslator(lex,wordTranslator,sentenceTranslator);
 		PlainTextTranslator t=new PlainTextTranslator();

@@ -26,26 +26,38 @@ import javax.swing.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class DictionaryHintExtractor{
-	public static Hint[] extractHint(String word,String prefix,NavigableDictionary dict){
-		String entry=dict.getMeaning(word);
-		if(entry==null)
-			entry=dict.getMeaning(normalize(word));
-		if(entry!=null)
-			return split(entry,word,prefix);
-		else
-			return new Hint[0];
+	public static Hint[] extractHint(String word,String prefix,NavigableDictionary dict,WordMemory memory){
+		String normalizeWord=normalize(word);
+		ArrayList<Hint> hints=new ArrayList<>();
+		appendHistory(word,prefix,hints,memory);
+		split(dict.getMeaning(word),word,prefix,hints);
+		if(!normalizeWord.equals(word)){
+			appendHistory(normalizeWord,prefix,hints,memory);
+			split(dict.getMeaning(normalizeWord),word,prefix,hints);
+		}
+		return hints.toArray(new Hint[0]);
 	}
 	private static String normalize(String word){
 		return word.toLowerCase();
 	}
-	private static Hint[] split(String text,String word,String prefix){
-		ArrayList<Hint> hints=new ArrayList<>();
+	private static void appendHistory(String word,String prefix,ArrayList<Hint> hints,WordMemory memory){
+		java.util.List<Meaning> meanings=memory.getMeanings(word);
+		if(meanings!=null){
+			int prefixLen=prefix.length();
+			for(Meaning meaning:meanings)
+				hints.add(new SimpleHint(meaning.getText()+meaning.getCount(),meaning.getText().substring(prefixLen),
+						null,meaning.getTag()));
+		}
+	}
+	private static void split(String text,String word,String prefix,ArrayList<Hint> hints){
 		int prefixLen=prefix.length();
 		String type="";
 		for(int i=0;i<text.length();i++){
 			char c=text.charAt(i);
 			if(c=='['){
 				while(++i<text.length()&&text.charAt(i)!=']');
+			}else if(c=='{'){
+				while(++i<text.length()&&text.charAt(i)!='}');
 			}else if(Character.isWhitespace(c)){
 
 			}else{
@@ -66,17 +78,18 @@ public class DictionaryHintExtractor{
 		}
 		if(word.startsWith(prefix))
 			hints.add(new SimpleHint(word,word.substring(prefixLen),null,""));
-		return hints.toArray(new Hint[0]);
 	}
 	public static void main(String[] args) throws IOException{
 		JFrame f=new JFrame("Test");
 		StardictDictionary dict=new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2"));
+		WordMemory memory=new WordMemory();
 		JTextField input=new JTextField();
 		f.add(input,BorderLayout.NORTH);
 		JTextArea output=new JTextArea();
 		f.add(output,BorderLayout.CENTER);
 		input.addActionListener((e)->{
-			output.setText(Arrays.stream(extractHint(input.getText(),"",dict)).map((o)->o.toString()).collect(Collectors.joining("\n")));
+			output.setText(Arrays.stream(extractHint(input.getText(),"",dict,memory)).
+					map((o)->o.toString()).collect(Collectors.joining("\n")));
 		});
 		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

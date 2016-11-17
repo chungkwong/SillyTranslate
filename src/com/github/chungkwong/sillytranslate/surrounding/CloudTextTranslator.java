@@ -31,6 +31,8 @@ import javax.swing.*;
 public class CloudTextTranslator extends JPanel implements TextTranslator{
 	private final ArrayList<RealTimeTask<String>> output=new ArrayList<>();
 	private DocumentTranslatorEngine callback;
+	private Locale from;
+	private Locale to;
 	public CloudTextTranslator(CloudTranslator... translators){
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		for(CloudTranslator translator:translators){
@@ -46,13 +48,18 @@ public class CloudTextTranslator extends JPanel implements TextTranslator{
 			slogan.setAlignmentX(0);
 			add(slogan);
 			JTextArea area=new ActionTextArea((text)->callback.textTranslated(text));
+			area.setAlignmentX(0);
 			add(area);
 			RealTimeTask<String> task=new RealTimeTask<>((text)->{
-				area.setText(translator.translate(text,Locale.ENGLISH,Locale.CHINA,true));
+				area.setText(translator.translate(text,from,to,true));
 			});
 			new Thread(task).start();
 			output.add(task);
 		}
+	}
+	public void setTranslateDirection(Locale from,Locale to){
+		this.from=from;
+		this.to=to;
 	}
 	@Override
 	public void translate(String text,DocumentTranslatorEngine callback){

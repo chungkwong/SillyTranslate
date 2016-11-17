@@ -40,7 +40,9 @@ public class Configure extends JFrame{
 	private final JRadioButton javaLex=new JRadioButton("Java default");
 	private final JRadioButton dictWord=new JRadioButton("Dictionary");
 	private final JRadioButton naiveSentence=new JRadioButton("Naive");
-	private final LocaleChooser localeChooser=new LocaleChooser();
+	private final JTextField wordCache=new JTextField();
+	private final LocaleChooser localeIn=new LocaleChooser();
+	private final LocaleChooser localeOut=new LocaleChooser();
 	private final DictionaryChooser dictionaryChooser=new DictionaryChooser();
 	public Configure(){
 		Box box=Box.createVerticalBox();
@@ -76,9 +78,16 @@ public class Configure extends JFrame{
 		box.add(sentenceBox);
 		Box localeBox=Box.createHorizontalBox();
 		localeBox.add(new JLabel("Input language"));
-		localeBox.add(localeChooser);
+		localeBox.add(localeIn);
+		localeBox.add(new JLabel("Output language"));
+		localeBox.add(localeOut);
 		localeBox.setAlignmentX(0);
 		box.add(localeBox);
+		Box cacheBox=Box.createHorizontalBox();
+		cacheBox.add(new JLabel("Word cache path"));
+		cacheBox.add(wordCache);
+		cacheBox.setAlignmentX(0);
+		box.add(cacheBox);
 		dictionaryChooser.setAlignmentX(0);
 		box.add(dictionaryChooser);
 		Box control=Box.createHorizontalBox();
@@ -144,21 +153,25 @@ public class Configure extends JFrame{
 		pref.putBoolean("JavaLex",javaLex.isSelected());
 		pref.putBoolean("DictionaryTranslator",dictWord.isSelected());
 		pref.putBoolean("NaiveSentenceTranslator",naiveSentence.isSelected());
-		pref.put("InputLanguage",localeChooser.getSelectedItem().toLanguageTag());
+		pref.put("InputLanguage",localeIn.getSelectedItem().toLanguageTag());
+		pref.put("OutputLanguage",localeOut.getSelectedItem().toLanguageTag());
+		pref.put("WordCache",wordCache.getText());
 		pref.put("Dictionary",dictionaryChooser.toPaths());
 	}
 	private void load(){
 		simple.setSelected(pref.getBoolean("NaiveTranslator",true));
 		staged.setSelected(pref.getBoolean("StagedTranslator",true));
-		staged.setSelected(pref.getBoolean("CloudTranslator",true));
-		staged.setSelected(pref.getBoolean("useBaidu",true));
-		staged.setSelected(pref.getBoolean("useYandex",false));
+		cloud.setSelected(pref.getBoolean("CloudTranslator",true));
+		baidu.setSelected(pref.getBoolean("useBaidu",false));
+		yandex.setSelected(pref.getBoolean("useYandex",false));
 		simpleLex.setSelected(pref.getBoolean("SimpleLex",true));
 		prefixLex.setSelected(pref.getBoolean("PrefixLex",false));
 		javaLex.setSelected(pref.getBoolean("JavaLex",false));
 		dictWord.setSelected(pref.getBoolean("DictionaryTranslator",true));
 		naiveSentence.setSelected(pref.getBoolean("NaiveSentenceTranslator",true));
-		localeChooser.setSelectedItem(Locale.forLanguageTag(pref.get("InputLanguage","en-US")));
+		localeIn.setSelectedItem(Locale.forLanguageTag(pref.get("InputLanguage","en-US")));
+		localeOut.setSelectedItem(Locale.forLanguageTag(pref.get("OutputLanguage","zh-CN")));
+		wordCache.setText(pref.get("WordCache",System.getProperty("user.home")+"/.sillytranslatecache"));
 		try{
 			dictionaryChooser.fromPaths(pref.get("Dictionary",""));
 		}catch(IOException ex){
@@ -182,8 +195,8 @@ public class Configure extends JFrame{
 			translators.add(new SimpleTextTranslator());
 		if(staged.isSelected()){
 			Lex lex=simpleLex.isSelected()?new SimpleLex():
-					(prefixLex.isSelected()?new PrefixLex(dictionaryChooser.getDictionary()):new JavaLex(localeChooser.getSelectedItem()));
-			WordTranslator wordTranslator=new WordTranslator(dictionaryChooser.getDictionary());
+					(prefixLex.isSelected()?new PrefixLex(dictionaryChooser.getDictionary()):new JavaLex(localeIn.getSelectedItem()));
+			WordTranslator wordTranslator=new WordTranslator(dictionaryChooser.getDictionary(),new WordMemory(wordCache.getText()));
 			SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(new NaiveTranslator(24));
 			translators.add(new StagedTextTranslator(lex,wordTranslator,sentenceTranslator));
 		}
@@ -193,7 +206,9 @@ public class Configure extends JFrame{
 				clouds.add(new BaiduTranslator());
 			if(yandex.isSelected())
 				clouds.add(new YandexTranslator());
-			translators.add(new CloudTextTranslator(clouds.toArray(new CloudTranslator[0])));
+			CloudTextTranslator cloudTextTranslator=new CloudTextTranslator(clouds.toArray(new CloudTranslator[0]));
+			cloudTextTranslator.setTranslateDirection(localeIn.getSelectedItem(),localeOut.getSelectedItem());
+			translators.add(cloudTextTranslator);
 		}
 		return new CombinedTextTranslator(translators.toArray(new TextTranslator[0]));
 	}
