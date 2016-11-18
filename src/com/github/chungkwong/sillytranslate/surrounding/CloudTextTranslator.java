@@ -41,7 +41,7 @@ public class CloudTextTranslator extends JPanel implements TextTranslator{
 				try{
 					Desktop.getDesktop().browse(new URI(translator.getHOME()));
 				}catch(IOException|URISyntaxException ex){
-					Logger.getLogger(CloudTranslatorView.class.getName()).log(Level.SEVERE,null,ex);
+					Logger.getLogger(CloudTextTranslator.class.getName()).log(Level.SEVERE,null,ex);
 				}
 			});
 			slogan.setFocusable(false);

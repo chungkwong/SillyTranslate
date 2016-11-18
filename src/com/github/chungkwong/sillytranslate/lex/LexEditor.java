@@ -20,6 +20,7 @@ import com.github.chungkwong.sillytranslate.ui.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.List;
 import java.util.*;
 import java.util.function.*;
 import java.util.logging.*;
@@ -31,11 +32,11 @@ import javax.swing.text.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class LexEditor extends JPanel implements ActionListener,DocumentListener,TranslatorStage<Lex,Iterator<Token>>{
+public class LexEditor extends JPanel implements ActionListener,DocumentListener,TranslatorStage<Lex,List<Token>>{
 	private final ActionTextArea pane;
 	private final TreeMap<Integer,Token> tokens=new TreeMap<>();
 	private final JPopupMenu menu=new JPopupMenu();
-	private Consumer<Iterator<Token>> consumer;
+	private Consumer<List<Token>> consumer;
 	public LexEditor(){
 		super(new BorderLayout());
 		pane=new ActionTextArea((text)->commit());
@@ -52,11 +53,11 @@ public class LexEditor extends JPanel implements ActionListener,DocumentListener
 	public void commit(){
 		pane.getDocument().removeDocumentListener(this);
 		pane.setText("");
-		consumer.accept(tokens.values().stream().collect(Collectors.toList()).iterator());
+		consumer.accept(tokens.values().stream().collect(Collectors.toList()));
 		tokens.clear();
 	}
 	@Override
-	public JComponent accept(Lex source,Consumer<Iterator<Token>> callback){
+	public JComponent accept(Lex source,Consumer<List<Token>> callback){
 		this.consumer=callback;
 		pane.getDocument().removeDocumentListener(this);
 		pane.setText("");
@@ -110,7 +111,7 @@ public class LexEditor extends JPanel implements ActionListener,DocumentListener
 					if(i==-1)
 						i=raw.length();
 					left=tokens.get(pos).getText().substring(Math.min(begin-pos,tokens.get(pos).getText().length()));
-					tokens.put(pos,new Token(Token.Type.WORD,tokens.get(pos).getText().substring(0,begin-pos)+raw.substring(0,i)));
+					tokens.put(pos,new Token(Token.Type.WORD,tokens.get(pos).getText().substring(0,begin-pos)+raw.substring(0,i),""));
 				}else{
 					left=tokens.remove(pos).getText();
 				}
@@ -120,16 +121,16 @@ public class LexEditor extends JPanel implements ActionListener,DocumentListener
 					int to=raw.indexOf(' ',i);
 					if(to==-1)
 						to=raw.length();
-					tokens.put(i+begin,new Token(Token.Type.WORD,raw.substring(i,to)));
+					tokens.put(i+begin,new Token(Token.Type.WORD,raw.substring(i,to),""));
 					i=to;
 				}
 			}
 			if(!left.isEmpty()){
 				pos=tokens.lowerKey(end);
 				if(pos!=null&&pos+tokens.get(pos).getText().length()==end){
-					tokens.put(pos,new Token(Token.Type.WORD,tokens.get(pos).getText()+left));
+					tokens.put(pos,new Token(Token.Type.WORD,tokens.get(pos).getText()+left,""));
 				}else{
-					tokens.put(end,new Token(Token.Type.WORD,left));
+					tokens.put(end,new Token(Token.Type.WORD,left,""));
 				}
 			}
 		}catch(BadLocationException ex){
@@ -147,7 +148,7 @@ public class LexEditor extends JPanel implements ActionListener,DocumentListener
 			if(text.isEmpty())
 				tokens.remove(pos);
 			else
-				tokens.put(pos,new Token(token.getType(),text));
+				tokens.put(pos,new Token(token.getType(),text,""));
 			pos=tokens.higherKey(pos);
 		}
 		while(pos!=null&&pos+tokens.get(pos).getText().length()<=end){
@@ -158,7 +159,7 @@ public class LexEditor extends JPanel implements ActionListener,DocumentListener
 			Integer prev=tokens.lowerKey(pos);
 			if(prev!=null){
 				Token t=tokens.get(prev);
-				tokens.put(prev,new Token(t.getType(),t.getText()+tokens.get(pos).getText().substring(end-pos)));
+				tokens.put(prev,new Token(t.getType(),t.getText()+tokens.get(pos).getText().substring(end-pos),""));
 				tokens.remove(pos);
 				pos=tokens.higherKey(pos);
 			}
@@ -183,7 +184,7 @@ public class LexEditor extends JPanel implements ActionListener,DocumentListener
 			int start=entry.getKey();
 			String text=entry.getValue().getText();
 			Token.Type type=Token.Type.valueOf(e.getActionCommand());
-			tokens.put(start,new Token(type,text));
+			tokens.put(start,new Token(type,text,""));
 			correctHighlight();
 		}
 	}

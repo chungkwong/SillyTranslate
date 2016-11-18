@@ -37,14 +37,7 @@ public class JavaLex implements Lex{
 		iter.first();
 	}
 	private Token createToken(String word){
-		Token.Type type=Token.Type.WORD;
-		if(word.codePointCount(0,word.length())==1){
-			ResourceBundle bundle=ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/lex/LANGUAGE",locale);
-			for(String key:bundle.keySet())
-				if(bundle.getString(key).contains(word))
-					type=Token.Type.valueOf(key);
-		}
-		return new Token(type,word);
+		return new Token(Token.guessType(word,locale),word,"");
 	}
 	@Override
 	public Token next() throws IOException{

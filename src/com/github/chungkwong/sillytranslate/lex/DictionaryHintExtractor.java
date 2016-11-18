@@ -44,9 +44,10 @@ public class DictionaryHintExtractor{
 		java.util.List<Meaning> meanings=memory.getMeanings(word);
 		if(meanings!=null){
 			int prefixLen=prefix.length();
-			for(Meaning meaning:meanings)
-				hints.add(new SimpleHint(meaning.getText()+meaning.getCount(),meaning.getText().substring(prefixLen),
-						null,meaning.getTag()));
+			for(Meaning meaning:meanings){
+				String token=meaning.getText()+":"+meaning.getTag();
+				hints.add(new SimpleHint(token+meaning.getCount(),token.substring(prefixLen),null,""));
+			}
 		}
 	}
 	private static void split(String text,String word,String prefix,ArrayList<Hint> hints){
@@ -70,8 +71,10 @@ public class DictionaryHintExtractor{
 				String token=text.substring(i,j);
 				if(token.endsWith("."))
 					type=token;
-				else if(!token.isEmpty()&&token.startsWith(prefix))
-					hints.add(new SimpleHint(token,token.substring(prefixLen),null,type));
+				else if(!token.isEmpty()&&token.startsWith(prefix)){
+					token+=":"+type;
+					hints.add(new SimpleHint(token,token.substring(prefixLen),null,""));
+				}
 				if(j>i)
 					i=j-1;
 			}

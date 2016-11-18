@@ -23,12 +23,13 @@ import java.util.logging.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class WordMemory{
+	private static final HashMap<String,WordMemory> pool=new HashMap<>();
 	private final HashMap<String,List<Meaning>> map=new HashMap<>();
 	private final File cache;
 	public WordMemory(){
 		this.cache=null;
 	}
-	public WordMemory(String path){
+	private WordMemory(String path){
 		this.cache=new File(path);
 		try(DataInputStream sc=new DataInputStream(new BufferedInputStream(new FileInputStream(cache)))){
 			cache.createNewFile();
@@ -40,10 +41,21 @@ public class WordMemory{
 				}
 				map.put(word,meanings);
 			}
+		}catch(EOFException ex){
+
 		}catch(IOException ex){
 			Logger.getLogger(WordMemory.class.getName()).log(Level.SEVERE,null,ex);
 		}
 		Runtime.getRuntime().addShutdownHook(new Thread(this::save));
+	}
+	public static WordMemory getWordMemory(String path){
+		if(pool.containsKey(path))
+			return pool.get(path);
+		else{
+			WordMemory instance=new WordMemory(path);
+			pool.put(path,instance);
+			return instance;
+		}
 	}
 	public void useMeaning(String word,String meaning,String tag){
 		List<Meaning> lst=map.get(word);

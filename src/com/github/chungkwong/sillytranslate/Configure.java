@@ -41,6 +41,9 @@ public class Configure extends JFrame{
 	private final JRadioButton dictWord=new JRadioButton("Dictionary");
 	private final JRadioButton naiveSentence=new JRadioButton("Naive");
 	private final JTextField wordCache=new JTextField();
+	private final JTextField yandexKey=new JTextField();
+	private final JTextField baiduId=new JTextField();
+	private final JTextField baiduSecret=new JTextField();
 	private final LocaleChooser localeIn=new LocaleChooser();
 	private final LocaleChooser localeOut=new LocaleChooser();
 	private final DictionaryChooser dictionaryChooser=new DictionaryChooser();
@@ -49,8 +52,20 @@ public class Configure extends JFrame{
 		box.add(simple);
 		box.add(staged);
 		box.add(cloud);
-		box.add(baidu);
-		box.add(yandex);
+		Box baiduBox=Box.createHorizontalBox();
+		baiduBox.add(baidu);
+		baiduBox.add(new JLabel("ID:"));
+		baiduBox.add(baiduId);
+		baiduBox.add(new JLabel("Secret:"));
+		baiduBox.add(baiduSecret);
+		baiduBox.setAlignmentX(0);
+		box.add(baiduBox);
+		Box yandexBox=Box.createHorizontalBox();
+		yandexBox.add(yandex);
+		yandexBox.add(new JLabel("Key:"));
+		yandexBox.add(yandexKey);
+		yandexBox.setAlignmentX(0);
+		box.add(yandexBox);
 		Box lexBox=Box.createHorizontalBox();
 		lexBox.add(new JLabel("Lex:"));
 		ButtonGroup lexType=new ButtonGroup();
@@ -156,6 +171,9 @@ public class Configure extends JFrame{
 		pref.put("InputLanguage",localeIn.getSelectedItem().toLanguageTag());
 		pref.put("OutputLanguage",localeOut.getSelectedItem().toLanguageTag());
 		pref.put("WordCache",wordCache.getText());
+		pref.put("BaiduID",baiduId.getText());
+		pref.put("BaiduSecret",baiduSecret.getText());
+		pref.put("YandexKey",yandexKey.getText());
 		pref.put("Dictionary",dictionaryChooser.toPaths());
 	}
 	private void load(){
@@ -172,6 +190,9 @@ public class Configure extends JFrame{
 		localeIn.setSelectedItem(Locale.forLanguageTag(pref.get("InputLanguage","en-US")));
 		localeOut.setSelectedItem(Locale.forLanguageTag(pref.get("OutputLanguage","zh-CN")));
 		wordCache.setText(pref.get("WordCache",System.getProperty("user.home")+"/.sillytranslatecache"));
+		baiduId.setText(pref.get("BaiduID",""));
+		baiduSecret.setText(pref.get("BaiduSecret",""));
+		yandexKey.setText(pref.get("YandexKey",""));
 		try{
 			dictionaryChooser.fromPaths(pref.get("Dictionary",""));
 		}catch(IOException ex){
@@ -195,17 +216,17 @@ public class Configure extends JFrame{
 			translators.add(new SimpleTextTranslator());
 		if(staged.isSelected()){
 			Lex lex=simpleLex.isSelected()?new SimpleLex():
-					(prefixLex.isSelected()?new PrefixLex(dictionaryChooser.getDictionary()):new JavaLex(localeIn.getSelectedItem()));
-			WordTranslator wordTranslator=new WordTranslator(dictionaryChooser.getDictionary(),new WordMemory(wordCache.getText()));
+					(prefixLex.isSelected()?new PrefixLex(dictionaryChooser.getDictionary(),localeIn.getSelectedItem()):new JavaLex(localeIn.getSelectedItem()));
+			WordTranslator wordTranslator=new WordTranslator(dictionaryChooser.getDictionary(),WordMemory.getWordMemory(wordCache.getText()));
 			SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(new NaiveTranslator(24));
 			translators.add(new StagedTextTranslator(lex,wordTranslator,sentenceTranslator));
 		}
 		if(cloud.isSelected()){
 			ArrayList<CloudTranslator> clouds=new ArrayList<>();
 			if(baidu.isSelected())
-				clouds.add(new BaiduTranslator());
+				clouds.add(new BaiduTranslator(baiduId.getText(),baiduSecret.getText()));
 			if(yandex.isSelected())
-				clouds.add(new YandexTranslator());
+				clouds.add(new YandexTranslator(yandexKey.getText()));
 			CloudTextTranslator cloudTextTranslator=new CloudTextTranslator(clouds.toArray(new CloudTranslator[0]));
 			cloudTextTranslator.setTranslateDirection(localeIn.getSelectedItem(),localeOut.getSelectedItem());
 			translators.add(cloudTextTranslator);

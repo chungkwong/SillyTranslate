@@ -29,6 +29,7 @@ public class ActionTextArea extends JTextArea{
 			@Override
 			public void actionPerformed(ActionEvent e){
 				consumer.accept(getText());
+				setText("");
 			}
 		});
 	}

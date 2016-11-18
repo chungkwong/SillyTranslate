@@ -26,16 +26,13 @@ import java.util.logging.*;
  */
 public class BaiduTranslator extends CloudTranslator{
 	private static final ResourceBundle BUNDLE=ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/sentence/baidu");
-	private static final String APP_ID=BUNDLE.getString("APP_ID");
-	private static final String SECURITY_KEY=BUNDLE.getString("APP_SECRET");
+	private final String APP_ID;
+	private final String SECURITY_KEY;
 	private static final JSONParser PARSER=new JSONParser();
-	public static void main(String[] args){
-		CloudTranslator translator=new BaiduTranslator();
-		String query="I hate you.";
-		System.out.println(translator.translate(query,null,Locale.CHINA));
-	}
-	public BaiduTranslator(){
+	public BaiduTranslator(String APP_ID,String SECURITY_KEY){
 		super(BUNDLE.getString("HOST"),BUNDLE.getString("SLOGAN"),BUNDLE.getString("HOME"));
+		this.APP_ID=APP_ID;
+		this.SECURITY_KEY=SECURITY_KEY;
 	}
 	@Override
 	protected Map<String,String> getParams(String text,String from,String to){

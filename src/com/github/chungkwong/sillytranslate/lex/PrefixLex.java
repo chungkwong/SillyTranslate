@@ -18,6 +18,7 @@ package com.github.chungkwong.sillytranslate.lex;
 import com.github.chungkwong.sillytranslate.util.*;
 import java.awt.*;
 import java.io.*;
+import java.util.*;
 import java.util.logging.*;
 import java.util.stream.*;
 import javax.swing.*;
@@ -28,8 +29,10 @@ import javax.swing.*;
 public class PrefixLex implements Lex{
 	private CodePointReader in;
 	private final NavigableDictionary dict;
-	public PrefixLex(NavigableDictionary dict){
+	private final Locale locale;
+	public PrefixLex(NavigableDictionary dict,Locale locale){
 		this.dict=dict;
+		this.locale=locale;
 	}
 	@Override
 	public void setInput(String text){
@@ -54,14 +57,12 @@ public class PrefixLex implements Lex{
 		if(buf.length()==0)
 			return null;
 		else{
-			Token.Type type=Token.Type.WORD;
 			if(last==null){
 				last=new String(new int[]{buf.codePointAt(0)},0,1);
-				type=Token.Type.OTHER_MARK;
 			}
 			String curr=buf.toString().substring(last.length());
 			in.unread(curr.codePoints().mapToObj((i)->i).collect(Collectors.toList()));
-			return new Token(Token.Type.WORD,last);
+			return new Token(Token.guessType(last,locale),last,"");
 		}
 	}
 	public static void main(String[] args) throws IOException{
@@ -80,7 +81,7 @@ public class PrefixLex implements Lex{
 		JPanel out=new JPanel();
 		in.addActionListener((e)->{
 			out.removeAll();
-			PrefixLex lex=new PrefixLex(zhDict);
+			PrefixLex lex=new PrefixLex(zhDict,Locale.CHINESE);
 			lex.setInput(in.getText());
 			Token word;
 			try{

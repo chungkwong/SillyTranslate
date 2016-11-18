@@ -48,6 +48,13 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 				result.setText(list.getSelectedValue());
 			}
 		});
+		list.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),"submit");
+		list.getActionMap().put("submit",new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e){
+				next();
+			}
+		});
 		list.addMouseListener(new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent e){

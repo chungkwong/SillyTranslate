@@ -35,7 +35,7 @@ public class PrefixLexTest{
 		assertSplit(zhDict,"I do.","I"," ","d","o",".");
 	}
 	private static void assertSplit(NavigableDictionary dict,String sentence,String... words) throws IOException{
-		PrefixLex lex=new PrefixLex(dict);
+		PrefixLex lex=new PrefixLex(dict,Locale.CHINESE);
 		lex.setInput(sentence);
 		Token word;
 		ArrayList<String> result=new ArrayList<>();

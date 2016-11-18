@@ -28,13 +28,13 @@ import javax.swing.text.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class WordTranslator extends JPanel implements TranslatorStage<Iterator<Token>,Iterator<Token>>{
+public class WordTranslator extends JPanel implements TranslatorStage<List<Token>,Iterator<Token>>{
 	private final JLabel currIn=new JLabel();
 	private final JTextField currOut=new JTextField();
-	private final JTextField tag=new JTextField(5);
 	private final WordMemory memory;
 	private List<Token> buf;
-	private Iterator<Token> iter;
+	private List<Token> in;
+	private int index;
 	private Token curr;
 	private Consumer<Iterator<Token>> callback;
 	public WordTranslator(NavigableDictionary dict,WordMemory memory){
@@ -45,20 +45,28 @@ public class WordTranslator extends JPanel implements TranslatorStage<Iterator<T
 		new AutoCompleteSupport(currOut,new DictionaryHintProvider(dict));
 		currOut.addActionListener((e)->next());
 		add(currOut,BorderLayout.CENTER);
-		add(tag,BorderLayout.WEST);
 	}
 	private void next(){
 		if(curr!=null){
-			buf.add(new Token(curr.getType(),currOut.getText()));
-			memory.useMeaning(currIn.getText(),currOut.getText(),tag.getText());
+			String out=currOut.getText(),meaning,tag;
+			if(out.contains(":")){
+				int i=out.lastIndexOf(":");
+				meaning=out.substring(0,i);
+				tag=out.substring(i+1);
+			}else{
+				meaning=out;
+				tag="";
+			}
+			buf.add(new Token(curr.getType(),meaning,tag));
+			memory.useMeaning(currIn.getText(),meaning,tag);
 		}
-		if(iter.hasNext()){
-			curr=iter.next();
+		if(index<in.size()){
+			curr=in.get(index++);
 			currIn.setText(curr.getText());
 			currOut.setText("");
 			currOut.requestFocusInWindow();
 		}else{
-			iter=null;
+			in=null;
 			curr=null;
 			callback.accept(buf.iterator());
 			buf=null;
@@ -66,8 +74,9 @@ public class WordTranslator extends JPanel implements TranslatorStage<Iterator<T
 		}
 	}
 	@Override
-	public JComponent accept(Iterator<Token> source,Consumer<Iterator<Token>> callback){
-		this.iter=source;
+	public JComponent accept(List<Token> source,Consumer<Iterator<Token>> callback){
+		this.in=source;
+		this.index=0;
 		this.callback=callback;
 		buf=new ArrayList<>();
 		next();

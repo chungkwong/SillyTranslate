@@ -16,6 +16,7 @@
  */
 package com.github.chungkwong.sillytranslate;
 import com.github.chungkwong.sillytranslate.surrounding.*;
+import com.github.chungkwong.sillytranslate.ui.*;
 import java.awt.*;
 import java.io.*;
 import java.net.*;
@@ -60,12 +61,14 @@ public class Main extends JFrame{
 	}
 	private JPanel createInputCard(){
 		JPanel pane=new JPanel(new BorderLayout());
-		JTextArea area=new JTextArea();
+		JComboBox<DocumentTranslatorEngine> formats=new JComboBox<>(new DocumentTranslatorEngine[]{
+			new PlainTextTranslator(),new PropertiesTranslator(),new XMLTranslator()});
+		JTextArea area=new ActionTextArea((text)->{
+			startTranslation(text,(DocumentTranslatorEngine)formats.getSelectedItem());
+		});
 		pane.add(new JScrollPane(area),BorderLayout.CENTER);
 		Box box=Box.createHorizontalBox();
 		box.add(new JLabel("Format"));
-		JComboBox<DocumentTranslatorEngine> formats=new JComboBox<>(new DocumentTranslatorEngine[]{
-			new PlainTextTranslator(),new PropertiesTranslator(),new XMLTranslator()});
 		box.add(formats);
 		JButton setting=new JButton("Settings");
 		setting.addActionListener((e)->conf.setVisible(true));

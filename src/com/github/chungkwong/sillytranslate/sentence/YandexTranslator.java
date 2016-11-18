@@ -25,10 +25,11 @@ import java.util.logging.*;
  */
 public class YandexTranslator extends CloudTranslator{
 	private static final ResourceBundle BUNDLE=ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/sentence/yandex");
-	private static final String APP_KEY=BUNDLE.getString("APP_KEY");
+	private final String APP_KEY;
 	private static final JSONParser PARSER=new JSONParser();
-	public YandexTranslator(){
+	public YandexTranslator(String APP_KEY){
 		super(BUNDLE.getString("HOST"),BUNDLE.getString("SLOGAN"),BUNDLE.getString("HOME"));
+		this.APP_KEY=APP_KEY;
 	}
 	@Override
 	protected Map<String,String> getParams(String text,String from,String to){
@@ -55,10 +56,5 @@ public class YandexTranslator extends CloudTranslator{
 			Logger.getLogger(BaiduTranslator.class.getName()).log(Level.SEVERE,null,ex);
 			return null;
 		}
-	}
-	public static void main(String[] args){
-		CloudTranslator translator=new YandexTranslator();
-		String query="I hate you.";
-		System.out.println(translator.translate(query,null,Locale.CHINA));
 	}
 }

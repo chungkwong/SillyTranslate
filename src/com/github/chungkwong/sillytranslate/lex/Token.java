@@ -16,6 +16,7 @@
  */
 package com.github.chungkwong.sillytranslate.lex;
 import java.awt.*;
+import java.util.*;
 import static java.util.ResourceBundle.getBundle;
 /**
  *
@@ -48,9 +49,11 @@ public class Token{
 	};
 	private final Type type;
 	private final String text;
-	public Token(Type type,String text){
+	private final String tag;
+	public Token(Type type,String text,String tag){
 		this.type=type;
 		this.text=text;
+		this.tag=tag;
 	}
 	public Type getType(){
 		return type;
@@ -58,8 +61,21 @@ public class Token{
 	public String getText(){
 		return text;
 	}
+	public String getTag(){
+		return tag;
+	}
 	@Override
 	public String toString(){
-		return type+":"+text;
+		return type+":"+text+"("+tag+")";
+	}
+	public static Type guessType(String text,Locale locale){
+		Token.Type type=Token.Type.WORD;
+		if(text.codePointCount(0,text.length())==1){
+			ResourceBundle bundle=ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/lex/LANGUAGE",locale);
+			for(String key:bundle.keySet())
+				if(bundle.getString(key).contains(text))
+					type=Token.Type.valueOf(key);
+		}
+		return type;
 	}
 }
