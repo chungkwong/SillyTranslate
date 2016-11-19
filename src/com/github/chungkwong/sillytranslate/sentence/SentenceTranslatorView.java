@@ -17,7 +17,7 @@
 package com.github.chungkwong.sillytranslate.sentence;
 import com.github.chungkwong.sillytranslate.*;
 import com.github.chungkwong.sillytranslate.lex.*;
-import java.awt.event.*;
+import com.github.chungkwong.sillytranslate.ui.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
@@ -30,7 +30,7 @@ import javax.swing.event.*;
 public class SentenceTranslatorView extends JPanel implements TranslatorStage<Iterator<Token>,String>{
 	private final JLabel input=new JLabel();
 	private final DefaultListModel<String> choices=new DefaultListModel<>();
-	private final JList<String> list=new JList<>(choices);
+	private final ActionList<String> list=new ActionList<>(choices);
 	private final JTextField result=new JTextField();
 	private final SentenceTranslatorEngine engine;
 	private final StringBuilder buf=new StringBuilder();
@@ -48,20 +48,7 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 				result.setText(list.getSelectedValue());
 			}
 		});
-		list.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),"submit");
-		list.getActionMap().put("submit",new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e){
-				next();
-			}
-		});
-		list.addMouseListener(new MouseAdapter(){
-			@Override
-			public void mouseClicked(MouseEvent e){
-				if(e.getClickCount()==2)
-					next();
-			}
-		});
+		list.setAction((item)->next());
 		add(list);
 		result.addActionListener((e)->next());
 		add(result);

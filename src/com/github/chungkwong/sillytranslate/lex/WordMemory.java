@@ -66,6 +66,7 @@ public class WordMemory{
 		Optional<Meaning> entry=lst.stream().filter((m)->m.getText().equals(meaning)&&m.getTag().equals(tag)).findAny();
 		if(entry.isPresent()){
 			entry.get().used();
+			lst.sort((m,n)->n.getCount()-m.getCount());
 		}else{
 			lst.add(new Meaning(meaning,tag,1));
 		}

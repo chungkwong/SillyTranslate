@@ -26,15 +26,29 @@ import javax.swing.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class DictionaryHintExtractor{
+	private static WordNormalizer[] normalizers=E2CNormalizers.getNormalizers();
 	public static Hint[] extractHint(String word,String prefix,NavigableDictionary dict,WordMemory memory){
 		String normalizeWord=normalize(word);
 		ArrayList<Hint> hints=new ArrayList<>();
 		appendHistory(word,prefix,hints,memory);
 		split(dict.getMeaning(word),word,prefix,hints);
+		boolean found=hints.size()>1;
 		if(!normalizeWord.equals(word)){
 			appendHistory(normalizeWord,prefix,hints,memory);
-			split(dict.getMeaning(normalizeWord),word,prefix,hints);
+			split(dict.getMeaning(normalizeWord),normalizeWord,prefix,hints);
+			found=hints.size()>2;
 		}
+		if(!found)
+			for(WordNormalizer normalizer:normalizers){
+				String normalizedWord=normalizer.toNormal(normalizeWord);
+				System.out.println(normalizedWord);
+				if(normalizedWord.equals(normalizeWord))
+					continue;
+				appendHistory(normalizedWord,prefix,hints,memory);
+				split(dict.getMeaning(normalizedWord),normalizedWord,prefix,hints,normalizer);
+				if(hints.size()>2)
+					break;
+			}
 		return hints.toArray(new Hint[0]);
 	}
 	private static String normalize(String word){
@@ -81,6 +95,36 @@ public class DictionaryHintExtractor{
 		}
 		if(word.startsWith(prefix))
 			hints.add(new SimpleHint(word,word.substring(prefixLen),null,""));
+	}
+	private static void split(String text,String word,String prefix,ArrayList<Hint> hints,WordNormalizer normalizer){
+		int prefixLen=prefix.length();
+		String type="";
+		for(int i=0;i<text.length();i++){
+			char c=text.charAt(i);
+			if(c=='['){
+				while(++i<text.length()&&text.charAt(i)!=']');
+			}else if(c=='{'){
+				while(++i<text.length()&&text.charAt(i)!='}');
+			}else if(Character.isWhitespace(c)){
+
+			}else{
+				int j=i;
+				for(;j<text.length();j++){
+					int d=text.charAt(j);
+					if(d==','||d==';'||d=='\n'||d=='\r')
+						break;
+				}
+				String token=normalizer.toSpecial(text.substring(i,j));
+				if(token.endsWith("."))
+					type=token;
+				else if(!token.isEmpty()&&token.startsWith(prefix)){
+					token+=":"+type;
+					hints.add(new SimpleHint(token,token.substring(prefixLen),null,""));
+				}
+				if(j>i)
+					i=j-1;
+			}
+		}
 	}
 	public static void main(String[] args) throws IOException{
 		JFrame f=new JFrame("Test");
