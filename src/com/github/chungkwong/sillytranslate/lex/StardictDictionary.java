@@ -51,6 +51,9 @@ public class StardictDictionary implements NavigableDictionary{
 				break;
 			}
 	}
+	public TreeMap<String,Interval> getDictionary(){
+		return dictionary;
+	}
 	private void initInfo(File file) throws IOException{
 		Files.lines(file.toPath(),UTF8).forEach((line)->{
 			int split=line.indexOf('=');

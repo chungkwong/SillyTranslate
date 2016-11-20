@@ -15,57 +15,74 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.lex;
-
+import java.io.*;
+import java.util.*;
+import java.util.logging.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class E2CNormalizers{
 	private static final WordNormalizer[] NORMALIZERS=new WordNormalizer[]{
-		new PluralNormalizer(),new PastTenseNormalizer(),new ContinuingTenseNormalizer()
+		createPluralNormalizer(),createContinuingTenseNormalizer(),
+		createPastTenseNormalizer(),createPastPerfectTenseNormalizer()
 	};
 	public static WordNormalizer[] getNormalizers(){
 		return NORMALIZERS;
 	}
-	private static class PastTenseNormalizer implements WordNormalizer{
-		@Override
-		public String toNormal(String word){
-			return changeSuffix("ied","y","ed","");
-		}
-		@Override
-		public String toSpecial(String word){
-			return word+"了";
-		}
+	private static WordNormalizer createPastTenseNormalizer(){
+		return new PropertyNormalizer("PAST","","了");
 	}
-	private static class ContinuingTenseNormalizer implements WordNormalizer{
-		@Override
-		public String toNormal(String word){
-			return changeSuffix(word,"ing","");
-		}
-		@Override
-		public String toSpecial(String word){
-			return "正在"+word;
-		}
+	private static WordNormalizer createPastPerfectTenseNormalizer(){
+		return new PropertyNormalizer("PERFECT","","过");
 	}
-	private static class PluralNormalizer implements WordNormalizer{
-		@Override
-		public String toNormal(String word){
-			return changeSuffix(word,"ies","y","es","","s","");
+	private static WordNormalizer createContinuingTenseNormalizer(){
+		return new PropertyNormalizer("CONTINUING","正在","");
+	}
+	private static WordNormalizer createPluralNormalizer(){
+		return new PropertyNormalizer("PLURAL","","");
+	}
+	private static class PropertyNormalizer implements WordNormalizer{
+		private final Properties prop=new Properties();
+		private final String prefix,suffix;
+		private final String[] rules;
+		public PropertyNormalizer(String name,String prefix,String suffix){
+			this.prefix=prefix;
+			this.suffix=suffix;
+			try{
+				prop.load(E2CNormalizers.class.getResourceAsStream("/com/github/chungkwong/sillytranslate/lex/"+name+"_en.properties"));
+			}catch(IOException ex){
+				Logger.getLogger(E2CNormalizers.class.getName()).log(Level.SEVERE,null,ex);
+			}
+			String rule=prop.getProperty("RULES","");
+			ArrayList<String> term=new ArrayList<>();
+			if(!rule.isEmpty())
+				for(int i=0;;){
+					int j=rule.indexOf(',',i)+1;
+					if(j==0){
+						term.add(rule.substring(i));
+						break;
+					}else{
+						term.add(rule.substring(i,j-1));
+						i=j;
+					}
+				}
+			rules=term.toArray(new String[0]);
 		}
 		@Override
-		public String toSpecial(String word){
+		public String toNormal(String word){
+			if(prop.containsKey(word))
+				return prop.getProperty(word);
+			for(int i=0;i<rules.length;i+=2){
+				if(word.endsWith(rules[i])){
+					return word.substring(0,word.length()-rules[i].length())+rules[i+1];
+				}
+			}
 			return word;
 		}
-	}
-	private static boolean isVowel(int c){
-		return c=='e'||c=='a'||c=='o'||c=='i'||c=='u';
-	}
-	private static String changeSuffix(String word,String... replacement){
-		for(int i=0;i<replacement.length;i+=2){
-			if(word.endsWith(replacement[i])){
-				return word.substring(0,word.length()-replacement[i].length())+replacement[i+1];
-			}
+		@Override
+		public String toSpecial(String word){
+			return prefix+word+suffix;
 		}
-		return word;
 	}
 }

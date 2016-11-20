@@ -133,8 +133,13 @@ public class DictionaryHintExtractor{
 		JTextField input=new JTextField();
 		f.add(input,BorderLayout.NORTH);
 		JTextArea output=new JTextArea();
-		f.add(output,BorderLayout.CENTER);
+		f.add(new JScrollPane(output),BorderLayout.CENTER);
 		input.addActionListener((e)->{
+			/*Predicate<String> patt=Pattern.compile(input.getText()).asPredicate();
+			output.setText(dict.getDictionary().keySet().stream().filter(patt).collect(Collectors.joining("\n")));*/
+			/*Predicate<String> patt=Pattern.compile(input.getText()).asPredicate();
+			output.setText(dict.getDictionary().keySet().stream().filter((entry)->patt.test(dict.getMeaning(entry))).
+					map((entry)->entry+"="+dict.getMeaning(entry)).collect(Collectors.joining("\n")));*/
 			output.setText(Arrays.stream(extractHint(input.getText(),"",dict,memory)).
 					map((o)->o.toString()).collect(Collectors.joining("\n")));
 		});
