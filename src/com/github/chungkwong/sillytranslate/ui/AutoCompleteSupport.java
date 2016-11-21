@@ -39,7 +39,7 @@ public class AutoCompleteSupport implements KeyListener,FocusListener{
 		comp.addFocusListener(this);
 		comp.addCaretListener((e)->updateHint());
 	}
-	private void updateHint(){
+	public void updateHint(){
 		task.summit(new HintContext(hints,comp,comp.getSelectionStart()));
 	}
 	public static void main(String[] args){

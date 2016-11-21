@@ -41,7 +41,6 @@ public class DictionaryHintExtractor{
 		if(!found)
 			for(WordNormalizer normalizer:normalizers){
 				String normalizedWord=normalizer.toNormal(normalizeWord);
-				System.out.println(normalizedWord);
 				if(normalizedWord.equals(normalizeWord))
 					continue;
 				appendHistory(normalizedWord,prefix,hints,memory);
@@ -114,11 +113,11 @@ public class DictionaryHintExtractor{
 					if(d==','||d==';'||d=='\n'||d=='\r')
 						break;
 				}
-				String token=normalizer.toSpecial(text.substring(i,j));
+				String token=text.substring(i,j);
 				if(token.endsWith("."))
 					type=token;
 				else if(!token.isEmpty()&&token.startsWith(prefix)){
-					token+=":"+type;
+					token=normalizer.toSpecial(token)+":"+type;
 					hints.add(new SimpleHint(token,token.substring(prefixLen),null,""));
 				}
 				if(j>i)
