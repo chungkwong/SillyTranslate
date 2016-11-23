@@ -39,11 +39,14 @@ public class Configure extends JFrame{
 	private final JRadioButton prefixLex=new JRadioButton("Prefix");
 	private final JRadioButton javaLex=new JRadioButton("Java default");
 	private final JRadioButton dictWord=new JRadioButton("Dictionary");
-	private final JRadioButton naiveSentence=new JRadioButton("Naive");
+	private final JCheckBox naiveSentence=new JCheckBox("Naive");
+	private final JCheckBox ruleSentence=new JCheckBox("Rule based");
 	private final JTextField wordCache=new JTextField();
 	private final JTextField yandexKey=new JTextField();
 	private final JTextField baiduId=new JTextField();
 	private final JTextField baiduSecret=new JTextField();
+	private final JSpinner naiveLimit=new JSpinner(new SpinnerNumberModel(6,0,Integer.MAX_VALUE,1));
+	private final JSpinner ruleLimit=new JSpinner(new SpinnerNumberModel(6,0,Integer.MAX_VALUE,1));
 	private final LocaleChooser localeIn=new LocaleChooser();
 	private final LocaleChooser localeOut=new LocaleChooser();
 	private final DictionaryChooser dictionaryChooser=new DictionaryChooser();
@@ -86,9 +89,10 @@ public class Configure extends JFrame{
 		box.add(wordBox);
 		Box sentenceBox=Box.createHorizontalBox();
 		sentenceBox.add(new JLabel("Word:"));
-		ButtonGroup sentenceType=new ButtonGroup();
-		sentenceType.add(naiveSentence);
 		sentenceBox.add(naiveSentence);
+		sentenceBox.add(naiveLimit);
+		sentenceBox.add(ruleSentence);
+		sentenceBox.add(ruleLimit);
 		sentenceBox.setAlignmentX(0);
 		box.add(sentenceBox);
 		Box localeBox=Box.createHorizontalBox();
@@ -168,12 +172,15 @@ public class Configure extends JFrame{
 		pref.putBoolean("JavaLex",javaLex.isSelected());
 		pref.putBoolean("DictionaryTranslator",dictWord.isSelected());
 		pref.putBoolean("NaiveSentenceTranslator",naiveSentence.isSelected());
+		pref.putBoolean("RuleBasedSentenceTranslator",ruleSentence.isSelected());
 		pref.put("InputLanguage",localeIn.getSelectedItem().toLanguageTag());
 		pref.put("OutputLanguage",localeOut.getSelectedItem().toLanguageTag());
 		pref.put("WordCache",wordCache.getText());
 		pref.put("BaiduID",baiduId.getText());
 		pref.put("BaiduSecret",baiduSecret.getText());
 		pref.put("YandexKey",yandexKey.getText());
+		pref.putInt("NaiveLimit",(Integer)naiveLimit.getValue());
+		pref.putInt("RuleBasedLimit",(Integer)ruleLimit.getValue());
 		pref.put("Dictionary",dictionaryChooser.toPaths());
 	}
 	private void load(){
@@ -187,6 +194,9 @@ public class Configure extends JFrame{
 		javaLex.setSelected(pref.getBoolean("JavaLex",false));
 		dictWord.setSelected(pref.getBoolean("DictionaryTranslator",true));
 		naiveSentence.setSelected(pref.getBoolean("NaiveSentenceTranslator",true));
+		ruleSentence.setSelected(pref.getBoolean("RuleBasedSentenceTranslator",false));
+		naiveLimit.setValue(pref.getInt("NaiveLimit",6));
+		ruleLimit.setValue(pref.getInt("RuleLimit",6));
 		localeIn.setSelectedItem(Locale.forLanguageTag(pref.get("InputLanguage","en-US")));
 		localeOut.setSelectedItem(Locale.forLanguageTag(pref.get("OutputLanguage","zh-CN")));
 		wordCache.setText(pref.get("WordCache",System.getProperty("user.home")+"/.sillytranslatecache"));
@@ -218,7 +228,13 @@ public class Configure extends JFrame{
 			Lex lex=simpleLex.isSelected()?new SimpleLex():
 					(prefixLex.isSelected()?new PrefixLex(dictionaryChooser.getDictionary(),localeIn.getSelectedItem()):new JavaLex(localeIn.getSelectedItem()));
 			WordTranslator wordTranslator=new WordTranslator(dictionaryChooser.getDictionary(),WordMemory.getWordMemory(wordCache.getText()));
-			SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(new NaiveTranslator(24));
+			ArrayList<SentenceTranslatorEngine> sentenceTranslators=new ArrayList<>();
+			if(naiveSentence.isSelected())
+				sentenceTranslators.add(new NaiveTranslator((int)naiveLimit.getValue()));
+			if(ruleSentence.isSelected())
+				sentenceTranslators.add(new RuleBasedSentenceTranslator((int)ruleLimit.getValue()));
+			SentenceTranslatorEngine sentenceEngine=new CombinedTranslator(sentenceTranslators.toArray(new SentenceTranslatorEngine[0]));
+			SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(sentenceEngine);
 			translators.add(new StagedTextTranslator(lex,wordTranslator,sentenceTranslator));
 		}
 		if(cloud.isSelected()){

@@ -82,8 +82,9 @@ public class DictionaryHintExtractor{
 						break;
 				}
 				String token=text.substring(i,j);
-				if(token.endsWith("."))
+				if(token.endsWith(".")&&!token.endsWith("...")){
 					type=token;
+				}
 				else if(!token.isEmpty()&&token.startsWith(prefix)){
 					token+=":"+type;
 					hints.add(new SimpleHint(token,token.substring(prefixLen),null,""));
@@ -126,9 +127,9 @@ public class DictionaryHintExtractor{
 		}
 	}
 	public static void main(String[] args) throws IOException{
-		JFrame f=new JFrame("Test");
 		StardictDictionary dict=new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2"));
 		WordMemory memory=new WordMemory();
+		JFrame f=new JFrame("Test");
 		JTextField input=new JTextField();
 		f.add(input,BorderLayout.NORTH);
 		JTextArea output=new JTextArea();

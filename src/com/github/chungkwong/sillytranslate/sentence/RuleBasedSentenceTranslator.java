@@ -26,9 +26,12 @@ import java.util.stream.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class RuleBasedSentenceTranslator implements SentenceTranslatorEngine{
-	private static final int LIMIT=10;
+	private final int limit;
 	private static final Variable NEW=new Variable("NEW");
-	private static final Variable OLD=new Variable("OLD");
+	private static final Constant<String> FAIL=new Constant<>("fail");
+	public RuleBasedSentenceTranslator(int limit){
+		this.limit=limit;
+	}
 	@Override
 	public List<String> getTranslation(List<Token> words){
 		Processor exec=new Processor(prepareQuery(words),prepareDatabase(words));
@@ -37,7 +40,7 @@ public class RuleBasedSentenceTranslator implements SentenceTranslatorEngine{
 		ArrayList<String> translators=new ArrayList<>();
 		while((subst=exec.getSubstitution())!=null){
 			translators.add(extractTranslation(subst,words));
-			if(++i>=LIMIT)
+			if(++i>=limit)
 				break;
 			exec.reexecute();
 		}
@@ -45,8 +48,12 @@ public class RuleBasedSentenceTranslator implements SentenceTranslatorEngine{
 	}
 	private static Database prepareDatabase(List<Token> words){
 		Database db=new Database(new InputStreamReader(RuleBasedSentenceTranslator.class.getResourceAsStream("RULES.prolog")));
-		for(int i=0;i<words.size();i++)
-			db.addPredication(new CompoundTerm(words.get(i).getTag().replace('.','_'),new Constant(BigInteger.valueOf(i))));
+		db.getFlag("undefined_predicate").setValue(FAIL);
+		for(int i=0;i<words.size();i++){
+			db.addPredication(new CompoundTerm(words.get(i).getTag(),new Constant(BigInteger.valueOf(i))));
+			db.addPredication(new CompoundTerm("text",new Constant(BigInteger.valueOf(i)),new Constant(words.get(i).getText())));
+		}
+		System.out.println(db.toString());
 		return db;
 	}
 	private static Predication prepareQuery(List<Token> words){
@@ -57,12 +64,32 @@ public class RuleBasedSentenceTranslator implements SentenceTranslatorEngine{
 	}
 	private static String extractTranslation(Substitution subst,List<Token> words){
 		List<Term> list=Lists.toJavaList(subst.findRoot(NEW));
-		return list.stream().map((i)->words.get(((Number)((Constant)i).getValue()).intValue())).
-				map((t)->t.getText()).collect(Collectors.joining());
+		return list.stream().map((i)->{
+			Object val=((Constant)i).getValue();
+			return val instanceof Number?words.get(((Number)val).intValue()).getText():val.toString();
+		}).collect(Collectors.joining());
 	}
+	/**
+	 * Each line look like 我:n.:恨:v.:你:n.
+	 * @param args
+	 */
 	public static void main(String[] args){
-		RuleBasedSentenceTranslator translator=new RuleBasedSentenceTranslator();
-		System.out.println(translator.getTranslation(Arrays.asList(
-				new Token(Token.Type.WORD,"hello",""),new Token(Token.Type.WORD,"world",""))));
+		RuleBasedSentenceTranslator translator=new RuleBasedSentenceTranslator(10);
+		Scanner in=new Scanner(System.in);
+		while(in.hasNextLine()){
+			String line=in.nextLine();
+			if(line.isEmpty())
+				break;
+			String[] split=line.split(":");
+			ArrayList<Token> list=new ArrayList<>();
+			for(int i=0;i+1<split.length;i+=2)
+				list.add(new Token(Token.Type.WORD,split[i],split[i+1]));
+			System.out.println(list);
+			System.out.println(translator.getTranslation(list));
+		}
+	}
+	@Override
+	public String getName(){
+		return "Rule based";
 	}
 }

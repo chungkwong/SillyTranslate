@@ -42,6 +42,7 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 		this.engine=engine;
 		input.setFocusable(false);
 		add(input);
+		list.setAlignmentX(0);
 		list.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e){

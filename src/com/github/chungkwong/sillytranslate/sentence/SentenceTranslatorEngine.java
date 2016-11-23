@@ -23,4 +23,5 @@ import java.util.*;
  */
 public interface SentenceTranslatorEngine{
 	List<String> getTranslation(List<Token> words);
+	String getName();
 }
