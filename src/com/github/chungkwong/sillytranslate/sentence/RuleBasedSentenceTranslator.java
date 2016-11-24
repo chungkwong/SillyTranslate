@@ -37,14 +37,14 @@ public class RuleBasedSentenceTranslator implements SentenceTranslatorEngine{
 		Processor exec=new Processor(prepareQuery(words),prepareDatabase(words));
 		Substitution subst;
 		int i=0;
-		ArrayList<String> translators=new ArrayList<>();
+		Collection<String> translators=new TreeSet<>();
 		while((subst=exec.getSubstitution())!=null){
 			translators.add(extractTranslation(subst,words));
 			if(++i>=limit)
 				break;
 			exec.reexecute();
 		}
-		return translators;
+		return new ArrayList<>(translators);
 	}
 	private static Database prepareDatabase(List<Token> words){
 		Database db=new Database(new InputStreamReader(RuleBasedSentenceTranslator.class.getResourceAsStream("RULES.prolog")));
@@ -53,7 +53,6 @@ public class RuleBasedSentenceTranslator implements SentenceTranslatorEngine{
 			db.addPredication(new CompoundTerm(words.get(i).getTag(),new Constant(BigInteger.valueOf(i))));
 			db.addPredication(new CompoundTerm("text",new Constant(BigInteger.valueOf(i)),new Constant(words.get(i).getText())));
 		}
-		System.out.println(db.toString());
 		return db;
 	}
 	private static Predication prepareQuery(List<Token> words){

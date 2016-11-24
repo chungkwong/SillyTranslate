@@ -1,30 +1,50 @@
 append([],X,X).
 append([H|T],Y,[H|L]):-append(T,Y,L).
 
-noun([X]):-'n.'(X).
-noun([X]):-''(X).
+noun(A):-'n.'(A).
+noun(A):-'pron.'(A).
+noun(A):-'abbr.'(A).
+noun(A):-''(A).
 
-noun_phrase(X):-noun(X).
+verb(A):-'v.'(A).
+verb(A):-'vbl.'(A).
+verb(A):-''(A).
 
-verb([X]):-'v.'(X).
-verb([X]):-''(X).
+intransitive_verb(A):-'vi.'(A).
+intransitive_verb(A):-verb(A).
 
-intransitive_verb([X]):-'vi.'(X).
-intransitive_verb(X):-verb(X).
+transitive_verb(A):-'vt.'(A).
+transitive_verb(A):-verb(A).
 
-transitive_verb([X]):-'vt.'(X).
-transitive_verb(X):-verb(X).
+adjective(A):-'adj.'(A).
+adjective(A):-'num.'(A).
+adjective(A):-'art.'(A).
+adjective(A):-'a.'(A).
 
-verb_phrase(X):-intransitive_verb(X).
-verb_phrase(X):-append(V,N,X),noun_phrase(N),transitive_verb(V).
+adverb(A):-'adv.'(A).
 
+article(A):-'art.'(A).
+aux(A):-'aux.'(A).
+conj(A):-'conj.'(A).
+prep(A):-'prep.'(A).
+
+noun_phrase([A]):-noun(A).
+noun_phrase([H|T]):-adjective(H),noun_phrase(T).
 translate_noun_phrase(X,X):-noun_phrase(X).
-%translate_noun_phrase([A,C,B],[A,'、',B]):-text(C,'，'),noun_phrase(A),noun_phrase(B).
-translate_verb_phrase(X,X):-verb_phrase(X).
+translate_noun_phrase(X,Y):-append(A,[C|B],X),append(B,[C|A],Y),text(C,'的'),noun_phrase(A),noun_phrase(B).
+translate_noun_phrase(X,Y):-append(A,[C|B],X),append(A,[D|B],Y),text(C,E),translate_noun_conjection(E,D),noun_phrase(A),noun_phrase(B).
+translate_noun_conjection('，','、').
+translate_noun_conjection('和','和').
+translate_noun_conjection('与','与').
+translate_noun_conjection('及','及').
+translate_noun_conjection('或','或').
+
+translate_verb_phrase([A],[A]):-intransitive_verb(A).
+translate_verb_phrase([V|N],[V|M]):-transitive_verb(V),translate_noun_phrase(N,M).
 
 translate([X],[X]).
 translate(X,XX):-append(N,V,X),translate_noun_phrase(N,NN),translate_verb_phrase(V,VV),append(NN,VV,XX).
-%translate(X,X).
+translate(X,Y):-translate_noun_phrase(X,Y).
+translate(X,Y):-translate_verb_phrase(X,Y).
 
-%art., rt., int., prfix., pref., adj., d., suf., cinj., ad., blv., pr., v., adl.,
-%  pron., vbl., comb., pro., vt., www., num., n., abbr., conj., aux., vi., lv., st., a., abr., adv., prep.
+%translate(X,X).
