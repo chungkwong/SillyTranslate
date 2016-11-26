@@ -51,7 +51,8 @@ public class RuleBasedSentenceTranslator implements SentenceTranslatorEngine{
 		db.getFlag("undefined_predicate").setValue(FAIL);
 		for(int i=0;i<words.size();i++){
 			db.addPredication(new CompoundTerm(words.get(i).getTag(),new Constant(BigInteger.valueOf(i))));
-			db.addPredication(new CompoundTerm("text",new Constant(BigInteger.valueOf(i)),new Constant(words.get(i).getText())));
+			if(words.get(i).getType()!=Token.Type.FORMULA)
+				db.addPredication(new CompoundTerm("text",new Constant(BigInteger.valueOf(i)),new Constant(words.get(i).getText())));
 		}
 		return db;
 	}
