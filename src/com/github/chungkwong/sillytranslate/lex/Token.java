@@ -53,7 +53,7 @@ public class Token{
 	public Token(Type type,String text,String tag){
 		this.type=type;
 		this.text=text;
-		this.tag=tag;
+		this.tag=type!=Type.WORD&&tag.isEmpty()?type.name:tag;
 	}
 	public Type getType(){
 		return type;
