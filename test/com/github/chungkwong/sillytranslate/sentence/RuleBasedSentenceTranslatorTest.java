@@ -37,7 +37,11 @@ public class RuleBasedSentenceTranslatorTest{
 	}
 	@Test(timeout=5000)
 	public void testSentence(){
-
+		assertTranslations("因为:conj.:你:n.","因为你");
+		assertTranslations("因为:conj.:你:n.:是:aux.:你:n.","因为你是你");
+		assertTranslations("我:n.:是:aux.:我:n.:而:conj.:你:n.:是:aux.:你:n.","我是我而你是你");
+		assertTranslations("我:n.:是:aux.:我:n.:，:punct.:你:n.:是:aux.:你:n.","我是我，你是你");
+		assertTranslations("我:n.:是:aux.:我:n.:；:punct.:你:n.:是:aux.:你:n.","我是我；你是你");
 	}
 	@Test(timeout=5000)
 	public void testClause(){
@@ -46,6 +50,7 @@ public class RuleBasedSentenceTranslatorTest{
 		assertTranslations("我:n.:和::他:n.:恨:v.:你:n.","我和他恨你");
 		assertTranslations("我:n.:恨:v.:你:n.:和::他:n.","我恨你和他");
 		assertTranslations("\":pun.:老公:n.:的:prep.:大众:n.:\":pun.:恨:v.","\"大众的老公\"恨");
+		assertTranslations("数据库:n.:（:punct.:汇总:n.:的:prep.:事实:n.:）:punct.","数据库（事实的汇总）");
 	}
 	@Test(timeout=5000)
 	public void testNounPhrase(){
@@ -68,17 +73,35 @@ public class RuleBasedSentenceTranslatorTest{
 		assertTranslations("大:adj.:好:adj.:人:n.","大好人");
 		assertTranslations("可靠:adj.:，::及时:adj.:和:conj.:全面:adj.:服务:n.","可靠、及时和全面服务");
 		assertTranslations("学校:n.:后:prep.:战乱:n.","后战乱的学校");
-		assertTranslations("有名的:adj.:\"::老公:n.:的:prep.:大众:n.:\"","后战乱的学校");
-
+		assertTranslations("建筑:n.:从:prep.:东:n.:到:prep.:西:n.","从东到西的建筑","从到西的东的建筑","到西的从东的建筑");
+		assertTranslations("有名的:adj.:\":punct.:老公:n.:的:prep.:大众:n.:\":punct.","有名的\"大众的老公\"");
 	}
 	@Test(timeout=5000)
 	public void testVerbPhrase(){
+		assertTranslations("是:aux.:你:n.","是你");
 		assertTranslations("恨:vbl.:你:n.","恨你");
 		assertTranslations("恨:v.:你:n.","恨你");
 		assertTranslations("恨:vt.:你:n.","恨你");
 		assertTranslations("恨:vi.","恨");
 		assertTranslations("玩:vi.:开心地:adv.","开心地玩");
 		assertTranslations("看似:vi.:真:adv.:好:adj.","看似真好");
+		assertTranslations("去:vi.:到:prep.:学校:n.","到学校去");
+		assertTranslations("想:vi.::prep.:吃:vt.:饭:n.","想吃饭");
+		assertTranslations("看:vt.:电影:n.:最近:adv.","最近看电影");
+		assertTranslations("是:aux.:玩耍:vi.","玩耍");
+		assertTranslations("是:aux.:杀死:vt.","被杀死");
+		assertTranslations("是:aux.:杀死:vt.:他:n.","杀死他");
+		assertTranslations("是:aux.:杀死:vt.:由:prep.:他:n.","被由他杀死");
+		assertTranslations("是:aux.:快速地:adv.:杀死:vt.:由:prep.:他:n.","快速地被由他杀死");
+		assertTranslations("是:aux.:杀死:vt.:快速地:adv.","被快速地杀死");
+		assertTranslations("是:aux.:快速地:adv.:杀死:vt.","快速地被杀死");
+	}
+	@Test(timeout=5000)
+	public void testAdjectivePhrase(){
+		assertTranslations("好:adj.:人:n.","好人");
+		assertTranslations("老:adj.:好:adj.:人:n.","老好人");
+		assertTranslations("非常:adv.:好:adj.:人:n.","非常好人");
+		assertTranslations("两个:num.:非常:adv.:好:adj.:人:n.","两个非常好人");
 	}
 	@Test(timeout=5000)
 	public void testIncomplete(){

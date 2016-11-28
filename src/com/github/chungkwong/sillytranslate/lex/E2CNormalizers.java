@@ -24,7 +24,7 @@ import java.util.logging.*;
  */
 public class E2CNormalizers{
 	private static final WordNormalizer[] NORMALIZERS=new WordNormalizer[]{
-		createPluralNormalizer(),createContinuingTenseNormalizer(),
+		createOwnNormalizer(),createPluralNormalizer(),createContinuingTenseNormalizer(),
 		createPastTenseNormalizer(),createPastPerfectTenseNormalizer()
 	};
 	public static WordNormalizer[] getNormalizers(){
@@ -41,6 +41,9 @@ public class E2CNormalizers{
 	}
 	private static WordNormalizer createPluralNormalizer(){
 		return new PropertyNormalizer("PLURAL","","");
+	}
+	private static WordNormalizer createOwnNormalizer(){
+		return new PropertyNormalizer("OWN","","的");
 	}
 	private static class PropertyNormalizer implements WordNormalizer{
 		private final Properties prop=new Properties();
