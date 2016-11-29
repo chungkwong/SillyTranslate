@@ -49,6 +49,8 @@ public class RuleBasedSentenceTranslatorTest{
 		assertTranslations("我:n.:恨:v.:你:n.","我恨你");
 		assertTranslations("我:n.:和::他:n.:恨:v.:你:n.","我和他恨你");
 		assertTranslations("我:n.:恨:v.:你:n.:和::他:n.","我恨你和他");
+		assertTranslations("我:n.:跑:vi.:开心地:adv.:慢:adv.","我开心地慢跑");
+		assertTranslations("我:n.:走:vi.:从:prep.:左:n.:到:prep.:右:n.","我从到右的左走","我从左到右走");
 		assertTranslations("\":pun.:老公:n.:的:prep.:大众:n.:\":pun.:恨:v.","\"大众的老公\"恨");
 		assertTranslations("数据库:n.:（:punct.:汇总:n.:的:prep.:事实:n.:）:punct.","数据库（事实的汇总）");
 	}

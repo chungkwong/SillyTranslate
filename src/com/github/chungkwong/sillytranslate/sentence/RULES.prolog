@@ -30,7 +30,9 @@ translate_basic_prepositional_phrase([H|T],[H|S]):-prep(H),translate_noun_phrase
 translate_prepositional_phrase(X,Y):-translate_basic_prepositional_phrase(X,Y).
 translate_prepositional_phrase(X,Y):-append(A,B,X),translate_basic_prepositional_phrase(A,AA),translate_prepositional_phrase(B,BB),append(AA,BB,Y).
 translate_adverbial([A],[A]):-adverb(A).
+translate_adverbial([H|T],[H|S]):-adverb(H),translate_adverbial(T,S).
 translate_adverbial(X,Y):-translate_prepositional_phrase(X,Y).
+translate_adverbial(X,Y):-append(A,B,X),translate_prepositional_phrase(A,AA),translate_adverbial(B,BB),append(AA,BB,Y).
 translate_basic_adjective([A],[A]):-adjective(A).
 translate_basic_adjective([H|L],[H|L]):-adjective(H),translate_basic_adjective(L,L).
 translate_basic_adjective([H|L],[H|L]):-adverb(H),translate_basic_adjective(L,L).
@@ -43,15 +45,25 @@ basic_noun_phrase([H|L],[H|LL]):-noun(H),translate_quote(L,LL,'（','）').
 basic_noun_phrase(X,Y):-translate_quote(X,Y,'"','"').
 translate_basic_noun_phrase(X,Y):-basic_noun_phrase(X,Y).
 translate_basic_noun_phrase(X,Y):-append(A,B,X),translate_adjective(A,AA),basic_noun_phrase(B,BB),append(AA,BB,Y).
+%translate_basic_noun_phrase([W|X],Y):-text(W,T),wh(T,WW),translate_to_infinitive(X,XX),append(XX,[WW],Y).
+%translate_basic_noun_phrase([W|X],Y):-text(W,T),wh(T,WW),translate_clause(X,XX),append(XX,[WW],Y).
 translate_noun_phrase(X,Y):-translate_basic_noun_phrase(X,Y).
 translate_noun_phrase(X,Y):-append(A,[C|B],X),text(C,'的'),translate_noun_phrase(A,AA),translate_basic_noun_phrase(B,BB),append(BB,[C|AA],Y).
+%translate_noun_phrase(X,Y):-append(A,[C|B],X),text(C,E),wh(E,_),translate_noun_phrase(A,AA),translate_clause(B,BB),append(BB,[C|AA],Y).
 translate_noun_phrase(X,Y):-append(A,[C|B],X),text(C,E),translate_conjection(E,D),translate_noun_phrase(A,AA),translate_basic_noun_phrase(B,BB),append(AA,[D|BB],Y).
 translate_noun_phrase(X,Y):-append(N,P,X),translate_prepositional_phrase(P,Q),translate_noun_phrase(N,M),append(Q,['的'|M],Y).
+%translate_noun_phrase(X,Y):-append(N,P,X),translate_prepositional_phrase(P,Q),translate_noun_phrase(N,M),append(Q,['的'|M],Y).
 translate_conjection('，','、').
 translate_conjection('和','和').
 translate_conjection('与','与').
 translate_conjection('及','及').
 translate_conjection('或','或').
+wh('哪个','的').
+wh('什么','的').
+wh('什么地方','的地方').
+wh('什么时候','的时候').
+wh('为什么','的原因').
+wh('谁','的人').
 
 translate_to_infinitive([T|L],LL):-text(T,''),translate_verb_phrase(L,LL).
 translate_basic_verb_phrase([A],[A]):-intransitive_verb(A).
