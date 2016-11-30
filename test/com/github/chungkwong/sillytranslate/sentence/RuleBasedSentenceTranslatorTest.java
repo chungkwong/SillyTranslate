@@ -35,7 +35,7 @@ public class RuleBasedSentenceTranslatorTest{
 			list.add(new Token(Token.Type.WORD,split[i],split[i+1]));
 		Assert.assertArrayEquals(translator.getTranslation(list).toArray(),out);
 	}
-	@Test(timeout=5000)
+	@Test(timeout=8000)
 	public void testSentence(){
 		assertTranslations("因为:conj.:你:n.","因为你");
 		assertTranslations("因为:conj.:你:n.:是:aux.:你:n.","因为你是你");
@@ -77,6 +77,21 @@ public class RuleBasedSentenceTranslatorTest{
 		assertTranslations("学校:n.:后:prep.:战乱:n.","后战乱的学校");
 		assertTranslations("建筑:n.:从:prep.:东:n.:到:prep.:西:n.","从东到西的建筑","从到西的东的建筑","到西的从东的建筑");
 		assertTranslations("有名的:adj.:\":punct.:老公:n.:的:prep.:大众:n.:\":punct.","有名的\"大众的老公\"");
+	}
+	@Test(timeout=10000)
+	public void testWhClause(){
+		assertTranslations("什么:n.::prep.:吃:vt.","吃的");
+		assertTranslations("什么:n.::prep.:吃:v.","吃的");
+		assertTranslations("什么时候:n.::prep.:吃:v.","吃的时候");
+		assertTranslations("什么地方:n.::prep.:吃:v.","吃的地方");
+		assertTranslations("如何:n.::prep.:吃:v.","吃的方法");
+		assertTranslations("谁:n.::prep.:负责:v.","负责的人");
+		assertTranslations("哪个:n.::prep.:选择:v.","选择的哪个");
+		assertTranslations("为什么:n.::prep.:开始:v.","开始的原因");
+		assertTranslations("什么:n.:你:pron.:看到:v.","什么你看到","你看到的");
+		assertTranslations("车:n.:那:pron.:你:pron.:喜欢:v.","你喜欢的车","你的车喜欢","车那你喜欢");
+		assertTranslations("口子:n.:什么时候:pron.:你:pron.:恨:v.:我:n.","你恨我的口子","你的口子恨我","口子什么时候你恨我");
+		assertTranslations("什么:n.:你:pron.:看到:v.:是:aux.:什么:n.:你:pron.:得到:v.","你看到的是你得到的");
 	}
 	@Test(timeout=5000)
 	public void testVerbPhrase(){

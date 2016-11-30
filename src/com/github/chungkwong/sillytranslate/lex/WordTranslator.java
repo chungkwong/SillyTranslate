@@ -93,7 +93,6 @@ public class WordTranslator extends JPanel implements TranslatorStage<List<Token
 						trying=trying.toLowerCase();
 						next=dict.getCurrentWord(trying);
 					}
-					System.out.println(trying+":"+next);
 					if(trying.equals(next)){
 						lastMatch=trying;
 						end=j;

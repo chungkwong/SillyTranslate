@@ -19,7 +19,9 @@ import com.github.chungkwong.sillytranslate.*;
 import com.github.chungkwong.sillytranslate.lex.*;
 import com.github.chungkwong.sillytranslate.ui.*;
 import java.util.*;
+import java.util.concurrent.atomic.*;
 import java.util.function.*;
+import java.util.logging.*;
 import java.util.stream.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -83,12 +85,25 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 			callback=null;
 		}else{
 			input.setText(words.stream().map((t)->t.getText()).collect(Collectors.joining(" ")));
-			List<String> translation=engine.getTranslation(words);
-			choices.ensureCapacity(translation.size());
-			translation.forEach((s)->choices.addElement(s));
-			if(!translation.isEmpty())
-				list.setSelectedIndex(0);
-			list.requestFocusInWindow();
+			JDialog dialog=new JOptionPane("正在生成候选",JOptionPane.INFORMATION_MESSAGE,JOptionPane.OK_CANCEL_OPTION).createDialog("");;
+			AtomicBoolean finished=new AtomicBoolean(false);
+			Thread t=new Thread(()->{
+				List<String> translation=engine.getTranslation(words);
+				finished.set(true);
+				SwingUtilities.invokeLater(()->{
+					dialog.setVisible(false);//Illegal
+					choices.ensureCapacity(translation.size());
+					translation.forEach((s)->choices.addElement(s));
+					if(!translation.isEmpty())
+						list.setSelectedIndex(0);
+					list.requestFocusInWindow();
+				});
+			});
+			t.start();
+			if(!finished.get()){
+				dialog.setVisible(true);
+				t.interrupt();
+			}
 		}
 	}
 	/*public static void main(String[] args){
@@ -108,5 +123,22 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 		this.iter=source;
 		next();
 		return this;
+	}
+	public static void main(String[] args){
+		JOptionPane optionPane=new JOptionPane("正在生成候选",JOptionPane.INFORMATION_MESSAGE,JOptionPane.CANCEL_OPTION);
+		JDialog dialog=optionPane.createDialog("");
+		Thread t=new Thread(()->{
+			try{
+				Thread.sleep(5000);
+				dialog.setVisible(false);
+			}catch(InterruptedException ex){
+				System.out.println("oops");
+				Logger.getLogger(SentenceTranslatorView.class.getName()).log(Level.SEVERE,null,ex);
+			}
+		});
+		t.start();
+		dialog.setVisible(true);
+		t.interrupt();
+		System.exit(0);
 	}
 }
