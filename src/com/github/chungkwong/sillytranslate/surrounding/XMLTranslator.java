@@ -81,7 +81,10 @@ public class XMLTranslator implements DocumentTranslatorEngine{
 						break;
 					case XMLStreamReader.END_DOCUMENT:
 						out.writeEndDocument();
-						break;
+						out.flush();
+						callback.run();
+						in.close();
+						return;
 					case XMLStreamReader.END_ELEMENT:
 						out.writeEndElement();
 						break;
@@ -121,9 +124,6 @@ public class XMLTranslator implements DocumentTranslatorEngine{
 						break;
 				}
 			}
-			in.close();
-			out.flush();
-			callback.run();
 		}catch(XMLStreamException ex){
 			Logger.getLogger(XMLTranslator.class.getName()).log(Level.SEVERE,null,ex);
 		}

@@ -15,14 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.surrounding;
+import java.util.concurrent.*;
 import javax.swing.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class TextTranslatorStub implements TextTranslator{
+	Executor executor=Executors.newSingleThreadExecutor();
 	@Override
 	public void translate(String text,DocumentTranslatorEngine callback){
+		//executor.execute(()->callback.textTranslated("#"+text+"#"));
 		callback.textTranslated("#"+text+"#");
 	}
 	@Override
