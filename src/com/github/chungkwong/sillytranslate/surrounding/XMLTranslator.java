@@ -59,8 +59,13 @@ public class XMLTranslator implements DocumentTranslatorEngine{
 				switch(in.next()){
 					case XMLStreamReader.ATTRIBUTE:
 						for(int i=0;i<in.getAttributeCount();i++)
-							out.writeAttribute(in.getAttributePrefix(i),in.getAttributeNamespace(i),
-									in.getAttributeLocalName(i),in.getAttributeValue(i));
+							if(in.getAttributeNamespace(i)==null)
+								out.writeAttribute(in.getAttributeLocalName(i),in.getAttributeValue(i));
+							else if(in.getPrefix()==null)
+								out.writeAttribute(in.getAttributeNamespace(i),in.getAttributeLocalName(i),in.getAttributeValue(i));
+							else
+								out.writeAttribute(in.getAttributePrefix(i),in.getAttributeNamespace(i),
+										in.getAttributeLocalName(i),in.getAttributeValue(i));
 						break;
 					case XMLStreamReader.CDATA:
 						out.writeCData(in.getText());
@@ -112,6 +117,16 @@ public class XMLTranslator implements DocumentTranslatorEngine{
 						break;
 					case XMLStreamReader.START_DOCUMENT:
 						out.writeStartDocument(in.getEncoding(),in.getVersion());
+						for(int i=0;i<in.getNamespaceCount();i++)
+							out.writeNamespace(in.getNamespacePrefix(i),in.getNamespaceURI(i));
+						for(int i=0;i<in.getAttributeCount();i++)
+							if(in.getAttributeNamespace(i)==null)
+								out.writeAttribute(in.getAttributeLocalName(i),in.getAttributeValue(i));
+							else if(in.getPrefix()==null)
+								out.writeAttribute(in.getAttributeNamespace(i),in.getAttributeLocalName(i),in.getAttributeValue(i));
+							else
+								out.writeAttribute(in.getAttributePrefix(i),in.getAttributeNamespace(i),
+										in.getAttributeLocalName(i),in.getAttributeValue(i));
 						break;
 					case XMLStreamReader.START_ELEMENT:
 						if(in.getNamespaceURI()!=null)
@@ -121,6 +136,16 @@ public class XMLTranslator implements DocumentTranslatorEngine{
 								out.writeStartElement(in.getNamespaceURI(),in.getLocalName());
 						else
 							out.writeStartElement(in.getLocalName());
+						for(int i=0;i<in.getNamespaceCount();i++)
+							out.writeNamespace(in.getNamespacePrefix(i),in.getNamespaceURI(i));
+						for(int i=0;i<in.getAttributeCount();i++)
+							if(in.getAttributeNamespace(i)==null)
+								out.writeAttribute(in.getAttributeLocalName(i),in.getAttributeValue(i));
+							else if(in.getPrefix()==null)
+								out.writeAttribute(in.getAttributeNamespace(i),in.getAttributeLocalName(i),in.getAttributeValue(i));
+							else
+								out.writeAttribute(in.getAttributePrefix(i),in.getAttributeNamespace(i),
+										in.getAttributeLocalName(i),in.getAttributeValue(i));
 						break;
 				}
 			}

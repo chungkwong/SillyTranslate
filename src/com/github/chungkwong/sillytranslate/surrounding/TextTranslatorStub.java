@@ -22,11 +22,11 @@ import javax.swing.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class TextTranslatorStub implements TextTranslator{
-	Executor executor=Executors.newSingleThreadExecutor();
+	private static final Executor executor=Executors.newSingleThreadExecutor();
 	@Override
 	public void translate(String text,DocumentTranslatorEngine callback){
-		//executor.execute(()->callback.textTranslated("#"+text+"#"));
-		callback.textTranslated("#"+text+"#");
+		executor.execute(()->callback.textTranslated("#"+text+"#"));
+		//callback.textTranslated("#"+text+"#");
 	}
 	@Override
 	public JComponent getUserInterface(){
