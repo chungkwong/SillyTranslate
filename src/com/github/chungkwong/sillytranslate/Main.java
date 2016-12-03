@@ -45,13 +45,28 @@ public class Main extends JFrame{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 	}
-	private void startTranslation(String input,DocumentTranslatorEngine engine){
+	private void startTranslation(String text,DocumentTranslatorEngine engine){
+		ByteArrayOutputStream out=new ByteArrayOutputStream();
+		engine.setOnFinished(()->endTranslation(new String(out.toByteArray(),Charset.forName("UTF-8"))));
+		startTranslation(new ByteArrayInputStream(text.getBytes(Charset.forName("UTF-8"))),out,engine);
+	}
+	private void startTranslation(InputStream in,DocumentTranslatorEngine engine) throws FileNotFoundException{
+		fileChooser.showSaveDialog(this);
+		FileOutputStream out=new FileOutputStream(fileChooser.getSelectedFile());
+		engine.setOnFinished(()->{
+			try{
+				out.close();
+				card.show(getContentPane(),INPUT_CARD_NAME);
+			}catch(IOException ex){
+				Logger.getLogger(Main.class.getName()).log(Level.SEVERE,null,ex);
+			}
+		});
+		startTranslation(in,out,engine);
+	}
+	private void startTranslation(InputStream in,OutputStream out,DocumentTranslatorEngine engine){
 		TextTranslator translator=conf.getTranslator();
 		add(translator.getUserInterface(),PROCESS_CARD_NAME);
 		card.show(getContentPane(),PROCESS_CARD_NAME);
-		InputStream in=new ByteArrayInputStream(input.getBytes(Charset.forName("UTF-8")));
-		ByteArrayOutputStream out=new ByteArrayOutputStream();
-		engine.setOnFinished(()->endTranslation(new String(out.toByteArray(),Charset.forName("UTF-8"))));
 		engine.setTextTranslator(translator);
 		engine.start(in,out);
 	}
@@ -62,24 +77,20 @@ public class Main extends JFrame{
 	private JPanel createInputCard(){
 		JPanel pane=new JPanel(new BorderLayout());
 		JComboBox<DocumentTranslatorEngine> formats=new JComboBox<>(new DocumentTranslatorEngine[]{
-			new PlainTextTranslator(),new PropertiesTranslator(),new XMLTranslator()});
+			new PlainTextTranslator(),new PropertiesTranslator(),new XMLTranslator(),
+			new ODFTranslator(),new OOXMLTranslator()
+		});
 		JTextArea area=new ActionTextArea((text)->{
 			startTranslation(text,(DocumentTranslatorEngine)formats.getSelectedItem());
 		});
 		pane.add(new JScrollPane(area),BorderLayout.CENTER);
-		Box box=Box.createHorizontalBox();
-		box.add(new JLabel("Format"));
-		box.add(formats);
 		JButton setting=new JButton("Settings");
 		setting.addActionListener((e)->conf.setVisible(true));
-		box.add(setting);
 		JButton ok=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("START"));
 		ok.addActionListener((e)->{
 			startTranslation(area.getText(),(DocumentTranslatorEngine)formats.getSelectedItem());
 			area.setText("");
 		});
-		box.add(ok);
-		pane.add(box,BorderLayout.SOUTH);
 		Box from=Box.createHorizontalBox();
 		JButton fromClip=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("FROM CLIPBOARD"));
 		JButton fromFile=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("FROM FILE"));
@@ -91,7 +102,7 @@ public class Main extends JFrame{
 		fromFile.addActionListener((e)->{
 			if(fileChooser.showOpenDialog(this)==JFileChooser.APPROVE_OPTION){
 				try{
-					area.read(new FileReader(fileChooser.getSelectedFile()),null);
+					startTranslation(new FileInputStream(fileChooser.getSelectedFile()),(DocumentTranslatorEngine)formats.getSelectedItem());
 				}catch(IOException ex){
 					Logger.getLogger(Main.class.getName()).log(Level.SEVERE,null,ex);
 				}
@@ -101,10 +112,7 @@ public class Main extends JFrame{
 			String url=JOptionPane.showInputDialog(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("ENTER THE URL:"));
 			try{
 				URLConnection conn=new URL(url).openConnection();
-				String encode=conn.getContentEncoding();
-				if(encode==null)
-					encode="UTF-8";
-				area.read(new InputStreamReader(conn.getInputStream()),encode);
+				startTranslation(conn.getInputStream(),(DocumentTranslatorEngine)formats.getSelectedItem());
 			}catch(IOException ex){
 				Logger.getLogger(Main.class.getName()).log(Level.SEVERE,null,ex);
 			}
@@ -112,6 +120,10 @@ public class Main extends JFrame{
 		from.add(fromClip);
 		from.add(fromFile);
 		from.add(fromURL);
+		from.add(new JLabel("Format"));
+		from.add(formats);
+		from.add(setting);
+		from.add(ok);
 		pane.add(from,BorderLayout.NORTH);
 		return pane;
 	}

@@ -1,0 +1,32 @@
+SillyTranslate is a document translation toolkit. It is not really usable right now, but it is in active development.
+
+SillyTranslate try to integrate different CAT technology to enhence accuracy and efficiency:
+  - Cloud translation services including Yandex and Baidu
+  - Tranditional parsing approach
+
+SillyTranslate support the following document format：
+  - Plain text
+  - Properties
+  - XML
+  - ODF(e.g. odt, odp, ods)
+  - OOXML(e.g. docx, pptx, xlsx)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+SillyTranslate是一个计算机辅助翻译系统。虽然它目前还几乎不能用，但正在活跃开发中。
+
+SillyTranslate尝试整合多种计算机辅助翻译手段，以求提高翻译的准确度与效率：
+  - 云翻译系统（如Yandex、Baidu）
+  - 传统的语法分析方法
+
+SillyTranslate大致支持以下文档格式：
+  - 纯文本
+  - 属性文件
+  - XML
+  - ODF（含odt、odp、ods）
+  - OOXML（含docx、pptx、xlsx）
+
+本软件为自由软件: 你可以在自由软件基金会的GNU通用公共许可，版本3或按你的意愿更新的版本，的条款下再分发它和/或修改它。

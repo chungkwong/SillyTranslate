@@ -31,7 +31,7 @@ public class ODFTranslator extends ZipDocumentTranslator{
 	}
 	public static void main(String[] args)throws Exception{
 		ODFTranslator docxTranslator=new ODFTranslator();
-		docxTranslator.setOnFinished(()->System.err.println("end"));
+		docxTranslator.setOnFinished(()->System.exit(0));
 		docxTranslator.setTextTranslator(new TextTranslatorStub());
 		docxTranslator.start(new FileInputStream("/home/kwong/sysu_learning/政治课/11336019-陈颂光-读书报告.odt"),
 				new FileOutputStream("/home/kwong/sysu_learning/政治课/11336019-陈颂光-读书报告_clone.odt"));
@@ -39,7 +39,9 @@ public class ODFTranslator extends ZipDocumentTranslator{
 		//		new FileOutputStream("/home/kwong/sysu_learning/misc/classlist_clone.ods"));
 		//docxTranslator.start(new FileInputStream("/home/kwong/sysu_learning/政治课/ethic.odp"),
 		//		new FileOutputStream("/home/kwong/sysu_learning/政治课/ethic_clone.odp"));
-		//docxTranslator.start(new FileInputStream("/home/kwong/sysu_learning/政治课/ethic.odp"),
-		//		new FileOutputStream("/home/kwong/sysu_learning/政治课/ethic_clone.odp"));
+	}
+	@Override
+	public String toString(){
+		return "Open Document(odt, odp, ods)";
 	}
 }

@@ -143,7 +143,7 @@ public class PropertiesTranslator implements DocumentTranslatorEngine{
 	private int getHex() throws IOException{
 		return in.read()*0x1000+in.read()*0x100+in.read()*0x10+in.read();
 	}
-	private String encode(String text){
+	private static String encode(String text){
 		return text.replace("\\","\\\\").replace("\r","\\r").replace("\n","\\n");
 	}
 	@Override

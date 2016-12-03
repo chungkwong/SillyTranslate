@@ -18,17 +18,15 @@ package com.github.chungkwong.sillytranslate.surrounding;
 import com.github.chungkwong.sillytranslate.util.*;
 import java.io.*;
 import java.util.logging.*;
-import java.util.zip.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public abstract class ZipDocumentTranslator implements DocumentTranslatorEngine{
+public class POTranslator implements DocumentTranslatorEngine{
 	private TextTranslator translator;
 	private Runnable callback;
-	private ZipInputStream zipIn;
-	private ZipOutputStream zipOut;
-	private DocumentTranslatorEngine base;
+	private CodePointReader in;
+	private CodePointWriter out;
 	@Override
 	public void setTextTranslator(TextTranslator translator){
 		this.translator=translator;
@@ -39,42 +37,45 @@ public abstract class ZipDocumentTranslator implements DocumentTranslatorEngine{
 	}
 	@Override
 	public void start(InputStream in,OutputStream out){
-		zipIn=new ZipInputStream(in);
-		zipOut=new ZipOutputStream(out);
-		onFileFinished();
-	}
-	private void onFileFinished(){
 		try{
-			byte[] buf=new byte[4096];
-			ZipEntry entry=zipIn.getNextEntry();
-			while(entry!=null){
-				zipOut.putNextEntry(new ZipEntry(entry.getName()));
-				base=checkForBaseEngine(entry);
-				if(base!=null){
-					base.setOnFinished(()->onFileFinished());
-					base.setTextTranslator(translator);
-					base.start(new NoCloseInputStream(zipIn),zipOut);
-					return;
-				}
-				int count;
-				while((count=zipIn.read(buf))>=0){
-					zipOut.write(buf,0,count);
-				}
-				entry=zipIn.getNextEntry();
-			}
-			zipIn.close();
-			zipOut.finish();
-			base=null;
-			zipIn=null;
-			zipOut=null;
-			callback.run();
-		}catch(IOException ex){
-			Logger.getLogger(OOXMLTranslator.class.getName()).log(Level.SEVERE,null,ex);
+			this.in=new CodePointReader(new InputStreamReader(in,"UTF-8"));
+			this.out=new CodePointWriter(new OutputStreamWriter(out,"UTF-8"));
+			textTranslated("");
+		}catch(UnsupportedEncodingException ex){
+			Logger.getLogger(PropertiesTranslator.class.getName()).log(Level.SEVERE,null,ex);
 		}
 	}
 	@Override
 	public void textTranslated(String text){
-		base.textTranslated(text);
+		try{
+			out.write(encode(text));
+			int c=in.read();
+			while(c!=-1){
+				c=skipWhiteSpace(c);
+				if(c=='#'){
+					while(c!='\n'&&c!='\r'){
+						out.writeCodepoint(c);
+						c=in.read();
+					}
+				}else{
+					//TODO
+				}
+			}
+			in.close();
+			out.flush();
+			callback.run();
+		}catch(IOException ex){
+			Logger.getLogger(PropertiesTranslator.class.getName()).log(Level.SEVERE,null,ex);
+		}
 	}
-	protected abstract DocumentTranslatorEngine checkForBaseEngine(ZipEntry entry);
+	private int skipWhiteSpace(int c) throws IOException{
+		while(Character.isWhitespace(c)){
+			out.writeCodepoint(c);
+			c=in.read();
+		}
+		return c;
+	}
+	private String encode(String text){
+		return text.replace("\\","\\\\").replace("\r","\\r").replace("\n","\\n");
+	}
 }

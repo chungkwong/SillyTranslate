@@ -25,7 +25,8 @@ import java.util.zip.*;
  */
 public class OOXMLTranslator extends ZipDocumentTranslator{
 	private static final Predicate<String> PATTERN=Pattern.compile(
-			"word/document.xml|xl/worksheets/sheet[0-9]+\\.xml|ppt/slides/slide[0-9]+\\.xml").asPredicate();
+			"word/document\\.xml|.*sharedStrings\\.xml|ppt/slides/slide[0-9]+\\.xml").asPredicate();//ad-hoc
+	//xl/worksheets/sheet[0-9]+\\.xml
 	@Override
 	protected DocumentTranslatorEngine checkForBaseEngine(ZipEntry entry){
 		if(PATTERN.test(entry.getName()))
@@ -35,13 +36,19 @@ public class OOXMLTranslator extends ZipDocumentTranslator{
 	}
 	public static void main(String[] args)throws Exception{
 		OOXMLTranslator docxTranslator=new OOXMLTranslator();
-		docxTranslator.setOnFinished(()->System.err.println("end"));
+		docxTranslator.setOnFinished(()->System.exit(0));
 		docxTranslator.setTextTranslator(new TextTranslatorStub());
-		docxTranslator.start(new FileInputStream("/home/kwong/sysu_learning/misc/20122.xlsx"),
-				new FileOutputStream("/home/kwong/sysu_learning/misc/20122_clone.xlsx"));
-		//docxTranslator.start(new FileInputStream("/home/kwong/sysu_learning/中国近代经济史/中国近代经济史_教学安排.pptx"),
-		//		new FileOutputStream("/home/kwong/sysu_learning/中国近代经济史/中国近代经济史_教学安排_clone.pptx"));
+		//docxTranslator.start(new FileInputStream("/home/kwong/sysu_learning/misc/20122.xlsx"),
+		//		new FileOutputStream("/home/kwong/sysu_learning/misc/20122_clone.xlsx"));
+		//docxTranslator.start(new FileInputStream("/home/kwong/sysu_learning/misc/classlist.xlsx"),
+		//		new FileOutputStream("/home/kwong/sysu_learning/misc/classlist_clone.xlsx"));
+		docxTranslator.start(new FileInputStream("/home/kwong/sysu_learning/中国近代经济史/中国近代经济史_教学安排.pptx"),
+				new FileOutputStream("/home/kwong/sysu_learning/中国近代经济史/中国近代经济史_教学安排_clone.pptx"));
 		//docxTranslator.start(new FileInputStream("/home/kwong/下载/20161119044225181.docx"),
 		//		new FileOutputStream("/home/kwong/下载/20161119044225181_clone.docx"));
+	}
+	@Override
+	public String toString(){
+		return "OOXML(docx, pptx, xlsx)";
 	}
 }
