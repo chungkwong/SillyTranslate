@@ -14,24 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.chungkwong.sillytranslate.ui;
-import java.awt.event.*;
-import java.util.function.*;
-import javax.swing.*;
+package com.github.chungkwong.sillytranslate;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class ActionTextArea extends JTextArea{
-	public ActionTextArea(Consumer<String> consumer){
-		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,KeyEvent.CTRL_DOWN_MASK),"commit");
-		getActionMap().put("commit",new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e){
-				String text=getText();
-				setText("");
-				consumer.accept(text);
-			}
-		});
+public class ModuleLoader{
+
+	public static void main(String[] args){
+		ModuleLoader.class.getClassLoader();
 	}
 }

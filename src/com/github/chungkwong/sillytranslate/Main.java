@@ -78,13 +78,13 @@ public class Main extends JFrame{
 		JPanel pane=new JPanel(new BorderLayout());
 		JComboBox<DocumentTranslatorEngine> formats=new JComboBox<>(new DocumentTranslatorEngine[]{
 			new PlainTextTranslator(),new PropertiesTranslator(),new XMLTranslator(),
-			new ODFTranslator(),new OOXMLTranslator()
+			new ODFTranslator(),new OOXMLTranslator(),new POTranslator()
 		});
 		JTextArea area=new ActionTextArea((text)->{
 			startTranslation(text,(DocumentTranslatorEngine)formats.getSelectedItem());
 		});
 		pane.add(new JScrollPane(area),BorderLayout.CENTER);
-		JButton setting=new JButton("Settings");
+		JButton setting=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SETTINGS"));
 		setting.addActionListener((e)->conf.setVisible(true));
 		JButton ok=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("START"));
 		ok.addActionListener((e)->{
@@ -120,7 +120,7 @@ public class Main extends JFrame{
 		from.add(fromClip);
 		from.add(fromFile);
 		from.add(fromURL);
-		from.add(new JLabel("Format"));
+		from.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("FORMAT")));
 		from.add(formats);
 		from.add(setting);
 		from.add(ok);
@@ -141,7 +141,7 @@ public class Main extends JFrame{
 				}
 			}
 		});
-		JButton restart=new JButton("Restart");
+		JButton restart=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("RESTART"));
 		restart.addActionListener((e)->card.show(getContentPane(),INPUT_CARD_NAME));
 		bar.add(ok);
 		bar.add(restart);

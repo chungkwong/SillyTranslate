@@ -30,17 +30,17 @@ import javax.swing.*;
  */
 public class Configure extends JFrame{
 	private final Preferences pref=Preferences.userNodeForPackage(Configure.class);
-	private final JCheckBox simple=new JCheckBox("Naive");
-	private final JCheckBox staged=new JCheckBox("Staged");
-	private final JCheckBox cloud=new JCheckBox("Cloud");
-	private final JCheckBox baidu=new JCheckBox("Baidu");
-	private final JCheckBox yandex=new JCheckBox("Yandex");
-	private final JRadioButton simpleLex=new JRadioButton("Simple");
-	private final JRadioButton prefixLex=new JRadioButton("Prefix");
-	private final JRadioButton javaLex=new JRadioButton("Java default");
-	private final JRadioButton dictWord=new JRadioButton("Dictionary");
-	private final JCheckBox naiveSentence=new JCheckBox("Naive");
-	private final JCheckBox ruleSentence=new JCheckBox("Rule based");
+	private final JCheckBox simple=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("NAIVE"));
+	private final JCheckBox staged=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STAGED"));
+	private final JCheckBox cloud=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CLOUD"));
+	private final JCheckBox baidu=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("BAIDU"));
+	private final JCheckBox yandex=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("YANDEX"));
+	private final JRadioButton simpleLex=new JRadioButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SIMPLE"));
+	private final JRadioButton prefixLex=new JRadioButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("PREFIX"));
+	private final JRadioButton javaLex=new JRadioButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("JAVA DEFAULT"));
+	private final JRadioButton dictWord=new JRadioButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("DICTIONARY"));
+	private final JCheckBox naiveSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("NAIVE"));
+	private final JCheckBox ruleSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("RULE BASED"));
 	private final JTextField wordCache=new JTextField();
 	private final JTextField yandexKey=new JTextField();
 	private final JTextField baiduId=new JTextField();
@@ -57,20 +57,20 @@ public class Configure extends JFrame{
 		box.add(cloud);
 		Box baiduBox=Box.createHorizontalBox();
 		baiduBox.add(baidu);
-		baiduBox.add(new JLabel("ID:"));
+		baiduBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("ID:")));
 		baiduBox.add(baiduId);
-		baiduBox.add(new JLabel("Secret:"));
+		baiduBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SECRET:")));
 		baiduBox.add(baiduSecret);
 		baiduBox.setAlignmentX(0);
 		box.add(baiduBox);
 		Box yandexBox=Box.createHorizontalBox();
 		yandexBox.add(yandex);
-		yandexBox.add(new JLabel("Key:"));
+		yandexBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("KEY:")));
 		yandexBox.add(yandexKey);
 		yandexBox.setAlignmentX(0);
 		box.add(yandexBox);
 		Box lexBox=Box.createHorizontalBox();
-		lexBox.add(new JLabel("Lex:"));
+		lexBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("LEX:")));
 		ButtonGroup lexType=new ButtonGroup();
 		lexType.add(simpleLex);
 		lexBox.add(simpleLex);
@@ -81,14 +81,14 @@ public class Configure extends JFrame{
 		lexBox.setAlignmentX(0);
 		box.add(lexBox);
 		Box wordBox=Box.createHorizontalBox();
-		wordBox.add(new JLabel("Word:"));
+		wordBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("WORD:")));
 		ButtonGroup wordType=new ButtonGroup();
 		wordType.add(dictWord);
 		wordBox.add(dictWord);
 		wordBox.setAlignmentX(0);
 		box.add(wordBox);
 		Box sentenceBox=Box.createHorizontalBox();
-		sentenceBox.add(new JLabel("Word:"));
+		sentenceBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SENTENCE:")));
 		sentenceBox.add(naiveSentence);
 		sentenceBox.add(naiveLimit);
 		sentenceBox.add(ruleSentence);
@@ -96,27 +96,27 @@ public class Configure extends JFrame{
 		sentenceBox.setAlignmentX(0);
 		box.add(sentenceBox);
 		Box localeBox=Box.createHorizontalBox();
-		localeBox.add(new JLabel("Input language"));
+		localeBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("INPUT LANGUAGE")));
 		localeBox.add(localeIn);
-		localeBox.add(new JLabel("Output language"));
+		localeBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("OUTPUT LANGUAGE")));
 		localeBox.add(localeOut);
 		localeBox.setAlignmentX(0);
 		box.add(localeBox);
 		Box cacheBox=Box.createHorizontalBox();
-		cacheBox.add(new JLabel("Word cache path"));
+		cacheBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("WORD CACHE PATH")));
 		cacheBox.add(wordCache);
 		cacheBox.setAlignmentX(0);
 		box.add(cacheBox);
 		dictionaryChooser.setAlignmentX(0);
 		box.add(dictionaryChooser);
 		Box control=Box.createHorizontalBox();
-		JButton importPref=new JButton("Import");
+		JButton importPref=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("IMPORT"));
 		importPref.addActionListener((e)->importPref());
 		control.add(importPref);
-		JButton exportPref=new JButton("export");
+		JButton exportPref=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("EXPORT"));
 		exportPref.addActionListener((e)->exportPref());
 		control.add(exportPref);
-		JButton savePref=new JButton("Save as default");
+		JButton savePref=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SAVE AS DEFAULT"));
 		savePref.addActionListener((e)->savePref());
 		control.add(savePref);
 		control.setAlignmentX(0);
@@ -211,7 +211,6 @@ public class Configure extends JFrame{
 		}
 	}
 	public TextTranslator getTranslator(){
-
 		/*if(simple.isSelected())
 			return new SimpleTextTranslator();
 		else{
@@ -250,4 +249,3 @@ public class Configure extends JFrame{
 		return new CombinedTextTranslator(translators.toArray(new TextTranslator[0]));
 	}
 }
-

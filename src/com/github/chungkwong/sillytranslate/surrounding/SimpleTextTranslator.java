@@ -37,6 +37,9 @@ public class SimpleTextTranslator extends JPanel implements TextTranslator{
 		out.setText(text);
 		out.select(0,text.length());
 		out.requestFocusInWindow();
+
+		System.out.println(out.getText());
+
 	}
 	@Override
 	public JComponent getUserInterface(){
