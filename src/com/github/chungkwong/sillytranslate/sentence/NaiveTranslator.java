@@ -42,6 +42,6 @@ public class NaiveTranslator implements SentenceTranslatorEngine{
 	}
 	@Override
 	public String getName(){
-		return "Brute force";
+		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("BRUTE_FORCE");
 	}
 }

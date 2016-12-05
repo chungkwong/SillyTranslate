@@ -49,6 +49,6 @@ public class OOXMLTranslator extends ZipDocumentTranslator{
 	}
 	@Override
 	public String toString(){
-		return "OOXML(docx, pptx, xlsx)";
+		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("OOXML");
 	}
 }

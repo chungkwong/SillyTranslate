@@ -48,16 +48,9 @@ public class SimpleLex implements Lex{
 		if(buf.length()==0){
 			if(c==-1){
 				return null;
-			}else if(c==DOUBLE_QUOTE_SYMBOL){
-				return new Token(Token.Type.QUOTE_TOGGLE,(char)DOUBLE_QUOTE_SYMBOL+"","");
-			}else if(c==REMARK_START_SYMBOL){
-				return new Token(Token.Type.REMARK_START,(char)REMARK_START_SYMBOL+"","");
-			}else if(c==REMARK_END_SYMBOL){
-				return new Token(Token.Type.REMARK_END,(char)REMARK_END_SYMBOL+"","");
-			}else if(c==FULL_STOP_SYMBOL){
-				return new Token(Token.Type.FULL_STOP,(char)FULL_STOP_SYMBOL+"","");
 			}else{
-				return new Token(Token.Type.OTHER_MARK,new String(new int[]{c},0,1),"");
+				String last=new String(new int[]{c},0,1);
+				return new Token(Token.guessType(last,Locale.ENGLISH),last,"");
 			}
 		}else{
 			in.unread(c);

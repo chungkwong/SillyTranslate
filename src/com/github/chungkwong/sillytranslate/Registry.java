@@ -15,13 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate;
+import com.github.chungkwong.sillytranslate.lex.*;
+import com.github.chungkwong.sillytranslate.sentence.*;
+import com.github.chungkwong.sillytranslate.surrounding.*;
+import java.util.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class ModuleLoader{
-
+public class Registry{
+	public static final List<DocumentTranslatorEngine> DOCUMENT_TYPE=new ArrayList<>();
+	public static final List<SentenceTranslatorEngine> SENTENCE_TRANSLATOR_ENGINES=new ArrayList<>();
+	public static List<Lex> TOKENIZERS=new ArrayList<>();
+	static{
+		DOCUMENT_TYPE.add(new PlainTextTranslator());
+		DOCUMENT_TYPE.add(new PropertiesTranslator());
+		DOCUMENT_TYPE.add(new XMLTranslator());
+		DOCUMENT_TYPE.add(new ODFTranslator());
+		DOCUMENT_TYPE.add(new OOXMLTranslator());
+		DOCUMENT_TYPE.add(new POTranslator());
+		TOKENIZERS.add(new SimpleLex());
+	}
 	public static void main(String[] args){
-		ModuleLoader.class.getClassLoader();
+		Registry.class.getClassLoader();
 	}
 }

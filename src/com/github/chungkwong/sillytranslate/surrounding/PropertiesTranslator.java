@@ -148,7 +148,7 @@ public class PropertiesTranslator implements DocumentTranslatorEngine{
 	}
 	@Override
 	public String toString(){
-		return "Properties";
+		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("PROPERTIES");
 	}
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		String file="/home/kwong/NetBeansProjects/JGitGUI/src/com/chungkwong/jgitgui/text.properties";

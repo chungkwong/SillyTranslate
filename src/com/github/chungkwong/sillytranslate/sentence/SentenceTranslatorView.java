@@ -30,6 +30,7 @@ import javax.swing.event.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class SentenceTranslatorView extends JPanel implements TranslatorStage<Iterator<Token>,String>{
+	private static final String WAITING=java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("GENERATING");
 	private final JLabel input=new JLabel();
 	private final DefaultListModel<String> choices=new DefaultListModel<>();
 	private final ActionList<String> list=new ActionList<>(choices);
@@ -85,7 +86,7 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 			callback=null;
 		}else{
 			input.setText(words.stream().map((t)->t.getText()).collect(Collectors.joining(" ")));
-			JDialog dialog=new JOptionPane("正在生成候选",JOptionPane.INFORMATION_MESSAGE,JOptionPane.OK_CANCEL_OPTION).createDialog("");;
+			JDialog dialog=new JOptionPane(WAITING,JOptionPane.INFORMATION_MESSAGE,JOptionPane.OK_CANCEL_OPTION).createDialog("");;
 			AtomicBoolean finished=new AtomicBoolean(false);
 			Thread t=new Thread(()->{
 				List<String> translation=engine.getTranslation(words);

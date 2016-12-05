@@ -30,7 +30,7 @@ import javax.swing.*;
  */
 public class Configure extends JFrame{
 	private final Preferences pref=Preferences.userNodeForPackage(Configure.class);
-	private final JCheckBox simple=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("NAIVE"));
+	private final JCheckBox simple=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("MANUAL"));
 	private final JCheckBox staged=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STAGED"));
 	private final JCheckBox cloud=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CLOUD"));
 	private final JCheckBox baidu=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("BAIDU"));
@@ -39,7 +39,7 @@ public class Configure extends JFrame{
 	private final JRadioButton prefixLex=new JRadioButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("PREFIX"));
 	private final JRadioButton javaLex=new JRadioButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("JAVA DEFAULT"));
 	private final JRadioButton dictWord=new JRadioButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("DICTIONARY"));
-	private final JCheckBox naiveSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("NAIVE"));
+	private final JCheckBox naiveSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("BRUTE_FORCE"));
 	private final JCheckBox ruleSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("RULE BASED"));
 	private final JTextField wordCache=new JTextField();
 	private final JTextField yandexKey=new JTextField();

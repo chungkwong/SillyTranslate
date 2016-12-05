@@ -54,6 +54,6 @@ public class CombinedTextTranslator extends JPanel implements TextTranslator{
 	}
 	@Override
 	public String getName(){
-		return "Integrated";
+		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("INTEGRATED");
 	}
 }

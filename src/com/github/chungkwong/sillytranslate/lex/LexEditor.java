@@ -52,15 +52,14 @@ public class LexEditor extends JPanel implements ActionListener,DocumentListener
 	}
 	public void commit(){
 		pane.getDocument().removeDocumentListener(this);
-		pane.setText("");
 		consumer.accept(tokens.values().stream().collect(Collectors.toList()));
-		tokens.clear();
 	}
 	@Override
 	public JComponent accept(Lex source,Consumer<List<Token>> callback){
 		this.consumer=callback;
 		pane.getDocument().removeDocumentListener(this);
 		pane.setText("");
+		tokens.clear();
 		try{
 			Token next=source.next();
 			while(next!=null){

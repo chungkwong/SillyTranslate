@@ -72,6 +72,6 @@ public class CloudTextTranslator extends JPanel implements TextTranslator{
 	}
 	@Override
 	public String getName(){
-		return "Cloud";
+		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CLOUD");
 	}
 }

@@ -24,15 +24,15 @@ import static java.util.ResourceBundle.getBundle;
  */
 public class Token{
 	public enum Type{
-		WORD(getBundle("com/github/chungkwong/sillytranslate/lex/LOCALIZATION").getString("WORD"),Color.WHITE),
-		QUOTE_START(getBundle("com/github/chungkwong/sillytranslate/lex/LOCALIZATION").getString("QUOTE START"),Color.GREEN),
-		QUOTE_TOGGLE(getBundle("com/github/chungkwong/sillytranslate/lex/LOCALIZATION").getString("QUOTE TOGGLE"),Color.GREEN),
-		QUOTE_END(getBundle("com/github/chungkwong/sillytranslate/lex/LOCALIZATION").getString("QUOTE END"),Color.GREEN),
-		REMARK_START(getBundle("com/github/chungkwong/sillytranslate/lex/LOCALIZATION").getString("REMARK START"),Color.GREEN),
-		REMARK_END(getBundle("com/github/chungkwong/sillytranslate/lex/LOCALIZATION").getString("REMARK END"),Color.GREEN),
-		FULL_STOP(getBundle("com/github/chungkwong/sillytranslate/lex/LOCALIZATION").getString("FULL STOP"),Color.GREEN),
-		OTHER_MARK(getBundle("com/github/chungkwong/sillytranslate/lex/LOCALIZATION").getString("OTHER"),Color.YELLOW),
-		FORMULA(getBundle("com/github/chungkwong/sillytranslate/lex/LOCALIZATION").getString("FORMULA"),Color.LIGHT_GRAY);
+		WORD(getBundle("com/github/chungkwong/sillytranslate/Words").getString("WORD"),Color.WHITE),
+		QUOTE_START(getBundle("com/github/chungkwong/sillytranslate/Words").getString("QUOTE START"),Color.GREEN),
+		QUOTE_TOGGLE(getBundle("com/github/chungkwong/sillytranslate/Words").getString("QUOTE TOGGLE"),Color.GREEN),
+		QUOTE_END(getBundle("com/github/chungkwong/sillytranslate/Words").getString("QUOTE END"),Color.GREEN),
+		REMARK_START(getBundle("com/github/chungkwong/sillytranslate/Words").getString("REMARK START"),Color.GREEN),
+		REMARK_END(getBundle("com/github/chungkwong/sillytranslate/Words").getString("REMARK END"),Color.GREEN),
+		FULL_STOP(getBundle("com/github/chungkwong/sillytranslate/Words").getString("FULL STOP"),Color.GREEN),
+		OTHER_MARK(getBundle("com/github/chungkwong/sillytranslate/Words").getString("OTHER"),Color.YELLOW),
+		FORMULA(getBundle("com/github/chungkwong/sillytranslate/Words").getString("FORMULA"),Color.LIGHT_GRAY);
 		private final String name;
 		private final Color color;
 		private Type(String name,Color color){

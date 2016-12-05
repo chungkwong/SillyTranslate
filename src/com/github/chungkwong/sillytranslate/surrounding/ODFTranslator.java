@@ -42,6 +42,6 @@ public class ODFTranslator extends ZipDocumentTranslator{
 	}
 	@Override
 	public String toString(){
-		return "Open Document(odt, odp, ods)";
+		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("ODF");
 	}
 }

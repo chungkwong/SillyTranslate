@@ -45,7 +45,6 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 		content.add(sentenceTranslator,SENTENCE);
 		add(content,BorderLayout.CENTER);
 	}
-
 	@Override
 	public void translate(String text,DocumentTranslatorEngine callback){
 		this.callback=callback;
@@ -67,7 +66,7 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 	}
 	@Override
 	public String getName(){
-		return "Guided";
+		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STAGED");
 	}
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		JFrame f=new JFrame("Translator");

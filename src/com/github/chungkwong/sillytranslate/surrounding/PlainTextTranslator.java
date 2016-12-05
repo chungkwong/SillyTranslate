@@ -84,7 +84,7 @@ public class PlainTextTranslator implements DocumentTranslatorEngine{
 	}
 	@Override
 	public String toString(){
-		return "Plain";
+		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("PLAIN_TEXT");
 	}
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		String file="/home/kwong/NetBeansProjects/JSchemeMin/README.md";

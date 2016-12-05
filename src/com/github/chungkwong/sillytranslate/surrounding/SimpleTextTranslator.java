@@ -47,7 +47,7 @@ public class SimpleTextTranslator extends JPanel implements TextTranslator{
 	}
 	@Override
 	public String getName(){
-		return "Manual";
+		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("MANUAL");
 	}
 	public static void main(String[] args) throws FileNotFoundException{
 		JFrame f=new JFrame("Translator");

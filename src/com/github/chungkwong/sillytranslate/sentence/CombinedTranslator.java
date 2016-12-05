@@ -35,6 +35,6 @@ public class CombinedTranslator implements SentenceTranslatorEngine{
 	}
 	@Override
 	public String getName(){
-		return "Combined";
+		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("INTEGRATED");
 	}
 }

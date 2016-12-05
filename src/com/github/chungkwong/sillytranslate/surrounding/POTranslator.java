@@ -167,6 +167,6 @@ public class POTranslator implements DocumentTranslatorEngine{
 	}
 	@Override
 	public String toString(){
-		return "Gettext(PO file)";
+		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("PO");
 	}
 }

@@ -155,7 +155,7 @@ public class XMLTranslator implements DocumentTranslatorEngine{
 	}
 	@Override
 	public String toString(){
-		return "XML";
+		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("XML");
 	}
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		String file="/etc/gtkmathview/gtkmathview.conf.xml";
