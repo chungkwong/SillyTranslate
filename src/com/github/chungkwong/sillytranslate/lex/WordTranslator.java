@@ -63,51 +63,60 @@ public class WordTranslator extends JPanel implements TranslatorStage<List<Token
 		getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN,0),"more");
 		getActionMap().put("more",moreAction);
 		autoCompleteSupport=new AutoCompleteSupport(currOut,new DictionaryHintProvider(dict));
-		currOut.addActionListener((e)->next());
+		currOut.addActionListener((e)->next(false));//TODO add alternative for setting default
 		add(currOut,BorderLayout.CENTER);
 	}
-	private void next(){
-		if(curr!=null){
-			String out=currOut.getText(),meaning,tag;
-			if(out.contains(":")){
-				int i=out.lastIndexOf(":");
-				meaning=out.substring(0,i);
-				tag=out.substring(i+1);
-			}else{
-				meaning=out;
-				tag="";
+	private void next(boolean setDef){
+		while(true){
+			if(curr!=null){
+				String out=currOut.getText(),meaning,tag;
+				if(out.contains(":")){
+					int i=out.lastIndexOf(":");
+					meaning=out.substring(0,i);
+					tag=out.substring(i+1);
+				}else{
+					meaning=out;
+					tag="";
+				}
+				buf.add(new Token(curr.getType(),meaning,tag));
+				memory.useMeaning(currIn.getText(),meaning,tag,setDef);
 			}
-			buf.add(new Token(curr.getType(),meaning,tag));
-			memory.useMeaning(currIn.getText(),meaning,tag);
-		}
-		if(end<in.size()){
-			index=end++;
-			curr=in.get(index);
-			String lastMatch=curr.getText(),trying=lastMatch,next;
-			int j=end;
-			if(j<in.size())
-				do{
-					trying+=" "+in.get(j++).getText();
-					next=dict.getCurrentWord(trying);
-					if(!next.startsWith(trying)){
-						trying=trying.toLowerCase();
+			if(end<in.size()){
+				index=end++;
+				curr=in.get(index);
+				String lastMatch=curr.getText(),trying=lastMatch,next;
+				int j=end;
+				if(j<in.size())
+					do{
+						trying+=" "+in.get(j++).getText();
 						next=dict.getCurrentWord(trying);
-					}
-					if(trying.equals(next)){
-						lastMatch=trying;
-						end=j;
-					}
-				}while(j<in.size()&&next.startsWith(trying));
-			currIn.setText(lastMatch);
-			currOut.setText("");
-			autoCompleteSupport.updateHint();
-			currOut.requestFocusInWindow();
-		}else{
-			in=null;
-			curr=null;
-			callback.accept(buf.iterator());
-			buf=null;
-			callback=null;
+						if(!next.startsWith(trying)){
+							trying=trying.toLowerCase();
+							next=dict.getCurrentWord(trying);
+						}
+						if(trying.equals(next)){
+							lastMatch=trying;
+							end=j;
+						}
+					}while(j<in.size()&&next.startsWith(trying));
+				Meaning defaultMeaning=memory.getDefaultMeaning(lastMatch);
+				currIn.setText(lastMatch);
+				if(defaultMeaning!=null){
+					currOut.setText(defaultMeaning.getText()+":"+defaultMeaning.getTag());
+				}else{
+					currOut.setText("");
+					currOut.requestFocusInWindow();
+					autoCompleteSupport.updateHint();
+					return;
+				}
+			}else{
+				in=null;
+				curr=null;
+				callback.accept(buf.iterator());
+				buf=null;
+				callback=null;
+				return;
+			}
 		}
 	}
 	@Override
@@ -117,7 +126,7 @@ public class WordTranslator extends JPanel implements TranslatorStage<List<Token
 		this.end=0;
 		this.callback=callback;
 		buf=new ArrayList<>();
-		next();
+		next(false);
 		return this;
 	}
 	/*public static void main(String[] args) throws IOException{

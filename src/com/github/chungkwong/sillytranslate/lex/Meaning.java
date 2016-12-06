@@ -38,8 +38,8 @@ public class Meaning{
 	public int getCount(){
 		return count;
 	}
-	public void used(){
-		++count;
+	public void used(int times){
+		count+=times;
 	}
 	@Override
 	public String toString(){

@@ -24,7 +24,7 @@ import java.util.logging.*;
  */
 public class WordMemory{
 	private static final HashMap<String,WordMemory> pool=new HashMap<>();
-	private final HashMap<String,List<Meaning>> map=new HashMap<>();
+	private final HashMap<String,Candidates> map=new HashMap<>();
 	private final File cache;
 	public WordMemory(){
 		this.cache=null;
@@ -32,17 +32,23 @@ public class WordMemory{
 	private WordMemory(String path){
 		this.cache=new File(path);
 		try(DataInputStream sc=new DataInputStream(new BufferedInputStream(new FileInputStream(cache)))){
-			cache.createNewFile();
 			while(true){
 				String word=sc.readUTF();
+				boolean def=sc.readBoolean();
 				List<Meaning> meanings=new ArrayList<>();
 				while(sc.readBoolean()){
 					meanings.add(new Meaning(sc.readUTF(),sc.readUTF(),sc.readInt()));
 				}
-				map.put(word,meanings);
+				map.put(word,new Candidates(def,meanings));
 			}
 		}catch(EOFException ex){
 
+		}catch(FileNotFoundException ex){
+			try{
+				cache.createNewFile();
+			}catch(IOException ex1){
+				Logger.getLogger(WordMemory.class.getName()).log(Level.SEVERE,null,ex1);
+			}
 		}catch(IOException ex){
 			Logger.getLogger(WordMemory.class.getName()).log(Level.SEVERE,null,ex);
 		}
@@ -57,28 +63,54 @@ public class WordMemory{
 			return instance;
 		}
 	}
-	public void useMeaning(String word,String meaning,String tag){
-		List<Meaning> lst=map.get(word);
-		if(lst==null){
+	public void useMeaning(String word,String meaning,String tag,boolean def){
+		useMeaning(word,meaning,tag,def,1);
+	}
+	public void useMeaning(String word,String meaning,String tag,boolean def,int count){
+		Candidates cand=map.get(word);
+		List<Meaning> lst;
+		if(cand==null){
 			lst=new ArrayList<>();
-			map.put(word,lst);
+			map.put(word,new Candidates(def,lst));
+		}else{
+			lst=cand.getCandidates();
+			cand.setDefault(def||cand.hasDefault());
 		}
 		Optional<Meaning> entry=lst.stream().filter((m)->m.getText().equals(meaning)&&m.getTag().equals(tag)).findAny();
 		if(entry.isPresent()){
-			entry.get().used();
-			lst.sort((m,n)->n.getCount()-m.getCount());
+			entry.get().used(count);
+			//May be low performance and can easily improved
+			if(def){
+				lst.remove(entry.get());
+				lst.add(0,entry.get());
+			}else if(cand.hasDefault()){
+				Meaning frist=lst.remove(0);
+				lst.sort((m,n)->n.getCount()-m.getCount());
+				lst.add(0,frist);
+			}else{
+				lst.sort((m,n)->n.getCount()-m.getCount());
+			}
 		}else{
-			lst.add(new Meaning(meaning,tag,1));
+			lst.add(new Meaning(meaning,tag,count));
 		}
 	}
 	public List<Meaning> getMeanings(String word){
-		return map.get(word);
+		Candidates cand=map.get(word);
+		return cand!=null?cand.getCandidates():null;
+	}
+	public Meaning getDefaultMeaning(String word){
+		Candidates cand=map.get(word);
+		return cand!=null&&cand.hasDefault()?cand.getCandidates().get(0):null;
+	}
+	public void clear(){
+		map.clear();
 	}
 	public void save(){
 		try(DataOutputStream to=new DataOutputStream(new BufferedOutputStream(new FileOutputStream(cache)))){
-			for(Map.Entry<String,List<Meaning>> entry:map.entrySet()){
+			for(Map.Entry<String,Candidates> entry:map.entrySet()){
 				to.writeUTF(entry.getKey());
-				for(Meaning m:entry.getValue()){
+				to.writeBoolean(entry.getValue().hasDefault());
+				for(Meaning m:entry.getValue().getCandidates()){
 					to.writeBoolean(true);
 					to.writeUTF(m.getText());
 					to.writeUTF(m.getTag());
@@ -91,18 +123,82 @@ public class WordMemory{
 			Logger.getLogger(WordMemory.class.getName()).log(Level.SEVERE,null,ex);
 		}
 	}
+	public void writeAsText(Writer out) throws IOException{
+		out.write("Word\tTranslation\tTag\tCount\tDefault");
+		for(Map.Entry<String,Candidates> entry:map.entrySet()){
+			String word=entry.getKey();
+			boolean def=entry.getValue().hasDefault();
+			for(Meaning m:entry.getValue().getCandidates()){
+				out.write(word);
+				out.write('\t');
+				out.write(m.getText());
+				out.write('\t');
+				out.write(m.getTag());
+				out.write('\t');
+				out.write(m.getCount());
+				out.write('\t');
+				if(def){
+					def=false;
+					out.write("default");
+				}
+			}
+		}
+	}
+	public void readFromText(BufferedReader in) throws IOException{
+		in.readLine();
+		String line=null;
+		while((line=in.readLine())!=null){
+			addMeaning(line);
+		}
+	}
+	private void addMeaning(String line){
+		int begin=0;
+		int end=line.indexOf('\t');
+		String word=line.substring(begin,end);
+		begin=end+1;
+		end=line.indexOf('\t',begin);
+		String translation=line.substring(begin,end);
+		begin=end+1;
+		end=line.indexOf('\t',begin);
+		String tag=line.substring(begin,end);
+		begin=end+1;
+		end=line.indexOf('\t',begin);
+		int count=Integer.parseInt(line.substring(begin,end));
+		Meaning meaning=new Meaning(translation,tag,count);
+		boolean def=end+1!=line.length();
+		useMeaning(word,translation,tag,def,count);
+	}
 	@Override
 	public String toString(){
 		return map.toString();
 	}
 	public static void main(String[] args) throws FileNotFoundException, IOException{
+		System.out.println(new Scanner(System.in).delimiter());
 		WordMemory memory=new WordMemory("/home/kwong/useless.mem");
-		memory.useMeaning("a","一","art");
-		memory.useMeaning("a","一","art");
-		memory.useMeaning("a","一","art");
-		memory.useMeaning("a","个","ru");
-		memory.useMeaning("a","a","al");
+		memory.useMeaning("a","一","art",false);
+		memory.useMeaning("a","一","art",false);
+		memory.useMeaning("a","一","art",false);
+		memory.useMeaning("a","个","ru",false);
+		memory.useMeaning("a","a","al",false);
 		memory.save();
 		System.out.println(new WordMemory("/home/kwong/useless.mem"));
+	}
+	private static class Candidates{
+		private boolean def;
+		private List<Meaning> candidates;
+		public Candidates(boolean def,List<Meaning> candidates){
+			this.def=def;
+			this.candidates=candidates;
+		}
+		public void setDefault(boolean def){
+			this.def=def;
+		}
+		public boolean hasDefault(){
+			return def;
+		}
+		public List<Meaning> getCandidates(){
+			return candidates;
+		}
+
 	}
 }
