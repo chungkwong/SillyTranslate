@@ -64,6 +64,8 @@ public class WordTranslator extends JPanel implements TranslatorStage<List<Token
 		getActionMap().put("more",moreAction);
 		autoCompleteSupport=new AutoCompleteSupport(currOut,new DictionaryHintProvider(dict));
 		currOut.addActionListener((e)->next(false));//TODO add alternative for setting default
+		getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,KeyEvent.ALT_DOWN_MASK),"default");
+		getActionMap().put("default",new SaveAction());
 		add(currOut,BorderLayout.CENTER);
 	}
 	private void next(boolean setDef){
@@ -147,7 +149,7 @@ public class WordTranslator extends JPanel implements TranslatorStage<List<Token
 			try{
 				return DictionaryHintExtractor.extractHint(currIn.getText(),doc.getText(0,pos),dict,memory);
 			}catch(BadLocationException ex){
-				Logger.getLogger(WordTranslator.class.getName()).log(Level.SEVERE,null,ex);
+				Logger.getGlobal().log(Level.FINER,null,ex);
 				return new Hint[0];
 			}
 		}
@@ -170,6 +172,12 @@ public class WordTranslator extends JPanel implements TranslatorStage<List<Token
 				currIn.setText(in.subList(index,end).stream().map((t)->t.getText()).collect(Collectors.joining(" ")));
 				autoCompleteSupport.updateHint();
 			}
+		}
+	}
+	private class SaveAction extends AbstractAction{
+		@Override
+		public void actionPerformed(ActionEvent e){
+			next(true);
 		}
 	}
 }

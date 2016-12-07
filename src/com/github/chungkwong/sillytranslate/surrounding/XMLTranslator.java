@@ -40,7 +40,7 @@ public class XMLTranslator implements DocumentTranslatorEngine{
 			this.out.writeStartDocument(this.in.getEncoding(),this.in.getVersion());
 			textTranslated("");
 		}catch(XMLStreamException ex){
-			Logger.getLogger(XMLTranslator.class.getName()).log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.SEVERE,null,ex);
 		}
 	}
 	@Override
@@ -150,7 +150,7 @@ public class XMLTranslator implements DocumentTranslatorEngine{
 				}
 			}
 		}catch(XMLStreamException ex){
-			Logger.getLogger(XMLTranslator.class.getName()).log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.SEVERE,null,ex);
 		}
 	}
 	@Override

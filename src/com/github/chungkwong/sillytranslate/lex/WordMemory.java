@@ -18,6 +18,7 @@ package com.github.chungkwong.sillytranslate.lex;
 import java.io.*;
 import java.util.*;
 import java.util.logging.*;
+import javax.swing.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
@@ -47,10 +48,10 @@ public class WordMemory{
 			try{
 				cache.createNewFile();
 			}catch(IOException ex1){
-				Logger.getLogger(WordMemory.class.getName()).log(Level.SEVERE,null,ex1);
+				Logger.getGlobal().log(Level.INFO,null,ex1);
 			}
 		}catch(IOException ex){
-			Logger.getLogger(WordMemory.class.getName()).log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.INFO,null,ex);
 		}
 		Runtime.getRuntime().addShutdownHook(new Thread(this::save));
 	}
@@ -120,11 +121,11 @@ public class WordMemory{
 			}
 			to.flush();
 		}catch(IOException ex){
-			Logger.getLogger(WordMemory.class.getName()).log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.INFO,null,ex);
 		}
 	}
 	public void writeAsText(Writer out) throws IOException{
-		out.write("Word\tTranslation\tTag\tCount\tDefault");
+		out.write("Word\tTranslation\tTag\tCount\tDefault\n");
 		for(Map.Entry<String,Candidates> entry:map.entrySet()){
 			String word=entry.getKey();
 			boolean def=entry.getValue().hasDefault();
@@ -135,12 +136,13 @@ public class WordMemory{
 				out.write('\t');
 				out.write(m.getTag());
 				out.write('\t');
-				out.write(m.getCount());
+				out.write(Integer.toString(m.getCount()));
 				out.write('\t');
 				if(def){
 					def=false;
 					out.write("default");
 				}
+				out.write('\n');
 			}
 		}
 	}
@@ -148,7 +150,8 @@ public class WordMemory{
 		in.readLine();
 		String line=null;
 		while((line=in.readLine())!=null){
-			addMeaning(line);
+			if(!line.isEmpty())
+				addMeaning(line);
 		}
 	}
 	private void addMeaning(String line){
@@ -173,15 +176,16 @@ public class WordMemory{
 		return map.toString();
 	}
 	public static void main(String[] args) throws FileNotFoundException, IOException{
-		System.out.println(new Scanner(System.in).delimiter());
-		WordMemory memory=new WordMemory("/home/kwong/useless.mem");
-		memory.useMeaning("a","一","art",false);
-		memory.useMeaning("a","一","art",false);
-		memory.useMeaning("a","一","art",false);
-		memory.useMeaning("a","个","ru",false);
-		memory.useMeaning("a","a","al",false);
-		memory.save();
-		System.out.println(new WordMemory("/home/kwong/useless.mem"));
+		JFrame f=new JFrame();
+		JTextArea area=new JTextArea();
+		WordMemory memory=WordMemory.getWordMemory("/home/kwong/.sillytranslatecache");
+		StringWriter out=new StringWriter();
+		memory.writeAsText(out);
+		area.setText(out.getBuffer().toString());
+		f.add(area);
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		f.setVisible(true);
 	}
 	private static class Candidates{
 		private boolean def;

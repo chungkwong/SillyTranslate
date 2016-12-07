@@ -135,8 +135,7 @@ public class Configure extends JFrame{
 				pref.sync();
 				load();
 			}catch(IOException|InvalidPreferencesFormatException|BackingStoreException ex){
-				Logger.getLogger(Configure.class.getName()).log(Level.SEVERE,null,ex);
-				JOptionPane.showMessageDialog(null,ex.getLocalizedMessage());
+				Logger.getGlobal().log(Level.SEVERE,null,ex);
 			}
 		}
 	}
@@ -147,8 +146,7 @@ public class Configure extends JFrame{
 			try(OutputStream out=new FileOutputStream(jfc.getSelectedFile())){
 				pref.exportNode(out);
 			}catch(IOException|BackingStoreException ex){
-				Logger.getLogger(Configure.class.getName()).log(Level.SEVERE,null,ex);
-				JOptionPane.showMessageDialog(null,ex.getLocalizedMessage());
+				Logger.getGlobal().log(Level.SEVERE,null,ex);
 			}
 		}
 	}
@@ -157,8 +155,7 @@ public class Configure extends JFrame{
 		try{
 			pref.flush();
 		}catch(BackingStoreException ex){
-			Logger.getLogger(Configure.class.getName()).log(Level.SEVERE,null,ex);
-			JOptionPane.showMessageDialog(null,ex.getLocalizedMessage());
+			Logger.getGlobal().log(Level.SEVERE,null,ex);
 		}
 	}
 	private void updatePref(){
@@ -206,8 +203,7 @@ public class Configure extends JFrame{
 		try{
 			dictionaryChooser.fromPaths(pref.get("Dictionary",""));
 		}catch(IOException ex){
-			Logger.getLogger(Configure.class.getName()).log(Level.SEVERE,null,ex);
-			JOptionPane.showMessageDialog(null,ex.getLocalizedMessage());
+			Logger.getGlobal().log(Level.SEVERE,null,ex);
 		}
 	}
 	public TextTranslator getTranslator(){

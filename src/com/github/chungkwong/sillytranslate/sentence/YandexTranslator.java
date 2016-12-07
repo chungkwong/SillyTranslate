@@ -53,7 +53,7 @@ public class YandexTranslator extends CloudTranslator{
 			return ((JSONString)((JSONArray)object.getMembers().get(new JSONString("text"))).getElements().get(0)).getValue();
 		}catch(IOException|SyntaxException|RuntimeException ex){
 			System.err.println(result);
-			Logger.getLogger(BaiduTranslator.class.getName()).log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.FINE,null,ex);
 			return null;
 		}
 	}

@@ -51,6 +51,7 @@ public class Main extends JFrame{
 		startTranslation(new ByteArrayInputStream(text.getBytes(Charset.forName("UTF-8"))),out,engine);
 	}
 	private void startTranslation(InputStream in,DocumentTranslatorEngine engine) throws FileNotFoundException{
+		fileChooser.setSelectedFile(new File(fileChooser.getSelectedFile().toString()+".new"));
 		fileChooser.showSaveDialog(this);
 		FileOutputStream out=new FileOutputStream(fileChooser.getSelectedFile());
 		engine.setOnFinished(()->{
@@ -58,7 +59,7 @@ public class Main extends JFrame{
 				out.close();
 				card.show(getContentPane(),INPUT_CARD_NAME);
 			}catch(IOException ex){
-				Logger.getLogger(Main.class.getName()).log(Level.SEVERE,null,ex);
+				Logger.getGlobal().log(Level.SEVERE,null,ex);
 			}
 		});
 		startTranslation(in,out,engine);
@@ -76,55 +77,50 @@ public class Main extends JFrame{
 	}
 	private JPanel createInputCard(){
 		JPanel pane=new JPanel(new BorderLayout());
+		Box steps=Box.createVerticalBox();
+		Box step1=Box.createHorizontalBox();
+		step1.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STEP1")));
 		JComboBox<DocumentTranslatorEngine> formats=new JComboBox<>(new DocumentTranslatorEngine[]{
 			new PlainTextTranslator(),new PropertiesTranslator(),new XMLTranslator(),
 			new ODFTranslator(),new OOXMLTranslator(),new POTranslator()
 		});
-		JTextArea area=new ActionTextArea((text)->{
-			startTranslation(text,(DocumentTranslatorEngine)formats.getSelectedItem());
-		});
-		pane.add(new JScrollPane(area),BorderLayout.CENTER);
+		step1.add(formats);
 		JButton setting=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SETTINGS"));
 		setting.addActionListener((e)->conf.setVisible(true));
-		JButton ok=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("START"));
-		ok.addActionListener((e)->{
-			startTranslation(area.getText(),(DocumentTranslatorEngine)formats.getSelectedItem());
-			area.setText("");
-		});
-		Box from=Box.createHorizontalBox();
-		JButton fromClip=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("FROM CLIPBOARD"));
+		step1.add(setting);
+		steps.add(step1);
+		JPanel step2=new JPanel(new FlowLayout(FlowLayout.LEFT));
+		step2.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STEP2")));
 		JButton fromFile=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("FROM FILE"));
-		JButton fromURL=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("FROM URL"));
-		fromClip.addActionListener((e)->{
-			area.setText("");
-			area.paste();
-		});
 		fromFile.addActionListener((e)->{
 			if(fileChooser.showOpenDialog(this)==JFileChooser.APPROVE_OPTION){
 				try{
 					startTranslation(new FileInputStream(fileChooser.getSelectedFile()),(DocumentTranslatorEngine)formats.getSelectedItem());
 				}catch(IOException ex){
-					Logger.getLogger(Main.class.getName()).log(Level.SEVERE,null,ex);
+					Logger.getGlobal().log(Level.SEVERE,null,ex);
 				}
 			}
 		});
+		step2.add(fromFile);
+		step2.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("OR")));
+		JButton fromURL=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("FROM NETWORK"));
 		fromURL.addActionListener((e)->{
 			String url=JOptionPane.showInputDialog(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("ENTER THE URL:"));
 			try{
 				URLConnection conn=new URL(url).openConnection();
 				startTranslation(conn.getInputStream(),(DocumentTranslatorEngine)formats.getSelectedItem());
 			}catch(IOException ex){
-				Logger.getLogger(Main.class.getName()).log(Level.SEVERE,null,ex);
+				Logger.getGlobal().log(Level.SEVERE,null,ex);
 			}
 		});
-		from.add(fromClip);
-		from.add(fromFile);
-		from.add(fromURL);
-		from.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("FORMAT")));
-		from.add(formats);
-		from.add(setting);
-		from.add(ok);
-		pane.add(from,BorderLayout.NORTH);
+		step2.add(fromURL);
+		step2.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("FROM_TEXT")));
+		steps.add(step2);
+		pane.add(steps,BorderLayout.NORTH);
+		JTextArea area=new ActionTextArea((text)->{
+			startTranslation(text,(DocumentTranslatorEngine)formats.getSelectedItem());
+		});
+		pane.add(new JScrollPane(area),BorderLayout.CENTER);
 		return pane;
 	}
 	private JPanel createOutputCard(){
@@ -137,7 +133,7 @@ public class Main extends JFrame{
 				try{
 					out.write(new FileWriter(fileChooser.getSelectedFile()));
 				}catch(IOException ex){
-					Logger.getLogger(Main.class.getName()).log(Level.SEVERE,null,ex);
+					Logger.getGlobal().log(Level.SEVERE,null,ex);
 				}
 			}
 		});
@@ -149,6 +145,8 @@ public class Main extends JFrame{
 		return pane;
 	}
 	public static void main(String[] args) throws IOException{
+		Logger.getGlobal().setLevel(Level.SEVERE);
+		Logger.getGlobal().addHandler(OptionPaneHandler.INSTANCE);
 		new Main();
 	}
 }

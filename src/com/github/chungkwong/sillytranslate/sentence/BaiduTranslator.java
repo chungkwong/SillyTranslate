@@ -65,7 +65,7 @@ public class BaiduTranslator extends CloudTranslator{
 			object=(JSONObject)((JSONArray)object.getMembers().get(new JSONString("trans_result"))).getElements().get(0);
 			return ((JSONString)object.getMembers().get(new JSONString("dst"))).getValue();
 		}catch(IOException|SyntaxException|RuntimeException ex){
-			Logger.getLogger(BaiduTranslator.class.getName()).log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.FINE,null,ex);
 			return null;
 		}
 	}

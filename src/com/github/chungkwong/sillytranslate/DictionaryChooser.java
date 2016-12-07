@@ -57,7 +57,7 @@ public class DictionaryChooser extends JPanel{
 			fileChooser.showOpenDialog(this);
 			return new StardictDictionary(fileChooser.getSelectedFile());
 		}catch(IOException ex){
-			Logger.getLogger(DictionaryViewer.class.getName()).log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.SEVERE,null,ex);
 			return null;
 		}
 	}

@@ -43,7 +43,7 @@ public class PropertiesTranslator implements DocumentTranslatorEngine{
 			this.out=new CodePointWriter(new OutputStreamWriter(out,"UTF-8"));
 			textTranslated("");
 		}catch(UnsupportedEncodingException ex){
-			Logger.getLogger(PropertiesTranslator.class.getName()).log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.SEVERE,null,ex);
 		}
 	}
 	@Override
@@ -103,7 +103,7 @@ public class PropertiesTranslator implements DocumentTranslatorEngine{
 			out.flush();
 			callback.run();
 		}catch(IOException ex){
-			Logger.getLogger(PropertiesTranslator.class.getName()).log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.SEVERE,null,ex);
 		}
 	}
 	private int skipWhiteSpace(int c) throws IOException{

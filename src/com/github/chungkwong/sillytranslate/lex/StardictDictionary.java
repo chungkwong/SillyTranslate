@@ -99,7 +99,7 @@ public class StardictDictionary implements NavigableDictionary{
 				CharBuffer cbuf=UTF8_DECODER.decode(ByteBuffer.wrap(pool,interval.getOffset(),interval.getSize()));
 				return cbuf.toString();
 			}catch(CharacterCodingException ex){
-				Logger.getLogger(StardictDictionary.class.getName()).log(Level.SEVERE,null,ex);
+				Logger.getGlobal().log(Level.FINEST,null,ex);
 			}
 		return "";
 	}
