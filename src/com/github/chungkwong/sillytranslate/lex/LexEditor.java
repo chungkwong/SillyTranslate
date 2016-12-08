@@ -70,7 +70,7 @@ public class LexEditor extends JPanel implements ActionListener,DocumentListener
 			}
 			correctHighlight();
 		}catch(IOException ex){
-			Logger.getGlobal().log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 		}
 		pane.getDocument().addDocumentListener(this);
 		pane.requestFocusInWindow();
@@ -88,7 +88,7 @@ public class LexEditor extends JPanel implements ActionListener,DocumentListener
 			try{
 				pane.getHighlighter().addHighlight(pos,pos+val.getText().length(),PAINTER.get(val.getType()));
 			}catch(BadLocationException ex){
-				Logger.getGlobal().log(Level.FINEST,null,ex);
+				Logger.getGlobal().log(Level.FINEST,ex.getLocalizedMessage(),ex);
 			}
 		});
 	}
@@ -133,7 +133,7 @@ public class LexEditor extends JPanel implements ActionListener,DocumentListener
 				}
 			}
 		}catch(BadLocationException ex){
-			Logger.getGlobal().log(Level.FINEST,null,ex);
+			Logger.getGlobal().log(Level.FINEST,ex.getLocalizedMessage(),ex);
 		}
 		correctHighlight();
 	}

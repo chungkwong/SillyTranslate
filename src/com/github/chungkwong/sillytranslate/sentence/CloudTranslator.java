@@ -147,7 +147,7 @@ public abstract class CloudTranslator{
 			try{
 				builder.append(URLEncoder.encode(value,"UTF-8"));
 			}catch(UnsupportedEncodingException ex){
-				Logger.getGlobal().log(Level.SEVERE,null,ex);
+				Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 			}
 		}
 		return builder.toString();

@@ -45,7 +45,7 @@ public class InternetDictionary implements NavigableDictionary{
 			//return buf.toString();
 			return removeHTMLTag(buf.toString());//.replaceAll("<[^>]*>","");
 		}catch(IOException ex){
-			Logger.getGlobal().log(Level.INFO,null,ex);
+			Logger.getGlobal().log(Level.INFO,ex.getLocalizedMessage(),ex);
 		}
 		return null;
 	}

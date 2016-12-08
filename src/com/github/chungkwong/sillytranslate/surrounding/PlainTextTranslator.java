@@ -36,7 +36,7 @@ public class PlainTextTranslator implements DocumentTranslatorEngine{
 			this.out=new CodePointWriter(new OutputStreamWriter(out,"UTF-8"));
 			textTranslated("");
 		}catch(IOException ex){
-			Logger.getGlobal().log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 		}
 	}
 	@Override
@@ -79,7 +79,7 @@ public class PlainTextTranslator implements DocumentTranslatorEngine{
 				callback.run();
 			}
 		}catch(IOException ex){
-			Logger.getGlobal().log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 		}
 	}
 	@Override

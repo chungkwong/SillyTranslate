@@ -19,8 +19,8 @@ import com.github.chungkwong.sillytranslate.*;
 import com.github.chungkwong.sillytranslate.ui.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.*;
 import java.util.logging.*;
 import java.util.stream.*;
@@ -32,7 +32,7 @@ import javax.swing.text.*;
  */
 public class WordTranslator extends JPanel implements TranslatorStage<List<Token>,Iterator<Token>>{
 	private final JLabel currIn=new JLabel();
-	private final JTextField currOut=new JTextField();
+	private final JTextArea currOut=new ActionTextArea((text)->next(false));
 	private final WordMemory memory;
 	private final NavigableDictionary dict;
 	private final AutoCompleteSupport autoCompleteSupport;
@@ -51,10 +51,12 @@ public class WordTranslator extends JPanel implements TranslatorStage<List<Token
 		LessAction lessAction=new LessAction();
 		Box inBox=Box.createHorizontalBox();
 		JButton less=new JButton("<");
+		less.setToolTipText(ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("POP_TIPS"));
 		less.setAction(lessAction);
 		inBox.add(less);
 		inBox.add(currIn);
 		JButton more=new JButton(">");
+		more.setToolTipText(ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("PUSH_TIPS"));
 		more.addActionListener(moreAction);
 		inBox.add(more);
 		add(currIn,BorderLayout.NORTH);
@@ -62,11 +64,11 @@ public class WordTranslator extends JPanel implements TranslatorStage<List<Token
 		getActionMap().put("less",lessAction);
 		getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN,0),"more");
 		getActionMap().put("more",moreAction);
-		autoCompleteSupport=new AutoCompleteSupport(currOut,new DictionaryHintProvider(dict));
-		currOut.addActionListener((e)->next(false));//TODO add alternative for setting default
 		getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,KeyEvent.ALT_DOWN_MASK),"default");
 		getActionMap().put("default",new SaveAction());
+		autoCompleteSupport=new AutoCompleteSupport(currOut,new DictionaryHintProvider(dict));
 		add(currOut,BorderLayout.CENTER);
+		add(new JLabel(ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("WORD_TIPS")),BorderLayout.SOUTH);
 	}
 	private void next(boolean setDef){
 		while(true){
@@ -149,7 +151,7 @@ public class WordTranslator extends JPanel implements TranslatorStage<List<Token
 			try{
 				return DictionaryHintExtractor.extractHint(currIn.getText(),doc.getText(0,pos),dict,memory);
 			}catch(BadLocationException ex){
-				Logger.getGlobal().log(Level.FINER,null,ex);
+				Logger.getGlobal().log(Level.FINER,ex.getLocalizedMessage(),ex);
 				return new Hint[0];
 			}
 		}

@@ -19,7 +19,9 @@ import com.github.chungkwong.sillytranslate.lex.*;
 import com.github.chungkwong.sillytranslate.sentence.*;
 import com.github.chungkwong.sillytranslate.surrounding.*;
 import com.github.chungkwong.sillytranslate.ui.*;
+import java.awt.*;
 import java.io.*;
+import java.net.*;
 import java.util.*;
 import java.util.logging.*;
 import java.util.prefs.*;
@@ -61,12 +63,30 @@ public class Configure extends JFrame{
 		baiduBox.add(baiduId);
 		baiduBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SECRET:")));
 		baiduBox.add(baiduSecret);
+		JButton getBaiduKey=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("GET_ONE"));
+		getBaiduKey.addActionListener((e)->{
+			try{
+				Desktop.getDesktop().browse(new URI("http://api.fanyi.baidu.com/api/trans/product/apiapply"));
+			}catch(URISyntaxException|IOException ex){
+				Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
+			}
+		});
+		baiduBox.add(getBaiduKey);
 		baiduBox.setAlignmentX(0);
 		box.add(baiduBox);
 		Box yandexBox=Box.createHorizontalBox();
 		yandexBox.add(yandex);
 		yandexBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("KEY:")));
 		yandexBox.add(yandexKey);
+		JButton getYandexKey=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("GET_ONE"));
+		getYandexKey.addActionListener((e)->{
+			try{
+				Desktop.getDesktop().browse(new URI("https://tech.yandex.com/key/form.xml?service=trnsl"));
+			}catch(URISyntaxException|IOException ex){
+				Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
+			}
+		});
+		yandexBox.add(getYandexKey);
 		yandexBox.setAlignmentX(0);
 		box.add(yandexBox);
 		Box lexBox=Box.createHorizontalBox();
@@ -105,6 +125,15 @@ public class Configure extends JFrame{
 		Box cacheBox=Box.createHorizontalBox();
 		cacheBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("WORD CACHE PATH")));
 		cacheBox.add(wordCache);
+		JButton view=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("VIEW"));
+		view.addActionListener((e)->{
+			JFrame dia=new JFrame();
+			WordMemory memory=WordMemory.getWordMemory(wordCache.getText());
+			dia.add(new WordMemoryEditor(memory));
+			dia.setExtendedState(JFrame.MAXIMIZED_BOTH);
+			dia.setVisible(true);
+		});
+		cacheBox.add(view);
 		cacheBox.setAlignmentX(0);
 		box.add(cacheBox);
 		dictionaryChooser.setAlignmentX(0);
@@ -135,7 +164,7 @@ public class Configure extends JFrame{
 				pref.sync();
 				load();
 			}catch(IOException|InvalidPreferencesFormatException|BackingStoreException ex){
-				Logger.getGlobal().log(Level.SEVERE,null,ex);
+				Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 			}
 		}
 	}
@@ -146,7 +175,7 @@ public class Configure extends JFrame{
 			try(OutputStream out=new FileOutputStream(jfc.getSelectedFile())){
 				pref.exportNode(out);
 			}catch(IOException|BackingStoreException ex){
-				Logger.getGlobal().log(Level.SEVERE,null,ex);
+				Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 			}
 		}
 	}
@@ -155,7 +184,7 @@ public class Configure extends JFrame{
 		try{
 			pref.flush();
 		}catch(BackingStoreException ex){
-			Logger.getGlobal().log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 		}
 	}
 	private void updatePref(){
@@ -203,7 +232,7 @@ public class Configure extends JFrame{
 		try{
 			dictionaryChooser.fromPaths(pref.get("Dictionary",""));
 		}catch(IOException ex){
-			Logger.getGlobal().log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 		}
 	}
 	public TextTranslator getTranslator(){

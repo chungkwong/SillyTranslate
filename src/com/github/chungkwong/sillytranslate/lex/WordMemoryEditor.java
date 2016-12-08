@@ -37,7 +37,7 @@ public class WordMemoryEditor extends JPanel{
 			try{
 				memory.readFromText(new BufferedReader(new StringReader(area.getText())));
 			}catch(IOException ex){
-				Logger.getGlobal().log(Level.SEVERE,null,ex);
+				Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 			}
 			updateText();
 		});
@@ -49,7 +49,7 @@ public class WordMemoryEditor extends JPanel{
 			memory.writeAsText(out);
 			area.setText(out.getBuffer().toString());
 		}catch(IOException ex){
-			Logger.getGlobal().log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 		}
 	}
 	public static void main(String[] args){

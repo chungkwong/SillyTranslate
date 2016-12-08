@@ -42,7 +42,7 @@ public class POTranslator implements DocumentTranslatorEngine{
 			this.out=new CodePointWriter(new OutputStreamWriter(out,"UTF-8"));
 			textTranslated(null);
 		}catch(UnsupportedEncodingException ex){
-			Logger.getGlobal().log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 		}
 	}
 	@Override
@@ -75,7 +75,7 @@ public class POTranslator implements DocumentTranslatorEngine{
 			out.flush();
 			callback.run();
 		}catch(IOException ex){
-			Logger.getGlobal().log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 		}
 	}
 	private int skipWhiteSpace(int c) throws IOException{

@@ -69,7 +69,7 @@ public abstract class ZipDocumentTranslator implements DocumentTranslatorEngine{
 			zipOut=null;
 			callback.run();
 		}catch(IOException ex){
-			Logger.getGlobal().log(Level.SEVERE,null,ex);
+			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 		}
 	}
 	@Override

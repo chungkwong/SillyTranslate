@@ -68,6 +68,10 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 	public String getName(){
 		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STAGED");
 	}
+	@Override
+	public String getUsage(){
+		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CTRL_ENTER_NEXT");
+	}
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		JFrame f=new JFrame("Translator");
 		Lex lex=new SimpleLex();

@@ -55,7 +55,7 @@ public class E2CNormalizers{
 			try{
 				prop.load(E2CNormalizers.class.getResourceAsStream("/com/github/chungkwong/sillytranslate/lex/"+name+"_en.properties"));
 			}catch(IOException ex){
-				Logger.getGlobal().log(Level.INFO,null,ex);
+				Logger.getGlobal().log(Level.INFO,ex.getLocalizedMessage(),ex);
 			}
 			String rule=prop.getProperty("RULES","");
 			ArrayList<String> term=new ArrayList<>();

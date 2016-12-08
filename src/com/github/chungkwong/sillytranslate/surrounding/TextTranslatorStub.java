@@ -36,4 +36,8 @@ public class TextTranslatorStub implements TextTranslator{
 	public String getName(){
 		return "Stub";
 	}
+	@Override
+	public String getUsage(){
+		return "";
+	}
 }

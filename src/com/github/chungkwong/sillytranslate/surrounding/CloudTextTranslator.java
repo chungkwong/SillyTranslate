@@ -41,7 +41,7 @@ public class CloudTextTranslator extends JPanel implements TextTranslator{
 				try{
 					Desktop.getDesktop().browse(new URI(translator.getHOME()));
 				}catch(IOException|URISyntaxException ex){
-					Logger.getGlobal().log(Level.FINE,null,ex);
+					Logger.getGlobal().log(Level.FINE,ex.getLocalizedMessage(),ex);
 				}
 			});
 			slogan.setFocusable(false);
@@ -73,5 +73,9 @@ public class CloudTextTranslator extends JPanel implements TextTranslator{
 	@Override
 	public String getName(){
 		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CLOUD");
+	}
+	@Override
+	public String getUsage(){
+		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CTRL_ENTER");
 	}
 }

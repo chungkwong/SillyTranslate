@@ -59,7 +59,7 @@ public class Main extends JFrame{
 				out.close();
 				card.show(getContentPane(),INPUT_CARD_NAME);
 			}catch(IOException ex){
-				Logger.getGlobal().log(Level.SEVERE,null,ex);
+				Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 			}
 		});
 		startTranslation(in,out,engine);
@@ -97,7 +97,7 @@ public class Main extends JFrame{
 				try{
 					startTranslation(new FileInputStream(fileChooser.getSelectedFile()),(DocumentTranslatorEngine)formats.getSelectedItem());
 				}catch(IOException ex){
-					Logger.getGlobal().log(Level.SEVERE,null,ex);
+					Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 				}
 			}
 		});
@@ -110,7 +110,7 @@ public class Main extends JFrame{
 				URLConnection conn=new URL(url).openConnection();
 				startTranslation(conn.getInputStream(),(DocumentTranslatorEngine)formats.getSelectedItem());
 			}catch(IOException ex){
-				Logger.getGlobal().log(Level.SEVERE,null,ex);
+				Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 			}
 		});
 		step2.add(fromURL);
@@ -125,6 +125,7 @@ public class Main extends JFrame{
 	}
 	private JPanel createOutputCard(){
 		JPanel pane=new JPanel(new BorderLayout());
+		pane.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("RESULT")),BorderLayout.NORTH);
 		pane.add(new JScrollPane(out),BorderLayout.CENTER);
 		Box bar=Box.createHorizontalBox();
 		JButton ok=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SAVE"));
@@ -133,7 +134,7 @@ public class Main extends JFrame{
 				try{
 					out.write(new FileWriter(fileChooser.getSelectedFile()));
 				}catch(IOException ex){
-					Logger.getGlobal().log(Level.SEVERE,null,ex);
+					Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 				}
 			}
 		});
@@ -145,6 +146,7 @@ public class Main extends JFrame{
 		return pane;
 	}
 	public static void main(String[] args) throws IOException{
+		//Locale.setDefault(Locale.FRANCE);
 		Logger.getGlobal().setLevel(Level.SEVERE);
 		Logger.getGlobal().addHandler(OptionPaneHandler.INSTANCE);
 		new Main();

@@ -34,7 +34,7 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 	private final JLabel input=new JLabel();
 	private final DefaultListModel<String> choices=new DefaultListModel<>();
 	private final ActionList<String> list=new ActionList<>(choices);
-	private final JTextField result=new JTextField();
+	private final JTextArea result=new ActionTextArea((text)->next(text));
 	private final SentenceTranslatorEngine engine;
 	private final StringBuilder buf=new StringBuilder();
 	private Iterator<Token> iter;
@@ -44,6 +44,7 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		this.engine=engine;
 		input.setFocusable(false);
+		input.setAlignmentX(0);
 		add(input);
 		list.setAlignmentX(0);
 		list.addListSelectionListener(new ListSelectionListener() {
@@ -52,13 +53,13 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 				result.setText(list.getSelectedValue());
 			}
 		});
-		list.setAction((item)->next());
+		list.setAction((item)->next(item));
+		list.setAlignmentX(0);
 		add(list);
-		result.addActionListener((e)->next());
 		add(result);
 	}
-	private void next(){
-		buf.append(result.getText());
+	private void next(String text){
+		buf.append(text);
 		result.setText("");
 		choices.removeAllElements();
 		if(curr!=null){
@@ -122,7 +123,7 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 	public JComponent accept(Iterator<Token> source,Consumer<String> callback){
 		this.callback=callback;
 		this.iter=source;
-		next();
+		next("");
 		return this;
 	}
 	public static void main(String[] args){

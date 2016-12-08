@@ -58,4 +58,8 @@ public class SimpleTextTranslator extends JPanel implements TextTranslator{
 		f.setVisible(true);
 		t.start(new FileInputStream("/home/kwong/NetBeansProjects/JSchemeMin/README.md"),System.out);
 	}
+	@Override
+	public String getUsage(){
+		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CTRL_ENTER");
+	}
 }

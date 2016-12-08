@@ -26,16 +26,16 @@ public class CombinedTextTranslator extends JPanel implements TextTranslator{
 	public CombinedTextTranslator(TextTranslator... translators){
 		this.translators=translators;
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-		JLabel org=new JLabel("Input");
+		JLabel org=new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("INPUT"));
 		org.setAlignmentX(0);
 		add(org);
 		in.setEditable(false);
 		in.setAlignmentX(0);
 		add(in);
 		for(TextTranslator translator:translators){
-			JLabel label=new JLabel(translator.getName());
-			label.setAlignmentX(0);
-			add(label);
+			JLabel tips=new JLabel(translator.getName()+"    "+translator.getUsage());
+			tips.setAlignmentX(0);
+			add(tips);
 			JComponent translatorView=translator.getUserInterface();
 			translatorView.setAlignmentX(0);
 			add(translatorView);
@@ -55,5 +55,9 @@ public class CombinedTextTranslator extends JPanel implements TextTranslator{
 	@Override
 	public String getName(){
 		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("INTEGRATED");
+	}
+	@Override
+	public String getUsage(){
+		return "";
 	}
 }

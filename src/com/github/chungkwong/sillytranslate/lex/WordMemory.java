@@ -51,7 +51,7 @@ public class WordMemory{
 				Logger.getGlobal().log(Level.INFO,null,ex1);
 			}
 		}catch(IOException ex){
-			Logger.getGlobal().log(Level.INFO,null,ex);
+			Logger.getGlobal().log(Level.INFO,ex.getLocalizedMessage(),ex);
 		}
 		Runtime.getRuntime().addShutdownHook(new Thread(this::save));
 	}
@@ -121,7 +121,7 @@ public class WordMemory{
 			}
 			to.flush();
 		}catch(IOException ex){
-			Logger.getGlobal().log(Level.INFO,null,ex);
+			Logger.getGlobal().log(Level.INFO,ex.getLocalizedMessage(),ex);
 		}
 	}
 	public void writeAsText(Writer out) throws IOException{
