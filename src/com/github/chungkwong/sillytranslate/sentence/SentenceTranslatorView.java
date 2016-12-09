@@ -54,8 +54,8 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 			}
 		});
 		list.setAction((item)->next(item));
-		list.setAlignmentX(0);
 		add(list);
+		result.setAlignmentX(0);
 		add(result);
 	}
 	private void next(String text){

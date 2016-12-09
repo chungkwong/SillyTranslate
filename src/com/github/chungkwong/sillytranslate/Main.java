@@ -51,7 +51,8 @@ public class Main extends JFrame{
 		startTranslation(new ByteArrayInputStream(text.getBytes(Charset.forName("UTF-8"))),out,engine);
 	}
 	private void startTranslation(InputStream in,DocumentTranslatorEngine engine) throws FileNotFoundException{
-		fileChooser.setSelectedFile(new File(fileChooser.getSelectedFile().toString()+".new"));
+		if(fileChooser.getSelectedFile()!=null)
+			fileChooser.setSelectedFile(new File(fileChooser.getSelectedFile().toString()+".new"));
 		fileChooser.showSaveDialog(this);
 		FileOutputStream out=new FileOutputStream(fileChooser.getSelectedFile());
 		engine.setOnFinished(()->{

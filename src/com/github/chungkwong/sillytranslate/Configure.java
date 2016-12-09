@@ -36,6 +36,7 @@ public class Configure extends JFrame{
 	private final JCheckBox staged=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STAGED"));
 	private final JCheckBox cloud=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CLOUD"));
 	private final JCheckBox baidu=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("BAIDU"));
+	private final JCheckBox youdao=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("YOUDAO"));
 	private final JCheckBox yandex=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("YANDEX"));
 	private final JRadioButton simpleLex=new JRadioButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SIMPLE"));
 	private final JRadioButton prefixLex=new JRadioButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("PREFIX"));
@@ -47,6 +48,8 @@ public class Configure extends JFrame{
 	private final JTextField yandexKey=new JTextField();
 	private final JTextField baiduId=new JTextField();
 	private final JTextField baiduSecret=new JTextField();
+	private final JTextField youdaoId=new JTextField();
+	private final JTextField youdaoSecret=new JTextField();
 	private final JSpinner naiveLimit=new JSpinner(new SpinnerNumberModel(6,0,Integer.MAX_VALUE,1));
 	private final JSpinner ruleLimit=new JSpinner(new SpinnerNumberModel(6,0,Integer.MAX_VALUE,1));
 	private final LocaleChooser localeIn=new LocaleChooser();
@@ -74,6 +77,23 @@ public class Configure extends JFrame{
 		baiduBox.add(getBaiduKey);
 		baiduBox.setAlignmentX(0);
 		box.add(baiduBox);
+		Box youdaoBox=Box.createHorizontalBox();
+		youdaoBox.add(youdao);
+		youdaoBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("ID:")));
+		youdaoBox.add(youdaoId);
+		youdaoBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SECRET:")));
+		youdaoBox.add(youdaoSecret);
+		JButton getYoudexKey=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("GET_ONE"));
+		getYoudexKey.addActionListener((e)->{
+			try{
+				Desktop.getDesktop().browse(new URI("http://fanyi.youdao.com/openapi?path=data-mode"));
+			}catch(URISyntaxException|IOException ex){
+				Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
+			}
+		});
+		youdaoBox.add(getYoudexKey);
+		youdaoBox.setAlignmentX(0);
+		box.add(youdaoBox);
 		Box yandexBox=Box.createHorizontalBox();
 		yandexBox.add(yandex);
 		yandexBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("KEY:")));
@@ -138,6 +158,15 @@ public class Configure extends JFrame{
 		box.add(cacheBox);
 		dictionaryChooser.setAlignmentX(0);
 		box.add(dictionaryChooser);
+		JButton dict=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CHECK_DICT"));
+		dict.setAlignmentX(0);
+		dict.addActionListener((e)->{
+			JFrame f=new JFrame(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("DICTIONARY VIEWER"));
+			f.add(new DictionaryViewer(dictionaryChooser.getDictionary()));
+			f.setExtendedState(JFrame.MAXIMIZED_BOTH);
+			f.setVisible(true);
+		});
+		box.add(dict);
 		Box control=Box.createHorizontalBox();
 		JButton importPref=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("IMPORT"));
 		importPref.addActionListener((e)->importPref());
@@ -193,6 +222,7 @@ public class Configure extends JFrame{
 		pref.putBoolean("CloudTranslator",cloud.isSelected());
 		pref.putBoolean("useBaidu",baidu.isSelected());
 		pref.putBoolean("useYandex",yandex.isSelected());
+		pref.putBoolean("useYoudao",youdao.isSelected());
 		pref.putBoolean("SimpleLex",simpleLex.isSelected());
 		pref.putBoolean("PrefixLex",prefixLex.isSelected());
 		pref.putBoolean("JavaLex",javaLex.isSelected());
@@ -204,6 +234,8 @@ public class Configure extends JFrame{
 		pref.put("WordCache",wordCache.getText());
 		pref.put("BaiduID",baiduId.getText());
 		pref.put("BaiduSecret",baiduSecret.getText());
+		pref.put("YoudaoID",youdaoId.getText());
+		pref.put("YoudaoSecret",youdaoSecret.getText());
 		pref.put("YandexKey",yandexKey.getText());
 		pref.putInt("NaiveLimit",(Integer)naiveLimit.getValue());
 		pref.putInt("RuleBasedLimit",(Integer)ruleLimit.getValue());
@@ -215,6 +247,7 @@ public class Configure extends JFrame{
 		cloud.setSelected(pref.getBoolean("CloudTranslator",true));
 		baidu.setSelected(pref.getBoolean("useBaidu",false));
 		yandex.setSelected(pref.getBoolean("useYandex",false));
+		youdao.setSelected(pref.getBoolean("useYoudao",false));
 		simpleLex.setSelected(pref.getBoolean("SimpleLex",true));
 		prefixLex.setSelected(pref.getBoolean("PrefixLex",false));
 		javaLex.setSelected(pref.getBoolean("JavaLex",false));
@@ -228,6 +261,8 @@ public class Configure extends JFrame{
 		wordCache.setText(pref.get("WordCache",System.getProperty("user.home")+"/.sillytranslatecache"));
 		baiduId.setText(pref.get("BaiduID",""));
 		baiduSecret.setText(pref.get("BaiduSecret",""));
+		youdaoId.setText(pref.get("YoudaoID",""));
+		youdaoSecret.setText(pref.get("YoudaoSecret",""));
 		yandexKey.setText(pref.get("YandexKey",""));
 		try{
 			dictionaryChooser.fromPaths(pref.get("Dictionary",""));
@@ -236,15 +271,6 @@ public class Configure extends JFrame{
 		}
 	}
 	public TextTranslator getTranslator(){
-		/*if(simple.isSelected())
-			return new SimpleTextTranslator();
-		else{
-			Lex lex=simpleLex.isSelected()?new SimpleLex():
-					(prefixLex.isSelected()?new PrefixLex(dictionaryChooser.getDictionary()):new JavaLex(localeChooser.getSelectedItem()));
-			WordTranslator wordTranslator=new WordTranslator(dictionaryChooser.getDictionary());
-			SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(new NaiveTranslator(24));
-			return new StagedTextTranslator(lex,wordTranslator,sentenceTranslator);
-		}*/
 		ArrayList<TextTranslator> translators=new ArrayList<>();
 		if(simple.isSelected())
 			translators.add(new SimpleTextTranslator());
@@ -265,6 +291,8 @@ public class Configure extends JFrame{
 			ArrayList<CloudTranslator> clouds=new ArrayList<>();
 			if(baidu.isSelected())
 				clouds.add(new BaiduTranslator(baiduId.getText(),baiduSecret.getText()));
+			if(youdao.isSelected())
+				clouds.add(new YoudaoTranslator(youdaoId.getText(),youdaoSecret.getText()));
 			if(yandex.isSelected())
 				clouds.add(new YandexTranslator(yandexKey.getText()));
 			CloudTextTranslator cloudTextTranslator=new CloudTextTranslator(clouds.toArray(new CloudTranslator[0]));

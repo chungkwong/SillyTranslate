@@ -49,13 +49,17 @@ public class DictionaryChooser extends JPanel{
 				intervalAdded(e);
 			}
 		});
-		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		add(new EditableList(dicts,this::loadDictionary),"");
 	}
 	private NavigableDictionary loadDictionary(){
 		try{
 			fileChooser.showOpenDialog(this);
-			return new StardictDictionary(fileChooser.getSelectedFile());
+			File file=fileChooser.getSelectedFile();
+			if(file.isDirectory())
+				return new StardictDictionary(fileChooser.getSelectedFile());
+			else
+				return new KeyValueDictionary(file);
 		}catch(IOException ex){
 			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 			return null;

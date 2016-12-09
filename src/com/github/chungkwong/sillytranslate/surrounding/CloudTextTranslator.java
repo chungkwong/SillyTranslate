@@ -51,7 +51,7 @@ public class CloudTextTranslator extends JPanel implements TextTranslator{
 			area.setAlignmentX(0);
 			add(area);
 			RealTimeTask<String> task=new RealTimeTask<>((text)->{
-				area.setText(translator.translate(text,from,to,true));
+				area.setText(translator.translate(text,from,to));
 			});
 			new Thread(task).start();
 			output.add(task);

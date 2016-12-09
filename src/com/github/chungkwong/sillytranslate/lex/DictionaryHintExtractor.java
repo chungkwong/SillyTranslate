@@ -59,7 +59,8 @@ public class DictionaryHintExtractor{
 			int prefixLen=prefix.length();
 			for(Meaning meaning:meanings){
 				String token=meaning.getText()+":"+meaning.getTag();
-				hints.add(new SimpleHint(token+meaning.getCount(),token.substring(prefixLen),null,""));
+				if(token.length()>prefixLen)
+					hints.add(new SimpleHint(token+meaning.getCount(),token.substring(prefixLen),null,""));
 			}
 		}
 	}
@@ -84,16 +85,16 @@ public class DictionaryHintExtractor{
 				String token=text.substring(i,j);
 				if(token.endsWith(".")&&!token.endsWith("...")){
 					type=token;
-				}
-				else if(!token.isEmpty()&&token.startsWith(prefix)){
+				}else if(!token.isEmpty()&&token.startsWith(prefix)){
 					token+=":"+type;
-					hints.add(new SimpleHint(token,token.substring(prefixLen),null,""));
+					if(token.length()>prefixLen)
+						hints.add(new SimpleHint(token,token.substring(prefixLen),null,""));
 				}
 				if(j>i)
 					i=j-1;
 			}
 		}
-		if(word.startsWith(prefix))
+		if(word.startsWith(prefix)&&word.length()>prefixLen)
 			hints.add(new SimpleHint(word,word.substring(prefixLen),null,""));
 	}
 	private static void split(String text,String word,String prefix,ArrayList<Hint> hints,WordNormalizer normalizer){

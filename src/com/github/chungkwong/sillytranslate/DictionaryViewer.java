@@ -16,8 +16,8 @@
  */
 
 package com.github.chungkwong.sillytranslate;
+import com.github.chungkwong.sillytranslate.lex.*;
 import java.awt.*;
-import java.io.*;
 import javax.swing.*;
 import javax.swing.event.*;
 /**
@@ -26,13 +26,14 @@ import javax.swing.event.*;
  */
 public class DictionaryViewer extends JPanel{
 	private static final int WORD_LIST_MAX_LENGTH=10;
+	private final NavigableDictionary dict;
 	private final JTextField input=new JTextField();
 	private final DefaultListModel<String> wordsModel=new DefaultListModel<>();
 	private final JList words=new JList(wordsModel);
 	private final JTextArea meaning=new JTextArea();
-	private final DictionaryChooser dictionaryChooser=new DictionaryChooser();
-	public DictionaryViewer(){
-		setLayout(new BorderLayout());
+	public DictionaryViewer(NavigableDictionary dict){
+		super(new BorderLayout());
+		this.dict=dict;
 		input.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void insertUpdate(DocumentEvent e){
@@ -57,32 +58,21 @@ public class DictionaryViewer extends JPanel{
 		add(words,BorderLayout.WEST);
 		meaning.setEditable(false);
 		add(new JScrollPane(meaning),BorderLayout.CENTER);
-		add(dictionaryChooser,BorderLayout.SOUTH);
 	}
 	private void inputUpdated(){
-		String word=dictionaryChooser.getDictionary().getCurrentWord(input.getText());
+		String word=dict.getCurrentWord(input.getText());
 		wordsModel.clear();
 		for(int i=0;i<WORD_LIST_MAX_LENGTH&&word!=null;i++){
 			wordsModel.addElement(word);
-			word=dictionaryChooser.getDictionary().getNextWord(word);
+			word=dict.getNextWord(word);
 		}
 		wordUpdated();
 	}
 	private void wordUpdated(){
 		if(words.isSelectionEmpty()){
 			if(!wordsModel.isEmpty())
-				meaning.setText(dictionaryChooser.getDictionary().getMeaning(wordsModel.get(0)));
+				meaning.setText(dict.getMeaning(wordsModel.get(0)));
 		}else
-			meaning.setText(dictionaryChooser.getDictionary().getMeaning((String)words.getSelectedValue()));
-	}
-	/**
-	 * @param args the command line arguments
-	 */
-	public static void main(String[] args) throws IOException {
-		JFrame f=new JFrame(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("DICTIONARY VIEWER"));
-		f.add(new DictionaryViewer());
-		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setVisible(true);
+			meaning.setText(dict.getMeaning((String)words.getSelectedValue()));
 	}
 }
