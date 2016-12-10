@@ -20,7 +20,8 @@ package com.github.chungkwong.sillytranslate.lex;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public interface NavigableDictionary{
-	public String getMeaning(String word);
-	public String getCurrentWord(String word);
-	public String getNextWord(String word);
+	String getMeaning(String word);
+	String getCurrentWord(String word);
+	String getNextWord(String word);
+	String getSource();
 }

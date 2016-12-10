@@ -27,6 +27,7 @@ import javax.swing.event.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class DictionaryChooser extends JPanel{
+	private static final File BASE=new File(System.getProperty("user.home"),".SillyTranslate");
 	private final JFileChooser fileChooser=new JFileChooser();
 	private final IntegratedDictionary dict=new IntegratedDictionary();
 	private final DefaultListModel<NavigableDictionary> dicts=new DefaultListModel<>();
@@ -53,31 +54,38 @@ public class DictionaryChooser extends JPanel{
 		add(new EditableList(dicts,this::loadDictionary),"");
 	}
 	private NavigableDictionary loadDictionary(){
+		fileChooser.showOpenDialog(this);
+		return loadDictionary(fileChooser.getSelectedFile());
+	}
+	private NavigableDictionary loadDictionary(File file){
 		try{
-			fileChooser.showOpenDialog(this);
-			File file=fileChooser.getSelectedFile();
 			if(file.isDirectory())
-				return new StardictDictionary(fileChooser.getSelectedFile());
+				return new StardictDictionary(file);
 			else
 				return new KeyValueDictionary(file);
 		}catch(IOException ex){
 			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
-			return null;
+			throw new RuntimeException(ex);
 		}
 	}
 	public IntegratedDictionary getDictionary(){
 		return dict;
 	}
-	public void fromPaths(String folders) throws IOException{
+	public void fromPaths(String folders)throws IOException{
 		dicts.clear();
 		for(String path:folders.split(":"))
-			if(!path.isEmpty())
-				dicts.addElement(new StardictDictionary(new File(path)));
+			if(!path.isEmpty()){
+				File file=new File(path);
+				if(file.isAbsolute())
+					dicts.addElement(loadDictionary(file));
+				else
+					dicts.addElement(loadDictionary(new File(BASE,path)));
+			}
 	}
 	public String toPaths(){
 		StringBuilder buf=new StringBuilder();
 		for(int i=0;i<dict.getNumberOfDictionary();i++){
-			buf.append(((StardictDictionary)dict.getDictionary(i)).getSource()).append(':');
+			buf.append(dict.getDictionary(i).getSource()).append(':');
 		}
 		return buf.toString();
 	}

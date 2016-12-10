@@ -22,9 +22,11 @@ import java.util.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class KeyValueDictionary implements NavigableDictionary{
+	private final String source;
 	private final String name;
 	private final TreeMap<String,String> dictionary=new TreeMap<>();
 	public KeyValueDictionary(File file) throws FileNotFoundException{
+		source=file.getAbsolutePath();
 		name="{"+file.getName()+"}";
 		Scanner in=new Scanner(file);
 		in.useDelimiter("[=\\n\\r]+");
@@ -43,6 +45,10 @@ public class KeyValueDictionary implements NavigableDictionary{
 	@Override
 	public String getNextWord(String word){
 		return dictionary.higherKey(word);
+	}
+	@Override
+	public String getSource(){
+		return source;
 	}
 	@Override
 	public String toString(){

@@ -115,6 +115,7 @@ public class StardictDictionary implements NavigableDictionary{
 	public String toString(){
 		return info.toString();
 	}
+	@Override
 	public String getSource(){
 		return source;
 	}

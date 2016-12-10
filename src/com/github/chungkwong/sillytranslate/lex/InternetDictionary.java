@@ -84,6 +84,10 @@ public class InternetDictionary implements NavigableDictionary{
 		}
 		return buf.toString();
 	}
+	@Override
+	public String getSource(){
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
 	public static void main(String[] args){
 /*		Scanner in=new Scanner(System.in);
 		while(in.hasNextLine())

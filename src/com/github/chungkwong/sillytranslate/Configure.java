@@ -187,7 +187,7 @@ public class Configure extends JFrame{
 	}
 	private void importPref(){
 		JFileChooser jfc=new JFileChooser();
-		if(jfc.showSaveDialog(null)==JFileChooser.APPROVE_OPTION){
+		if(jfc.showOpenDialog(null)==JFileChooser.APPROVE_OPTION){
 			try(InputStream in=new FileInputStream(jfc.getSelectedFile())){
 				Preferences.importPreferences(in);
 				pref.sync();

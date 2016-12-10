@@ -73,8 +73,11 @@ public class IntegratedDictionary implements NavigableDictionary{
 		return best;
 	}
 	@Override
+	public String getSource(){
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+	@Override
 	public String toString(){
 		return dictionarys.toString();
 	}
-
 }
