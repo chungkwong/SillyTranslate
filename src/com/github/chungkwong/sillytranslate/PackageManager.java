@@ -27,7 +27,7 @@ import javax.swing.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class PackageManager extends JPanel{
-	private static final String URL="https://github.com/chungkwong/SillyTranslate/blob/master/PACKAGES";
+	private static final String URL="https://raw.githubusercontent.com/chungkwong/SillyTranslate/master/PACKAGES";
 	private static final File PATH=new File(System.getProperty("user.home"),".SillyTranslate");
 	private static final Charset UTF8=Charset.forName("UTF-8");
 	private final JPanel installed=new JPanel(new FlowLayout(FlowLayout.LEFT));
