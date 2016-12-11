@@ -179,6 +179,9 @@ public class Configure extends JFrame{
 		control.add(savePref);
 		control.setAlignmentX(0);
 		box.add(control);
+		PackageManager pkg=new PackageManager(this);
+		pkg.setAlignmentX(0);
+		box.add(pkg);
 		load();
 		add(box);
 		setUndecorated(false);
@@ -187,14 +190,16 @@ public class Configure extends JFrame{
 	}
 	private void importPref(){
 		JFileChooser jfc=new JFileChooser();
-		if(jfc.showOpenDialog(null)==JFileChooser.APPROVE_OPTION){
-			try(InputStream in=new FileInputStream(jfc.getSelectedFile())){
-				Preferences.importPreferences(in);
-				pref.sync();
-				load();
-			}catch(IOException|InvalidPreferencesFormatException|BackingStoreException ex){
-				Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
-			}
+		if(jfc.showOpenDialog(null)==JFileChooser.APPROVE_OPTION)
+			importPref(jfc.getSelectedFile());
+	}
+	void importPref(File file){
+		try(InputStream in=new FileInputStream(file)){
+			Preferences.importPreferences(in);
+			pref.sync();
+			load();
+		}catch(IOException|InvalidPreferencesFormatException|BackingStoreException ex){
+			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 		}
 	}
 	private void exportPref(){
@@ -283,7 +288,7 @@ public class Configure extends JFrame{
 				sentenceTranslators.add(new NaiveTranslator((int)naiveLimit.getValue()));
 			if(ruleSentence.isSelected())
 				sentenceTranslators.add(new RuleBasedSentenceTranslator((int)ruleLimit.getValue()));
-			SentenceTranslatorEngine sentenceEngine=new CombinedTranslator(sentenceTranslators.toArray(new SentenceTranslatorEngine[0]));
+			SentenceTranslatorEngine sentenceEngine=new IntegratedSentenceTranslator(sentenceTranslators.toArray(new SentenceTranslatorEngine[0]));
 			SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(sentenceEngine);
 			translators.add(new StagedTextTranslator(lex,wordTranslator,sentenceTranslator));
 		}

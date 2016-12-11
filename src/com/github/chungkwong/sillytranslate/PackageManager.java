@@ -32,7 +32,9 @@ public class PackageManager extends JPanel{
 	private static final Charset UTF8=Charset.forName("UTF-8");
 	private final JPanel installed=new JPanel(new FlowLayout(FlowLayout.LEFT));
 	private final JPanel downloadable=new JPanel(new FlowLayout(FlowLayout.LEFT));
-	public PackageManager(){
+	private final Configure conf;
+	public PackageManager(Configure conf){
+		this.conf=conf;
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		JLabel pkgLabel=new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("PACKAGE"));
 		pkgLabel.setAlignmentX(0);
@@ -58,7 +60,7 @@ public class PackageManager extends JPanel{
 			installed.removeAll();
 			for(String name:PATH.list((dir,name)->name.endsWith(".xml"))){
 				JButton button=new JButton(name);
-				button.addActionListener((e)->{});
+				button.addActionListener((e)->conf.importPref(new File(PATH,name)));
 				installed.add(button);
 			}
 			validate();
@@ -105,12 +107,5 @@ public class PackageManager extends JPanel{
 		}catch(IOException ex){
 			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 		}
-	}
-	public static void main(String[] args){
-		JFrame f=new JFrame();
-		f.add(new PackageManager());
-		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setVisible(true);
 	}
 }

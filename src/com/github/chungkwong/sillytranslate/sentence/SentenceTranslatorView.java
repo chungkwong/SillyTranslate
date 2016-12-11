@@ -19,7 +19,6 @@ import com.github.chungkwong.sillytranslate.*;
 import com.github.chungkwong.sillytranslate.lex.*;
 import com.github.chungkwong.sillytranslate.ui.*;
 import java.util.*;
-import java.util.concurrent.atomic.*;
 import java.util.function.*;
 import java.util.logging.*;
 import java.util.stream.*;
@@ -88,12 +87,10 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 		}else{
 			input.setText(words.stream().map((t)->t.getText()).collect(Collectors.joining(" ")));
 			JDialog dialog=new JOptionPane(WAITING,JOptionPane.INFORMATION_MESSAGE,JOptionPane.OK_CANCEL_OPTION).createDialog("");;
-			AtomicBoolean finished=new AtomicBoolean(false);
 			Thread t=new Thread(()->{
 				List<String> translation=engine.getTranslation(words);
-				finished.set(true);
 				SwingUtilities.invokeLater(()->{
-					dialog.setVisible(false);//Illegal
+					dialog.setVisible(false);
 					choices.ensureCapacity(translation.size());
 					translation.forEach((s)->choices.addElement(s));
 					if(!translation.isEmpty())
@@ -101,11 +98,11 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 					list.requestFocusInWindow();
 				});
 			});
-			t.start();
-			if(!finished.get()){
+			SwingUtilities.invokeLater(()->{
 				dialog.setVisible(true);
 				t.interrupt();
-			}
+			});
+			t.start();
 		}
 	}
 	/*public static void main(String[] args){

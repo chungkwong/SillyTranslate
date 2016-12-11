@@ -25,13 +25,15 @@ public class KeyValueDictionary implements NavigableDictionary{
 	private final String source;
 	private final String name;
 	private final TreeMap<String,String> dictionary=new TreeMap<>();
-	public KeyValueDictionary(File file) throws FileNotFoundException{
+	public KeyValueDictionary(File file) throws IOException{
 		source=file.getAbsolutePath();
 		name="{"+file.getName()+"}";
-		Scanner in=new Scanner(file);
-		in.useDelimiter("[=\\n\\r]+");
-		while(in.hasNext()){
-			dictionary.put(in.next(),in.next());
+		BufferedReader in=new BufferedReader(new InputStreamReader(new FileInputStream(file),"UTF-8"));
+		String line;
+		while((line=in.readLine())!=null){
+			int i=line.indexOf('=');
+			if(i!=-1)
+				dictionary.put(line.substring(0,i),line.substring(i+1));
 		}
 	}
 	@Override

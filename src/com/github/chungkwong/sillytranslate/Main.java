@@ -67,7 +67,7 @@ public class Main extends JFrame{
 	}
 	private void startTranslation(InputStream in,OutputStream out,DocumentTranslatorEngine engine){
 		TextTranslator translator=conf.getTranslator();
-		add(translator.getUserInterface(),PROCESS_CARD_NAME);
+		add(new JScrollPane(translator.getUserInterface()),PROCESS_CARD_NAME);
 		card.show(getContentPane(),PROCESS_CARD_NAME);
 		engine.setTextTranslator(translator);
 		engine.start(in,out);

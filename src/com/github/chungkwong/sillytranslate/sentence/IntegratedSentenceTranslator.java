@@ -21,9 +21,9 @@ import java.util.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class CombinedTranslator implements SentenceTranslatorEngine{
+public class IntegratedSentenceTranslator implements SentenceTranslatorEngine{
 	private final SentenceTranslatorEngine[] engines;
-	public CombinedTranslator(SentenceTranslatorEngine... engines){
+	public IntegratedSentenceTranslator(SentenceTranslatorEngine... engines){
 		this.engines=engines;
 	}
 	@Override

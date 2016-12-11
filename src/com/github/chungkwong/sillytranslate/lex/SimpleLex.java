@@ -23,10 +23,6 @@ import java.util.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class SimpleLex implements Lex{
-	private static final int DOUBLE_QUOTE_SYMBOL='\"';
-	private static final int REMARK_START_SYMBOL='(';
-	private static final int REMARK_END_SYMBOL=')';
-	private static final int FULL_STOP_SYMBOL='.';
 	private CodePointReader in;
 	public SimpleLex(){
 	}
