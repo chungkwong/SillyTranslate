@@ -19,18 +19,29 @@ import com.github.chungkwong.jprologmin.*;
 import com.github.chungkwong.sillytranslate.lex.*;
 import java.io.*;
 import java.math.*;
+import java.nio.file.*;
 import java.util.*;
+import java.util.logging.*;
 import java.util.stream.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class RuleBasedSentenceTranslator implements SentenceTranslatorEngine{
-	private final int limit;
 	private static final Variable NEW=new Variable("NEW");
 	private static final Constant<String> FAIL=new Constant<>("fail");
-	public RuleBasedSentenceTranslator(int limit){
+	private final int limit;
+	private final Locale locale;
+	private String rules;
+	public RuleBasedSentenceTranslator(int limit,File src,Locale locale){
 		this.limit=limit;
+		this.locale=locale;
+		try{
+			rules=Files.readAllLines(src.toPath()).stream().collect(Collectors.joining("\n"));
+		}catch(IOException ex){
+			rules="";
+			Logger.getLogger(RuleBasedSentenceTranslator.class.getName()).log(Level.SEVERE,null,ex);
+		}
 	}
 	@Override
 	public List<String> getTranslation(List<Token> words){
@@ -46,8 +57,8 @@ public class RuleBasedSentenceTranslator implements SentenceTranslatorEngine{
 		}
 		return new ArrayList<>(translators);
 	}
-	private static Database prepareDatabase(List<Token> words){
-		Database db=new Database(new InputStreamReader(RuleBasedSentenceTranslator.class.getResourceAsStream("RULES.prolog")));
+	private Database prepareDatabase(List<Token> words){
+		Database db=new Database(new StringReader(rules));
 		db.getFlag("undefined_predicate").setValue(FAIL);
 		for(int i=0;i<words.size();i++){
 			db.addPredication(new CompoundTerm(words.get(i).getTag(),new Constant(BigInteger.valueOf(i))));
@@ -62,19 +73,19 @@ public class RuleBasedSentenceTranslator implements SentenceTranslatorEngine{
 			indices.add(new Constant(BigInteger.valueOf(i)));
 		return new CompoundTerm("translate",Lists.asList(indices),NEW);
 	}
-	private static String extractTranslation(Substitution subst,List<Token> words){
+	private String extractTranslation(Substitution subst,List<Token> words){
 		List<Term> list=Lists.toJavaList(subst.findRoot(NEW));
-		return list.stream().map((i)->{
+		return Sentences.build(list.stream().map((i)->{
 			Object val=((Constant)i).getValue();
 			return val instanceof Number?words.get(((Number)val).intValue()).getText():val.toString();
-		}).collect(Collectors.joining());
+		}),locale);
 	}
 	/**
 	 * Each line look like 我:n.:恨:v.:你:n.
 	 * @param args
 	 */
-	public static void main(String[] args){
-		RuleBasedSentenceTranslator translator=new RuleBasedSentenceTranslator(10);
+	/*public static void main(String[] args){
+		RuleBasedSentenceTranslator translator=new RuleBasedSentenceTranslator(10,Locale.ENGLISH);
 		Scanner in=new Scanner(System.in);
 		while(in.hasNextLine()){
 			String line=in.nextLine();
@@ -87,7 +98,7 @@ public class RuleBasedSentenceTranslator implements SentenceTranslatorEngine{
 			System.out.println(list);
 			System.out.println(translator.getTranslation(list));
 		}
-	}
+	}*/
 	@Override
 	public String getName(){
 		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("RULE BASED");

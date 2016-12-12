@@ -31,6 +31,7 @@ import javax.swing.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class Configure extends JFrame{
+	private static final File BASE=new File(System.getProperty("user.home"),".SillyTranslate");
 	private final Preferences pref=Preferences.userNodeForPackage(Configure.class);
 	private final JCheckBox simple=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("MANUAL"));
 	private final JCheckBox staged=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STAGED"));
@@ -45,6 +46,7 @@ public class Configure extends JFrame{
 	private final JCheckBox naiveSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("BRUTE_FORCE"));
 	private final JCheckBox ruleSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("RULE BASED"));
 	private final JTextField wordCache=new JTextField();
+	private final JTextField rules=new JTextField();
 	private final JTextField yandexKey=new JTextField();
 	private final JTextField baiduId=new JTextField();
 	private final JTextField baiduSecret=new JTextField();
@@ -133,6 +135,8 @@ public class Configure extends JFrame{
 		sentenceBox.add(naiveLimit);
 		sentenceBox.add(ruleSentence);
 		sentenceBox.add(ruleLimit);
+		sentenceBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("RULES_FILE")));
+		sentenceBox.add(rules);
 		sentenceBox.setAlignmentX(0);
 		box.add(sentenceBox);
 		Box localeBox=Box.createHorizontalBox();
@@ -244,6 +248,7 @@ public class Configure extends JFrame{
 		pref.put("YandexKey",yandexKey.getText());
 		pref.putInt("NaiveLimit",(Integer)naiveLimit.getValue());
 		pref.putInt("RuleBasedLimit",(Integer)ruleLimit.getValue());
+		pref.put("RulesFile",rules.getText());
 		pref.put("Dictionary",dictionaryChooser.toPaths());
 	}
 	private void load(){
@@ -261,6 +266,7 @@ public class Configure extends JFrame{
 		ruleSentence.setSelected(pref.getBoolean("RuleBasedSentenceTranslator",false));
 		naiveLimit.setValue(pref.getInt("NaiveLimit",6));
 		ruleLimit.setValue(pref.getInt("RuleLimit",6));
+		rules.setText(pref.get("RulesFile",""));
 		localeIn.setSelectedItem(Locale.forLanguageTag(pref.get("InputLanguage","en-US")));
 		localeOut.setSelectedItem(Locale.forLanguageTag(pref.get("OutputLanguage","zh-CN")));
 		wordCache.setText(pref.get("WordCache",System.getProperty("user.home")+"/.sillytranslatecache"));
@@ -277,17 +283,19 @@ public class Configure extends JFrame{
 	}
 	public TextTranslator getTranslator(){
 		ArrayList<TextTranslator> translators=new ArrayList<>();
+		Locale input=localeIn.getSelectedItem();
+		Locale output=localeOut.getSelectedItem();
 		if(simple.isSelected())
 			translators.add(new SimpleTextTranslator());
 		if(staged.isSelected()){
 			Lex lex=simpleLex.isSelected()?new SimpleLex():
-					(prefixLex.isSelected()?new PrefixLex(dictionaryChooser.getDictionary(),localeIn.getSelectedItem()):new JavaLex(localeIn.getSelectedItem()));
+					(prefixLex.isSelected()?new PrefixLex(dictionaryChooser.getDictionary(),input):new JavaLex(input));
 			WordTranslator wordTranslator=new WordTranslator(dictionaryChooser.getDictionary(),WordMemory.getWordMemory(wordCache.getText()));
 			ArrayList<SentenceTranslatorEngine> sentenceTranslators=new ArrayList<>();
 			if(naiveSentence.isSelected())
-				sentenceTranslators.add(new NaiveTranslator((int)naiveLimit.getValue()));
+				sentenceTranslators.add(new NaiveTranslator((int)naiveLimit.getValue(),output));
 			if(ruleSentence.isSelected())
-				sentenceTranslators.add(new RuleBasedSentenceTranslator((int)ruleLimit.getValue()));
+				sentenceTranslators.add(new RuleBasedSentenceTranslator((int)ruleLimit.getValue(),resolveFile(rules.getText()),output));
 			SentenceTranslatorEngine sentenceEngine=new IntegratedSentenceTranslator(sentenceTranslators.toArray(new SentenceTranslatorEngine[0]));
 			SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(sentenceEngine);
 			translators.add(new StagedTextTranslator(lex,wordTranslator,sentenceTranslator));
@@ -301,9 +309,13 @@ public class Configure extends JFrame{
 			if(yandex.isSelected())
 				clouds.add(new YandexTranslator(yandexKey.getText()));
 			CloudTextTranslator cloudTextTranslator=new CloudTextTranslator(clouds.toArray(new CloudTranslator[0]));
-			cloudTextTranslator.setTranslateDirection(localeIn.getSelectedItem(),localeOut.getSelectedItem());
+			cloudTextTranslator.setTranslateDirection(input,output);
 			translators.add(cloudTextTranslator);
 		}
 		return new CombinedTextTranslator(translators.toArray(new TextTranslator[0]));
+	}
+	public static File resolveFile(String path){
+		File file=new File(path);
+		return file.isAbsolute()?file:new File(BASE,path);
 	}
 }

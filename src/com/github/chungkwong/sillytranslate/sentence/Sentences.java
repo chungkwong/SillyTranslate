@@ -15,34 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.sentence;
-import com.github.chungkwong.sillytranslate.lex.*;
-import com.github.chungkwong.sillytranslate.util.*;
 import java.util.*;
+import java.util.stream.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class NaiveTranslator implements SentenceTranslatorEngine{
-	private final int limit;
-	private final Locale locale;
-	public NaiveTranslator(int limit,Locale locale){
-		this.limit=limit;
-		this.locale=locale;
-	}
-	@Override
-	public List<String> getTranslation(List<Token> words){
-		List<String> list=new ArrayList<>();
-		Permutator<Token> perm=new Permutator<>(words);
-		List<Token> p=words;
-		int i=0;
-		while(p!=null&&++i<=limit){
-			list.add(Sentences.build(p.stream().map((t)->t.getText()),locale));
-			p=perm.nextPermutation();
-		}
-		return list;
-	}
-	@Override
-	public String getName(){
-		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("BRUTE_FORCE");
+public class Sentences{
+	public static String build(Stream<String> tokens,Locale locale){
+		String sep=ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/lex/LANGUAGE").getString("WORD_SEPARATOR");
+		return tokens.collect(Collectors.joining(sep));
 	}
 }

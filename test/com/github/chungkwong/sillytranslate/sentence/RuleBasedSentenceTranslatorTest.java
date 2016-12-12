@@ -28,7 +28,7 @@ public class RuleBasedSentenceTranslatorTest{
 	public RuleBasedSentenceTranslatorTest(){
 	}
 	private static void assertTranslations(String in,String... out){
-		RuleBasedSentenceTranslator translator=new RuleBasedSentenceTranslator(10);
+		RuleBasedSentenceTranslator translator=new RuleBasedSentenceTranslator(10,Locale.CHINESE);
 		String[] split=in.split(":");
 		ArrayList<Token> list=new ArrayList<>();
 		for(int i=0;i+1<split.length;i+=2)
@@ -43,7 +43,7 @@ public class RuleBasedSentenceTranslatorTest{
 		assertTranslations("我:n.:是:aux.:我:n.:，:punct.:你:n.:是:aux.:你:n.","我是我，你是你");
 		assertTranslations("我:n.:是:aux.:我:n.:；:punct.:你:n.:是:aux.:你:n.","我是我；你是你");
 	}
-	@Test(timeout=5000)
+	@Test(timeout=8000)
 	public void testClause(){
 		assertTranslations("我:xyz.","我");
 		assertTranslations("我:n.:恨:v.:你:n.","我恨你");

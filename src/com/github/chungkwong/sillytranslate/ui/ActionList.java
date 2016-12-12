@@ -28,6 +28,7 @@ public class ActionList<T> extends JList<T>{
 	}
 	public void setAction(Consumer<T> consumer){
 		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),"submit");
+		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,KeyEvent.CTRL_DOWN_MASK),"submit");
 		getActionMap().put("submit",new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e){

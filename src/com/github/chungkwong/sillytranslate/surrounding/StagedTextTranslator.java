@@ -19,6 +19,7 @@ import com.github.chungkwong.sillytranslate.lex.*;
 import com.github.chungkwong.sillytranslate.sentence.*;
 import java.awt.*;
 import java.io.*;
+import java.util.*;
 import javax.swing.*;
 /**
  *
@@ -76,7 +77,7 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 		JFrame f=new JFrame("Translator");
 		Lex lex=new SimpleLex();
 		WordTranslator wordTranslator=new WordTranslator(new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2")),new WordMemory());
-		SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(new NaiveTranslator(24));
+		SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(new NaiveTranslator(24,Locale.CHINESE));
 		StagedTextTranslator translator=new StagedTextTranslator(lex,wordTranslator,sentenceTranslator);
 		PlainTextTranslator t=new PlainTextTranslator();
 		t.setTextTranslator(translator);

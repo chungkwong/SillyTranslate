@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.lex;
+import com.github.chungkwong.sillytranslate.*;
 import java.io.*;
 import java.util.*;
 import java.util.logging.*;
@@ -24,7 +25,7 @@ import javax.swing.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class WordMemory{
-	private static final File BASE=new File(System.getProperty("user.home"),".SillyTranslate");
+
 	private static final HashMap<String,WordMemory> pool=new HashMap<>();
 	private final HashMap<String,Candidates> map=new HashMap<>();
 	private final File cache;
@@ -32,8 +33,7 @@ public class WordMemory{
 		this.cache=null;
 	}
 	private WordMemory(String path){
-		File file=new File(path);
-		cache=file.isAbsolute()?file:new File(BASE,path);
+		cache=Configure.resolveFile(path);
 		try(DataInputStream sc=new DataInputStream(new BufferedInputStream(new FileInputStream(cache)))){
 			while(true){
 				String word=sc.readUTF();
