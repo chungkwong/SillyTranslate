@@ -23,10 +23,12 @@ import java.util.logging.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class GroffTranslator implements DocumentTranslatorEngine{
+	private static final String singleEscape="\"#\\e’`-_.%! 0|^&)/,~:{}acdeEprtu";
 	private TextTranslator translator;
 	private Runnable callback;
 	private CodePointReader in;
 	private CodePointWriter out;
+	private boolean newline;
 	@Override
 	public void setTextTranslator(TextTranslator translator){
 		this.translator=translator;
@@ -48,16 +50,20 @@ public class GroffTranslator implements DocumentTranslatorEngine{
 	@Override
 	public void textTranslated(String text){
 		try{
-			if(text!=null)
+			if(null==text)
+				newline=true;
+			else
 				out.write(encode(text));
 			int c=in.read();
 			while(c!=-1){
 				if(c=='\n'){
 					out.writeCodepoint(c);
 					c=in.read();
-				}else if(c=='.'){
+					newline=true;
+				}else if(newline&&(c=='.'||c=='\'')){
 					c=skipLine(c);
 				}else{
+					newline=false;
 					StringBuilder buf=new StringBuilder();
 					while(c!='\n'&&c!=-1){
 						if(c=='\\'){
@@ -66,12 +72,22 @@ public class GroffTranslator implements DocumentTranslatorEngine{
 								translator.translate(buf.toString(),this);
 								return;
 							}else{
-								c=processEscape(in.read());
+								c=in.read();
+								if(c=='\n'){
+									buf.append(' ');
+									c=in.read();
+								}else
+									c=processEscape(c);
 							}
 						}else{
 							buf.appendCodePoint(c);
 							c=in.read();
 						}
+					}
+					if(buf.length()>0){
+						in.unread(c);
+						translator.translate(buf.toString(),this);
+						return;
 					}
 				}
 			}
@@ -83,7 +99,7 @@ public class GroffTranslator implements DocumentTranslatorEngine{
 		}
 	}
 	private int skipLine(int c) throws IOException{
-		while(c=='\n'){
+		while(c!='\n'&&c!=-1){
 			out.writeCodepoint(c);
 			c=in.read();
 		}
@@ -91,11 +107,31 @@ public class GroffTranslator implements DocumentTranslatorEngine{
 	}
 	private int processEscape(int c) throws IOException{
 		out.writeCodepoint('\\');
-		if(c=='*'){
+		if(singleEscape.indexOf(c)!=-1){
 			out.writeCodepoint(c);
 			c=in.read();
+		}else if(c=='s'){
+			out.writeCodepoint(c);
+			c=in.read();
+			if(c=='+'||c=='-'){
+				out.writeCodepoint(c);
+				c=processNameOrArgment(in.read());
+			}
+		}else if(c=='?'){
+			out.writeCodepoint(c);
+			while((c=in.read())!='?'&&c!=-1)
+				out.writeCodepoint(c);
+			out.writeCodepoint('?');
+			c=in.read();
+		}else{
+			c=processNameOrArgment(c);
+			c=processNameOrArgment(c);
 		}
-		out.writeCodepoint(c);
+		return c;
+	}
+	private int processNameOrArgment(int c) throws IOException{
+		if(c!=-1)
+			out.writeCodepoint(c);
 		if(c=='('){
 			out.writeCodepoint(in.read());
 			out.writeCodepoint(in.read());
@@ -103,46 +139,28 @@ public class GroffTranslator implements DocumentTranslatorEngine{
 			while((c=in.read())!=']'&&c!=-1)
 				out.writeCodepoint(c);
 			out.writeCodepoint(']');
-		}else{
-
-		}
-		c=in.read();
-		if(c=='['){
-			while((c=in.read())!=']'&&c!=-1)
-				out.writeCodepoint(c);
-			out.writeCodepoint(']');
-			c=in.read();
 		}else if(c=='\''){
 			while((c=in.read())!='\''&&c!=-1)
 				out.writeCodepoint(c);
 			out.writeCodepoint('\'');
-			c=in.read();
-		}
-		return c;
-	}
-
-	private int readEcapse(int c) throws IOException{
-		if(c=='x'||c=='X'){
-			return readInteger(in.read(),16);
 		}else{
-			return readInteger(c,8);
+
 		}
-	}
-	private int readInteger(int c,int base) throws IOException{
-		int number=0;
-		int d;
-		while((d=Character.digit(c,base))!=-1){
-			number=number*base+d;
-			c=in.read();
-		}
-		in.unread(c);
-		return number;
+		return in.read();
 	}
 	private String encode(String text){
-		return '\"'+text.replace("\\","\\\\").replace("\r","\\r\"\n\"").replace("\n","\\n\"\n\"")+"\"\n\n";
+		return text.replace("\\","\\e");
 	}
 	@Override
 	public String toString(){
 		return "Groff";
+	}
+	public static void main(String[] args) throws FileNotFoundException, IOException{
+		String file="/home/kwong/manman";
+		GroffTranslator t=new GroffTranslator();
+		TextTranslatorStub stub=new TextTranslatorStub();
+		t.setTextTranslator(stub);
+		t.setOnFinished(()->{stub.close();});
+		t.start(new FileInputStream(file),System.out);
 	}
 }

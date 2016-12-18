@@ -125,5 +125,4 @@ public class RuleBasedSentenceTranslatorTest{
 	public void testIncomplete(){
 		assertTranslations("我:xyz.","我");
 	}
-
 }

@@ -22,7 +22,7 @@ import javax.swing.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class TextTranslatorStub implements TextTranslator{
-	private static final Executor executor=Executors.newSingleThreadExecutor();
+	private static final ExecutorService executor=Executors.newSingleThreadExecutor();
 	@Override
 	public void translate(String text,DocumentTranslatorEngine callback){
 		executor.execute(()->callback.textTranslated("#"+text+"#"));
@@ -39,5 +39,8 @@ public class TextTranslatorStub implements TextTranslator{
 	@Override
 	public String getUsage(){
 		return "";
+	}
+	public static void close(){
+		executor.shutdown();
 	}
 }

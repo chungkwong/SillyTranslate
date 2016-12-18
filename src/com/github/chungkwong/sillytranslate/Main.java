@@ -83,7 +83,7 @@ public class Main extends JFrame{
 		step1.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STEP1")));
 		JComboBox<DocumentTranslatorEngine> formats=new JComboBox<>(new DocumentTranslatorEngine[]{
 			new PlainTextTranslator(),new PropertiesTranslator(),new XMLTranslator(),
-			new ODFTranslator(),new OOXMLTranslator(),new POTranslator()
+			new ODFTranslator(),new OOXMLTranslator(),new POTranslator(),new GroffTranslator()
 		});
 		step1.add(formats);
 		JButton setting=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SETTINGS"));
