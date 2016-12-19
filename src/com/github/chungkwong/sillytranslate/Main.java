@@ -82,8 +82,8 @@ public class Main extends JFrame{
 		Box step1=Box.createHorizontalBox();
 		step1.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STEP1")));
 		JComboBox<DocumentTranslatorEngine> formats=new JComboBox<>(new DocumentTranslatorEngine[]{
-			new PlainTextTranslator(),new PropertiesTranslator(),new XMLTranslator(),
-			new ODFTranslator(),new OOXMLTranslator(),new POTranslator(),new GroffTranslator()
+			new PlainTextTranslator(),new PropertiesTranslator(),new POTranslator(),new XMLTranslator(),
+			new ODFTranslator(),new OOXMLTranslator(),new GroffTranslator(),new TeXTranslator()
 		});
 		step1.add(formats);
 		JButton setting=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SETTINGS"));
