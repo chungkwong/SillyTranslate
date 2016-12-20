@@ -95,7 +95,6 @@ public class TeXTranslator implements DocumentTranslatorEngine{
 						}
 						if(line>=2){
 							in.unread(c);
-							in.unread(c);
 							translator.translate(buf.toString(),this);
 							return;
 						}

@@ -187,10 +187,11 @@ public class Configure extends JFrame{
 		pkg.setAlignmentX(0);
 		box.add(pkg);
 		load();
-		add(box);
+		add(new JScrollPane(box));
 		setUndecorated(false);
 		setType(Type.NORMAL);
 		pack();
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
 	}
 	private void importPref(){
 		JFileChooser jfc=new JFileChooser();
@@ -290,7 +291,7 @@ public class Configure extends JFrame{
 		if(staged.isSelected()){
 			Lex lex=simpleLex.isSelected()?new SimpleLex():
 					(prefixLex.isSelected()?new PrefixLex(dictionaryChooser.getDictionary(),input):new JavaLex(input));
-			WordTranslator wordTranslator=new WordTranslator(dictionaryChooser.getDictionary(),WordMemory.getWordMemory(wordCache.getText()));
+			WordTranslator wordTranslator=new WordTranslator(dictionaryChooser.getDictionary(),WordMemory.getWordMemory(wordCache.getText()),input);
 			ArrayList<SentenceTranslatorEngine> sentenceTranslators=new ArrayList<>();
 			if(naiveSentence.isSelected())
 				sentenceTranslators.add(new NaiveTranslator((int)naiveLimit.getValue(),output));

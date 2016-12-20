@@ -117,11 +117,10 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 		f.setVisible(true);
 	}*/
 	@Override
-	public JComponent accept(Iterator<Token> source,Consumer<String> callback){
+	public void accept(Iterator<Token> source,Consumer<String> callback){
 		this.callback=callback;
 		this.iter=source;
 		next("");
-		return this;
 	}
 	public static void main(String[] args){
 		JOptionPane optionPane=new JOptionPane("正在生成候选",JOptionPane.INFORMATION_MESSAGE,JOptionPane.CANCEL_OPTION);

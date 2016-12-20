@@ -55,7 +55,7 @@ public class LexEditor extends JPanel implements ActionListener,DocumentListener
 		consumer.accept(tokens.values().stream().collect(Collectors.toList()));
 	}
 	@Override
-	public JComponent accept(Lex source,Consumer<List<Token>> callback){
+	public void accept(Lex source,Consumer<List<Token>> callback){
 		this.consumer=callback;
 		pane.getDocument().removeDocumentListener(this);
 		pane.setText("");
@@ -74,7 +74,6 @@ public class LexEditor extends JPanel implements ActionListener,DocumentListener
 		}
 		pane.getDocument().addDocumentListener(this);
 		pane.requestFocusInWindow();
-		return this;
 	}
 	private static HashMap<Token.Type,Highlighter.HighlightPainter> PAINTER=new HashMap<>();
 	static{

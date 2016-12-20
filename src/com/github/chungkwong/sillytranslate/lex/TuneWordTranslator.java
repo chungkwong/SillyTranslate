@@ -16,31 +16,26 @@
  */
 package com.github.chungkwong.sillytranslate.lex;
 import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class Normalizers{
-	private static final HashMap<Locale,WordNormalizer[]> NORMALIZERS=new HashMap<>();
-	public static WordNormalizer[] getNormalizers(Locale locale){
-		WordNormalizer[] normalizers=NORMALIZERS.get(locale);
-		if(normalizers==null){
-			normalizers=loadNormalizers(locale);
-			NORMALIZERS.put(locale,normalizers);
-		}
-		return normalizers;
+public class TuneWordTranslator extends AbstractWordTranslator{
+	private final KeyValueDictionary dict;
+	public TuneWordTranslator(KeyValueDictionary dict){
+		this.dict=dict;
 	}
-	private static WordNormalizer[] loadNormalizers(Locale locale){
-		if(locale.getLanguage().equals("en")){
-			return new WordNormalizer[]{
-				new PropertyNormalizer("OWN","","的"),
-				new PropertyNormalizer("CONTINUING","正在",""),
-				new PropertyNormalizer("PLURAL","",""),
-				new PropertyNormalizer("PAST","","了"),
-				new PropertyNormalizer("PERFECT","","过")
-			};
-		}else{
-			return new WordNormalizer[0];
-		}
+	@Override
+	public void accept(List<Token> source,Consumer<Iterator<Token>> callback){
+		callback.accept(source.stream().map((t)->new Token(Token.Type.WORD,translate(t.getText()),""))
+				.collect(Collectors.toList()).iterator());
+	}
+	public String translate(String word){
+		if(dict.getCurrentWord(word).equals(word))
+			return dict.getMeaning(word);
+		else
+			return word;
 	}
 }

@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.lex;
-import com.github.chungkwong.sillytranslate.*;
 import com.github.chungkwong.sillytranslate.ui.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -30,22 +29,24 @@ import javax.swing.text.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class WordTranslator extends JPanel implements TranslatorStage<List<Token>,Iterator<Token>>{
+public class WordTranslator extends AbstractWordTranslator{
 	private final JLabel currIn=new JLabel();
 	private final JTextArea currOut=new ActionTextArea((text)->next(false));
 	private final WordMemory memory;
 	private final NavigableDictionary dict;
 	private final AutoCompleteSupport autoCompleteSupport;
+	private final DictionaryHintExtractor hintExtractor;
 	private List<Token> buf;
 	private List<Token> in;
 	private int index;
 	private int end;
 	private Token curr;
 	private Consumer<Iterator<Token>> callback;
-	public WordTranslator(NavigableDictionary dict,WordMemory memory){
+	public WordTranslator(NavigableDictionary dict,WordMemory memory,Locale locale){
 		setLayout(new BorderLayout());
 		this.memory=memory;
 		this.dict=dict;
+		hintExtractor=new DictionaryHintExtractor(locale);
 		currIn.setFocusable(false);
 		MoreAction moreAction=new MoreAction();
 		LessAction lessAction=new LessAction();
@@ -124,14 +125,13 @@ public class WordTranslator extends JPanel implements TranslatorStage<List<Token
 		}
 	}
 	@Override
-	public JComponent accept(List<Token> source,Consumer<Iterator<Token>> callback){
+	public void accept(List<Token> source,Consumer<Iterator<Token>> callback){
 		this.in=source;
 		this.index=0;
 		this.end=0;
 		this.callback=callback;
 		buf=new ArrayList<>();
 		next(false);
-		return this;
 	}
 	/*public static void main(String[] args) throws IOException{
 		JFrame f=new JFrame("Translator");
@@ -149,7 +149,7 @@ public class WordTranslator extends JPanel implements TranslatorStage<List<Token
 		@Override
 		public Hint[] getHints(Document doc,int pos){
 			try{
-				return DictionaryHintExtractor.extractHint(currIn.getText(),doc.getText(0,pos),dict,memory);
+				return hintExtractor.extractHint(currIn.getText(),doc.getText(0,pos),dict,memory);
 			}catch(BadLocationException ex){
 				Logger.getGlobal().log(Level.FINER,ex.getLocalizedMessage(),ex);
 				return new Hint[0];

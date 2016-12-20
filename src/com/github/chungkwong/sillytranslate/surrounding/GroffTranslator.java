@@ -123,6 +123,11 @@ public class GroffTranslator implements DocumentTranslatorEngine{
 				out.writeCodepoint(c);
 			out.writeCodepoint('?');
 			c=in.read();
+		}else if(c=='('){
+			out.writeCodepoint(c);
+			out.writeCodepoint(in.read());
+			out.writeCodepoint(in.read());
+			c=in.read();
 		}else{
 			c=processNameOrArgment(c);
 			c=processNameOrArgment(c);

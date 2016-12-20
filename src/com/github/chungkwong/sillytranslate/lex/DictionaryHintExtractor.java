@@ -26,8 +26,11 @@ import javax.swing.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class DictionaryHintExtractor{
-	private static WordNormalizer[] normalizers=E2CNormalizers.getNormalizers();
-	public static Hint[] extractHint(String word,String prefix,NavigableDictionary dict,WordMemory memory){
+	private final WordNormalizer[] normalizers;
+	public DictionaryHintExtractor(Locale locale){
+		normalizers=Normalizers.getNormalizers(locale);
+	}
+	public Hint[] extractHint(String word,String prefix,NavigableDictionary dict,WordMemory memory){
 		String normalizeWord=normalize(word);
 		ArrayList<Hint> hints=new ArrayList<>();
 		appendHistory(word,prefix,hints,memory);
@@ -135,13 +138,14 @@ public class DictionaryHintExtractor{
 		f.add(input,BorderLayout.NORTH);
 		JTextArea output=new JTextArea();
 		f.add(new JScrollPane(output),BorderLayout.CENTER);
+		DictionaryHintExtractor hintExtractor=new DictionaryHintExtractor(Locale.ENGLISH);
 		input.addActionListener((e)->{
 			/*Predicate<String> patt=Pattern.compile(input.getText()).asPredicate();
 			output.setText(dict.getDictionary().keySet().stream().filter(patt).collect(Collectors.joining("\n")));*/
 			/*Predicate<String> patt=Pattern.compile(input.getText()).asPredicate();
 			output.setText(dict.getDictionary().keySet().stream().filter((entry)->patt.test(dict.getMeaning(entry))).
 					map((entry)->entry+"="+dict.getMeaning(entry)).collect(Collectors.joining("\n")));*/
-			output.setText(Arrays.stream(extractHint(input.getText(),"",dict,memory)).
+			output.setText(Arrays.stream(hintExtractor.extractHint(input.getText(),"",dict,memory)).
 					map((o)->o.toString()).collect(Collectors.joining("\n")));
 		});
 		f.setExtendedState(JFrame.MAXIMIZED_BOTH);

@@ -18,8 +18,6 @@ package com.github.chungkwong.sillytranslate.surrounding;
 import com.github.chungkwong.sillytranslate.lex.*;
 import com.github.chungkwong.sillytranslate.sentence.*;
 import java.awt.*;
-import java.io.*;
-import java.util.*;
 import javax.swing.*;
 /**
  *
@@ -33,10 +31,10 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 	private final JPanel content=new JPanel(card);
 	private final LexEditor lexEditor=new LexEditor();
 	private final Lex lex;
-	private final WordTranslator wordTranslator;
+	private final AbstractWordTranslator wordTranslator;
 	private final SentenceTranslatorView sentenceTranslator;
 	private DocumentTranslatorEngine callback;
-	public StagedTextTranslator(Lex lex,WordTranslator wordTranslator,SentenceTranslatorView sentenceTranslator){
+	public StagedTextTranslator(Lex lex,AbstractWordTranslator wordTranslator,SentenceTranslatorView sentenceTranslator){
 		super(new BorderLayout());
 		this.lex=lex;
 		this.wordTranslator=wordTranslator;
@@ -73,7 +71,7 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 	public String getUsage(){
 		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CTRL_ENTER_NEXT");
 	}
-	public static void main(String[] args) throws FileNotFoundException, IOException{
+	/*public static void main(String[] args) throws FileNotFoundException, IOException{
 		JFrame f=new JFrame("Translator");
 		Lex lex=new SimpleLex();
 		WordTranslator wordTranslator=new WordTranslator(new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2")),new WordMemory());
@@ -87,5 +85,5 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
 		t.start(new FileInputStream("/home/kwong/NetBeansProjects/JSchemeMin/README.md"),System.out);
-	}
+	}*/
 }

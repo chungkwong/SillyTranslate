@@ -30,7 +30,7 @@ public PropertyNormalizer(String name,String prefix,String suffix){
 	this.prefix=prefix;
 	this.suffix=suffix;
 	try{
-		prop.load(E2CNormalizers.class.getResourceAsStream("/com/github/chungkwong/sillytranslate/lex/"+name+"_en.properties"));
+		prop.load(PropertyNormalizer.class.getResourceAsStream("/com/github/chungkwong/sillytranslate/lex/"+name+"_en.properties"));
 	}catch(IOException ex){
 		Logger.getGlobal().log(Level.INFO,ex.getLocalizedMessage(),ex);
 	}

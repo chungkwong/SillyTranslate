@@ -16,11 +16,10 @@
  */
 package com.github.chungkwong.sillytranslate;
 import java.util.function.*;
-import javax.swing.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public interface TranslatorStage<F,T>{
-	JComponent accept(F source,Consumer<T> callback);
+	void accept(F source,Consumer<T> callback);
 }
