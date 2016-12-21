@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.lex;
-import com.github.chungkwong.sillytranslate.*;
 import com.github.chungkwong.sillytranslate.ui.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -32,13 +31,13 @@ import javax.swing.text.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class LexEditor extends JPanel implements ActionListener,DocumentListener,TranslatorStage<Lex,List<Token>>{
+public class LexEditor extends AbstractLexView implements ActionListener,DocumentListener{
 	private final ActionTextArea pane;
 	private final TreeMap<Integer,Token> tokens=new TreeMap<>();
 	private final JPopupMenu menu=new JPopupMenu();
 	private Consumer<List<Token>> consumer;
 	public LexEditor(){
-		super(new BorderLayout());
+		setLayout(new BorderLayout());
 		pane=new ActionTextArea((text)->commit());
 		add(pane,BorderLayout.CENTER);
 		pane.getDocument().addDocumentListener(this);

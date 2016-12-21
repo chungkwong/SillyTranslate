@@ -29,17 +29,18 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 	private final String SENTENCE="Sentence";
 	private final CardLayout card=new CardLayout();
 	private final JPanel content=new JPanel(card);
-	private final LexEditor lexEditor=new LexEditor();
+	private final AbstractLexView lexView;
 	private final Lex lex;
 	private final AbstractWordTranslator wordTranslator;
 	private final SentenceTranslatorView sentenceTranslator;
 	private DocumentTranslatorEngine callback;
-	public StagedTextTranslator(Lex lex,AbstractWordTranslator wordTranslator,SentenceTranslatorView sentenceTranslator){
+	public StagedTextTranslator(Lex lex,AbstractLexView lexView,AbstractWordTranslator wordTranslator,SentenceTranslatorView sentenceTranslator){
 		super(new BorderLayout());
 		this.lex=lex;
+		this.lexView=lexView;
 		this.wordTranslator=wordTranslator;
 		this.sentenceTranslator=sentenceTranslator;
-		content.add(lexEditor,LEX);
+		content.add(lexView,LEX);
 		content.add(wordTranslator,WORD);
 		content.add(sentenceTranslator,SENTENCE);
 		add(content,BorderLayout.CENTER);
@@ -49,7 +50,7 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 		this.callback=callback;
 		card.show(content,LEX);
 		lex.setInput(text);
-		lexEditor.accept(lex,(words)->{
+		lexView.accept(lex,(words)->{
 			card.show(content,WORD);
 			wordTranslator.accept(words,(newWords)->{
 				card.show(content,SENTENCE);

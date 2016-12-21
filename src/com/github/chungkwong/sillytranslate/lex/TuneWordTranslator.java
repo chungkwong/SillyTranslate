@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.lex;
+import com.github.chungkwong.sillytranslate.ui.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
@@ -23,9 +24,13 @@ import java.util.stream.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class TuneWordTranslator extends AbstractWordTranslator{
-	private final KeyValueDictionary dict;
-	public TuneWordTranslator(KeyValueDictionary dict){
+	private final NavigableDictionary dict;
+	private final DictionaryHintExtractor hintExtractor;
+	private final WordMemory memory;
+	public TuneWordTranslator(NavigableDictionary dict,WordMemory memory,Locale locale){
 		this.dict=dict;
+		this.hintExtractor=new DictionaryHintExtractor(locale);
+		this.memory=memory;
 	}
 	@Override
 	public void accept(List<Token> source,Consumer<Iterator<Token>> callback){
@@ -33,8 +38,9 @@ public class TuneWordTranslator extends AbstractWordTranslator{
 				.collect(Collectors.toList()).iterator());
 	}
 	public String translate(String word){
-		if(dict.getCurrentWord(word).equals(word))
-			return dict.getMeaning(word);
+		Hint[] hints=hintExtractor.extractHint(word,"",dict,memory);
+		if(hints.length>0)
+			return hints[0].getInputText().substring(0,hints[0].getInputText().length()-1);
 		else
 			return word;
 	}

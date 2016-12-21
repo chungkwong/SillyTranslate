@@ -98,7 +98,7 @@ public class DictionaryHintExtractor{
 			}
 		}
 		if(word.startsWith(prefix)&&word.length()>prefixLen)
-			hints.add(new SimpleHint(word,word.substring(prefixLen),null,""));
+			hints.add(new SimpleHint(word,word.substring(prefixLen)+":",null,""));
 	}
 	private static void split(String text,String word,String prefix,ArrayList<Hint> hints,WordNormalizer normalizer){
 		int prefixLen=prefix.length();

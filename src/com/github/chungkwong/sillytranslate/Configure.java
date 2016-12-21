@@ -43,8 +43,11 @@ public class Configure extends JFrame{
 	private final JRadioButton prefixLex=new JRadioButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("PREFIX"));
 	private final JRadioButton javaLex=new JRadioButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("JAVA DEFAULT"));
 	private final JRadioButton dictWord=new JRadioButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("DICTIONARY"));
+	private final JRadioButton tuneWord=new JRadioButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("TUNE"));
 	private final JCheckBox naiveSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("BRUTE_FORCE"));
 	private final JCheckBox ruleSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("RULE BASED"));
+	private final JCheckBox autoSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("AUTO_SELECT"));
+	private final JCheckBox autoLex=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("AUTO_SELECT"));
 	private final JTextField wordCache=new JTextField();
 	private final JTextField rules=new JTextField();
 	private final JTextField yandexKey=new JTextField();
@@ -120,6 +123,7 @@ public class Configure extends JFrame{
 		lexBox.add(prefixLex);
 		lexType.add(javaLex);
 		lexBox.add(javaLex);
+		lexBox.add(autoLex);
 		lexBox.setAlignmentX(0);
 		box.add(lexBox);
 		Box wordBox=Box.createHorizontalBox();
@@ -127,6 +131,8 @@ public class Configure extends JFrame{
 		ButtonGroup wordType=new ButtonGroup();
 		wordType.add(dictWord);
 		wordBox.add(dictWord);
+		wordType.add(tuneWord);
+		wordBox.add(tuneWord);
 		wordBox.setAlignmentX(0);
 		box.add(wordBox);
 		Box sentenceBox=Box.createHorizontalBox();
@@ -137,6 +143,7 @@ public class Configure extends JFrame{
 		sentenceBox.add(ruleLimit);
 		sentenceBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("RULES_FILE")));
 		sentenceBox.add(rules);
+		sentenceBox.add(autoSentence);
 		sentenceBox.setAlignmentX(0);
 		box.add(sentenceBox);
 		Box localeBox=Box.createHorizontalBox();
@@ -237,8 +244,11 @@ public class Configure extends JFrame{
 		pref.putBoolean("PrefixLex",prefixLex.isSelected());
 		pref.putBoolean("JavaLex",javaLex.isSelected());
 		pref.putBoolean("DictionaryTranslator",dictWord.isSelected());
+		pref.putBoolean("TuneTranslator",tuneWord.isSelected());
 		pref.putBoolean("NaiveSentenceTranslator",naiveSentence.isSelected());
 		pref.putBoolean("RuleBasedSentenceTranslator",ruleSentence.isSelected());
+		pref.putBoolean("AutoSelectSentence",autoSentence.isSelected());
+		pref.putBoolean("AutoSelectLex",autoLex.isSelected());
 		pref.put("InputLanguage",localeIn.getSelectedItem().toLanguageTag());
 		pref.put("OutputLanguage",localeOut.getSelectedItem().toLanguageTag());
 		pref.put("WordCache",wordCache.getText());
@@ -263,8 +273,11 @@ public class Configure extends JFrame{
 		prefixLex.setSelected(pref.getBoolean("PrefixLex",false));
 		javaLex.setSelected(pref.getBoolean("JavaLex",false));
 		dictWord.setSelected(pref.getBoolean("DictionaryTranslator",true));
+		tuneWord.setSelected(pref.getBoolean("TuneTranslator",false));
 		naiveSentence.setSelected(pref.getBoolean("NaiveSentenceTranslator",true));
 		ruleSentence.setSelected(pref.getBoolean("RuleBasedSentenceTranslator",false));
+		autoSentence.setSelected(pref.getBoolean("AutoSelectSentence",false));
+		autoLex.setSelected(pref.getBoolean("AutoSelectLex",false));
 		naiveLimit.setValue(pref.getInt("NaiveLimit",6));
 		ruleLimit.setValue(pref.getInt("RuleLimit",6));
 		rules.setText(pref.get("RulesFile",""));
@@ -291,15 +304,26 @@ public class Configure extends JFrame{
 		if(staged.isSelected()){
 			Lex lex=simpleLex.isSelected()?new SimpleLex():
 					(prefixLex.isSelected()?new PrefixLex(dictionaryChooser.getDictionary(),input):new JavaLex(input));
-			WordTranslator wordTranslator=new WordTranslator(dictionaryChooser.getDictionary(),WordMemory.getWordMemory(wordCache.getText()),input);
+			AbstractLexView lexView;
+			if(autoLex.isSelected()){
+				lexView=new BypassLexView();
+			}else{
+				lexView=new LexEditor();
+			}
+			AbstractWordTranslator wordTranslator;
+			if(tuneWord.isSelected()){
+				wordTranslator=new TuneWordTranslator(dictionaryChooser.getDictionary(),WordMemory.getWordMemory(wordCache.getText()),input);
+			}else{
+				wordTranslator=new WordTranslator(dictionaryChooser.getDictionary(),WordMemory.getWordMemory(wordCache.getText()),input);
+			}
 			ArrayList<SentenceTranslatorEngine> sentenceTranslators=new ArrayList<>();
 			if(naiveSentence.isSelected())
 				sentenceTranslators.add(new NaiveTranslator((int)naiveLimit.getValue(),output));
 			if(ruleSentence.isSelected())
 				sentenceTranslators.add(new RuleBasedSentenceTranslator((int)ruleLimit.getValue(),resolveFile(rules.getText()),output));
 			SentenceTranslatorEngine sentenceEngine=new IntegratedSentenceTranslator(sentenceTranslators.toArray(new SentenceTranslatorEngine[0]));
-			SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(sentenceEngine);
-			translators.add(new StagedTextTranslator(lex,wordTranslator,sentenceTranslator));
+			SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(sentenceEngine,autoSentence.isSelected());
+			translators.add(new StagedTextTranslator(lex,lexView,wordTranslator,sentenceTranslator));
 		}
 		if(cloud.isSelected()){
 			ArrayList<CloudTranslator> clouds=new ArrayList<>();

@@ -22,8 +22,8 @@ import javax.swing.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public abstract class AbstractWordTranslator extends JPanel implements TranslatorStage<List<Token>,Iterator<Token>>{
-	protected AbstractWordTranslator(){
+public abstract class AbstractLexView extends JPanel implements TranslatorStage<Lex,List<Token>>{
+	protected AbstractLexView(){
 
 	}
 }

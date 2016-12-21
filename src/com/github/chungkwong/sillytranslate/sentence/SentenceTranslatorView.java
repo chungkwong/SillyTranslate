@@ -36,12 +36,17 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 	private final JTextArea result=new ActionTextArea((text)->next(text));
 	private final SentenceTranslatorEngine engine;
 	private final StringBuilder buf=new StringBuilder();
+	private final JButton cancel=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CANCEL"));
+	private final JProgressBar progressBar=new JProgressBar();
 	private Iterator<Token> iter;
 	private Consumer<String> callback;
 	private Token curr;
-	public SentenceTranslatorView(SentenceTranslatorEngine engine){
+	private final boolean auto;
+	private SwingWorker<List<String>,Object> worker;
+	public SentenceTranslatorView(SentenceTranslatorEngine engine,boolean auto){
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		this.engine=engine;
+		this.auto=auto;
 		input.setFocusable(false);
 		input.setAlignmentX(0);
 		add(input);
@@ -56,6 +61,17 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 		add(list);
 		result.setAlignmentX(0);
 		add(result);
+		Box progress=Box.createHorizontalBox();
+		cancel.setEnabled(false);
+		progress.add(progressBar);
+		cancel.addActionListener((e)->{
+			worker.cancel(true);
+			cancel.setEnabled(false);
+			progressBar.setString("");
+			progressBar.setIndeterminate(false);
+		});
+		progress.add(cancel);
+		add(progress);
 	}
 	private void next(String text){
 		buf.append(text);
@@ -86,23 +102,37 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 			callback=null;
 		}else{
 			input.setText(words.stream().map((t)->t.getText()).collect(Collectors.joining(" ")));
-			JDialog dialog=new JOptionPane(WAITING,JOptionPane.INFORMATION_MESSAGE,JOptionPane.OK_CANCEL_OPTION).createDialog("");;
-			Thread t=new Thread(()->{
-				List<String> translation=engine.getTranslation(words);
-				SwingUtilities.invokeLater(()->{
-					dialog.setVisible(false);
-					choices.ensureCapacity(translation.size());
-					translation.forEach((s)->choices.addElement(s));
-					if(!translation.isEmpty())
-						list.setSelectedIndex(0);
-					list.requestFocusInWindow();
-				});
-			});
-			SwingUtilities.invokeLater(()->{
-				dialog.setVisible(true);
-				t.interrupt();
-			});
-			t.start();
+			result.setText(input.getText());
+			worker=new SwingWorker<List<String>,Object>(){
+				@Override
+				protected List<String> doInBackground() throws Exception{
+					return engine.getTranslation(words);
+				}
+				@Override
+				protected void done(){
+					try{
+						List<String> translation=get();
+						if(auto&&translation.size()==1){
+							next(translation.get(0));
+						}else{
+							choices.ensureCapacity(translation.size());
+							translation.forEach((s)->choices.addElement(s));
+							if(!translation.isEmpty())
+								list.setSelectedIndex(0);
+							list.requestFocusInWindow();
+						}
+						cancel.setEnabled(false);
+						progressBar.setString("");
+						progressBar.setIndeterminate(false);
+					}catch(Exception ex){
+						Logger.getGlobal().log(Level.INFO,ex.getLocalizedMessage(),ex);
+					}
+				}
+			};
+			worker.execute();
+			cancel.setEnabled(true);
+			progressBar.setString(WAITING);
+			progressBar.setIndeterminate(true);
 		}
 	}
 	/*public static void main(String[] args){
@@ -123,7 +153,7 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 		next("");
 	}
 	public static void main(String[] args){
-		JOptionPane optionPane=new JOptionPane("正在生成候选",JOptionPane.INFORMATION_MESSAGE,JOptionPane.CANCEL_OPTION);
+		/*JOptionPane optionPane=new JOptionPane("正在生成候选",JOptionPane.INFORMATION_MESSAGE,JOptionPane.CANCEL_OPTION);
 		JDialog dialog=optionPane.createDialog("");
 		Thread t=new Thread(()->{
 			try{
@@ -137,6 +167,6 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 		t.start();
 		dialog.setVisible(true);
 		t.interrupt();
-		System.exit(0);
+		System.exit(0);*/
 	}
 }

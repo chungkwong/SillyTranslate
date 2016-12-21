@@ -15,15 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.lex;
-import com.github.chungkwong.sillytranslate.*;
+import java.io.*;
 import java.util.*;
-import javax.swing.*;
+import java.util.function.*;
+import java.util.logging.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public abstract class AbstractWordTranslator extends JPanel implements TranslatorStage<List<Token>,Iterator<Token>>{
-	protected AbstractWordTranslator(){
-
+public class BypassLexView extends AbstractLexView{
+	@Override
+	public void accept(Lex source,Consumer<List<Token>> callback){
+		Token t;
+		ArrayList<Token> lst=new ArrayList<>();
+		try{
+			while((t=source.next())!=null)
+				lst.add(t);
+		}catch(IOException ex){
+			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
+		}
+		callback.accept(lst);
 	}
 }
