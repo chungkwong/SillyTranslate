@@ -97,9 +97,9 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 		}
 		if(words.isEmpty()){
 			iter=null;
-			callback.accept(buf.toString());
+			String result=buf.toString();
 			buf.setLength(0);
-			callback=null;
+			callback.accept(result);
 		}else{
 			input.setText(words.stream().map((t)->t.getText()).collect(Collectors.joining(" ")));
 			result.setText(input.getText());
@@ -112,6 +112,9 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 				protected void done(){
 					try{
 						List<String> translation=get();
+						cancel.setEnabled(false);
+						progressBar.setString("");
+						progressBar.setIndeterminate(false);
 						if(auto&&translation.size()==1){
 							next(translation.get(0));
 						}else{
@@ -121,11 +124,9 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 								list.setSelectedIndex(0);
 							list.requestFocusInWindow();
 						}
-						cancel.setEnabled(false);
-						progressBar.setString("");
-						progressBar.setIndeterminate(false);
 					}catch(Exception ex){
 						Logger.getGlobal().log(Level.INFO,ex.getLocalizedMessage(),ex);
+						ex.printStackTrace();
 					}
 				}
 			};

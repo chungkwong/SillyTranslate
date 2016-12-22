@@ -19,6 +19,7 @@ import java.awt.*;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.*;
+import java.util.*;
 import java.util.logging.*;
 import java.util.zip.*;
 import javax.swing.*;
@@ -58,7 +59,9 @@ public class PackageManager extends JPanel{
 	public void listInstalled(){
 		if(PATH.exists()){
 			installed.removeAll();
-			for(String name:PATH.list((dir,name)->name.endsWith(".xml"))){
+			String[] confs=PATH.list((dir,name)->name.endsWith(".xml"));
+			Arrays.sort(confs);
+			for(String name:confs){
 				JButton button=new JButton(name);
 				button.addActionListener((e)->conf.importPref(new File(PATH,name)));
 				installed.add(button);
@@ -83,7 +86,7 @@ public class PackageManager extends JPanel{
 					downloadable.add(button);
 				}
 			}
-			validate();
+			revalidate();
 		}catch(IOException ex){
 			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 		}
