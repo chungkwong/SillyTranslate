@@ -54,6 +54,7 @@ public class TeXTranslator implements DocumentTranslatorEngine{
 			int c=in.read();
 			StringBuilder buf=new StringBuilder();
 			boolean empty=true;
+			boolean skip=false;
 			while(c!=-1){
 				if(c=='%'){
 					if(empty)
@@ -70,8 +71,11 @@ public class TeXTranslator implements DocumentTranslatorEngine{
 						if((c>='a'&&c<='z')||(c>='A'&&c<='Z')){
 							while((c>='a'&&c<='z')||(c>='A'&&c<='Z')){
 								out.writeCodepoint(c);
+								buf.appendCodePoint(c);
 								c=in.read();
 							}
+							skip=buf.toString().equals("begin")||buf.toString().equals("end");
+							buf.setLength(0);
 						}else{
 							out.writeCodepoint(c);
 							c=in.read();
@@ -95,6 +99,8 @@ public class TeXTranslator implements DocumentTranslatorEngine{
 						}
 						if(line>=2){
 							in.unread(c);
+							in.unread('\n');
+							in.unread('\n');
 							translator.translate(buf.toString(),this);
 							return;
 						}
@@ -103,6 +109,13 @@ public class TeXTranslator implements DocumentTranslatorEngine{
 					if(empty){
 						out.writeCodepoint(c);
 						c=in.read();
+						skip&=c!='}';
+					}else if(skip){
+						buf.appendCodePoint(c);
+						out.write(buf.toString());
+						buf.setLength(0);
+						c=in.read();
+						skip=false;
 					}else{
 						in.unread(c);
 						translator.translate(buf.toString(),this);

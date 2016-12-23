@@ -23,7 +23,51 @@ import java.util.stream.*;
  */
 public class Sentences{
 	public static String build(Stream<String> tokens,Locale locale){
-		String sep=ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/lex/LANGUAGE").getString("WORD_SEPARATOR");
-		return tokens.collect(Collectors.joining(sep));
+		switch(locale.getLanguage()){
+			case "en":
+				return buildEnglish(tokens);
+			default:
+				return buildOther(tokens);
+		}
+	}
+	private static String buildEnglish(Stream<String> tokens){
+		String sentence=tokens.collect(Collectors.joining(" "));
+		StringBuilder buf=new StringBuilder();
+		if(!sentence.isEmpty()){
+			buf.appendCodePoint(Character.toUpperCase(sentence.codePointAt(0)));
+			Stack<Integer> quote=new Stack<>();
+			for(int i=sentence.offsetByCodePoints(0,1);i<sentence.length();i=sentence.offsetByCodePoints(i,1)){
+				int c=sentence.codePointAt(i);
+				boolean rmLeft=c==','||c=='.'||c==';'||c=='?'||c=='!'||c==':'||c==')'||c=='/';
+				boolean rmRight=c=='('||c=='/';
+				if(c=='\''||c=='\"'){
+					if(quote.isEmpty()||quote.peek().intValue()!=c){
+						rmRight=true;
+						quote.push(c);
+					}else{
+						rmLeft=true;
+						quote.pop();
+					}
+				}
+				if(rmLeft&&buf.charAt(buf.length()-1)==' ')
+					buf.deleteCharAt(buf.length()-1);
+				buf.appendCodePoint(c);
+				if(rmRight){
+					int j=sentence.offsetByCodePoints(i,1);
+					if(j<sentence.length()&&sentence.charAt(j)==' '){
+						i=j;
+					}
+				}
+			}
+		}
+		return buf.toString();
+	}
+	private static String buildOther(Stream<String> tokens){
+		return tokens.collect(Collectors.joining());
+	}
+	public static void main(String[] args){
+		System.out.println(build(Arrays.stream(new String[]{"i","like","you"}),Locale.FRENCH));
+		System.out.println(build(Arrays.stream(new String[]{"i","(","like","\"","good","\"",")",",","you","."}),Locale.ENGLISH));
+		System.out.println(build(Arrays.stream(new String[]{"i","like","you"}),Locale.CHINA));
 	}
 }
