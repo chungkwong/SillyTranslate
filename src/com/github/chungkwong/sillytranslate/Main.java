@@ -21,6 +21,7 @@ import java.awt.*;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.*;
+import java.nio.file.*;
 import java.util.logging.*;
 import javax.swing.*;
 /**
@@ -48,7 +49,7 @@ public class Main extends JFrame{
 	private void startTranslation(String text,DocumentTranslatorEngine engine){
 		ByteArrayOutputStream out=new ByteArrayOutputStream();
 		engine.setOnFinished(()->endTranslation(new String(out.toByteArray(),Charset.forName("UTF-8"))));
-		startTranslation(new ByteArrayInputStream(text.getBytes(Charset.forName("UTF-8"))),out,engine);
+		startTranslation(new ByteArrayInputStream(text.getBytes(Charset.forName("UTF-8"))),out,engine,false);
 	}
 	private void startTranslation(InputStream in,DocumentTranslatorEngine engine) throws FileNotFoundException{
 		if(fileChooser.getSelectedFile()!=null)
@@ -63,10 +64,21 @@ public class Main extends JFrame{
 				Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 			}
 		});
-		startTranslation(in,out,engine);
+		startTranslation(in,out,engine,false);
 	}
-	private void startTranslation(InputStream in,OutputStream out,DocumentTranslatorEngine engine){
-		TextTranslator translator=conf.getTranslator();
+	private void resumeTranslation(InputStream in,OutputStream out,DocumentTranslatorEngine engine){
+		engine.setOnFinished(()->{
+			try{
+				out.close();
+				card.show(getContentPane(),INPUT_CARD_NAME);
+			}catch(IOException ex){
+				Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
+			}
+		});
+		startTranslation(in,out,engine,true);
+	}
+	private void startTranslation(InputStream in,OutputStream out,DocumentTranslatorEngine engine,boolean resume){
+		TextTranslator translator=conf.getTranslator(resume);
 		add(new JScrollPane(translator.getUserInterface()),PROCESS_CARD_NAME);
 		card.show(getContentPane(),PROCESS_CARD_NAME);
 		engine.setTextTranslator(translator);
@@ -115,6 +127,21 @@ public class Main extends JFrame{
 			}
 		});
 		step2.add(fromURL);
+		step2.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("OR")));
+		JButton resume=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CONTINUE"));
+		resume.addActionListener((e)->{
+			if(fileChooser.showOpenDialog(this)==JFileChooser.APPROVE_OPTION){
+				try{
+					File to=fileChooser.getSelectedFile();
+					File old=File.createTempFile("partial","");
+					Files.copy(to.toPath(),old.toPath(),StandardCopyOption.REPLACE_EXISTING);
+					resumeTranslation(new FileInputStream(old),new FileOutputStream(to),(DocumentTranslatorEngine)formats.getSelectedItem());
+				}catch(IOException ex){
+					Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
+				}
+			}
+		});
+		step2.add(resume);
 		step2.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("FROM_TEXT")));
 		steps.add(step2);
 		pane.add(steps,BorderLayout.NORTH);

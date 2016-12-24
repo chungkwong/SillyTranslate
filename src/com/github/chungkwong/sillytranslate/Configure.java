@@ -295,7 +295,7 @@ public class Configure extends JFrame{
 			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 		}
 	}
-	public TextTranslator getTranslator(){
+	public TextTranslator getTranslator(boolean resume){
 		ArrayList<TextTranslator> translators=new ArrayList<>();
 		Locale input=localeIn.getSelectedItem();
 		Locale output=localeOut.getSelectedItem();
@@ -337,7 +337,7 @@ public class Configure extends JFrame{
 			cloudTextTranslator.setTranslateDirection(input,output);
 			translators.add(cloudTextTranslator);
 		}
-		return new CombinedTextTranslator(translators.toArray(new TextTranslator[0]));
+		return new CombinedTextTranslator(resume,translators.toArray(new TextTranslator[0]));
 	}
 	public static File resolveFile(String path){
 		File file=new File(path);

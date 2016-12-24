@@ -22,6 +22,9 @@ import java.util.*;
  */
 public class Normalizers{
 	private static final HashMap<Locale,WordNormalizer[]> NORMALIZERS=new HashMap<>();
+	public static WordNormalizer[] registerNormalizers(Locale locale,WordNormalizer[] normalizers){
+		return NORMALIZERS.put(locale,normalizers);
+	}
 	public static WordNormalizer[] getNormalizers(Locale locale){
 		WordNormalizer[] normalizers=NORMALIZERS.get(locale);
 		if(normalizers==null){

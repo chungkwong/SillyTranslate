@@ -15,16 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.surrounding;
+import java.util.concurrent.*;
 import javax.swing.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class CombinedTextTranslator extends JPanel implements TextTranslator{
+	private static final String MAGIC="7617ccd567d77b740d321bcb0128d6ef";
 	private final TextTranslator[] translators;
 	private final JTextArea in=new JTextArea();
-	public CombinedTextTranslator(TextTranslator... translators){
+	private ExecutorService executor=null;
+	private boolean resume;
+	private DocumentTranslatorEngine callback;
+	public CombinedTextTranslator(boolean resume,TextTranslator... translators){
 		this.translators=translators;
+		this.resume=resume;
+		if(resume)
+			executor=Executors.newSingleThreadExecutor();
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
 		JLabel org=new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("INPUT"));
 		org.setAlignmentX(0);
@@ -40,12 +48,31 @@ public class CombinedTextTranslator extends JPanel implements TextTranslator{
 			translatorView.setAlignmentX(0);
 			add(translatorView);
 		}
+		JButton pause=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("PAUSE"));
+		pause.addActionListener((e)->{
+			executor=Executors.newSingleThreadExecutor();
+			callback.textTranslated(MAGIC+in.getText());
+		});
+		pause.setAlignmentX(0);
+		add(pause);
 	}
 	@Override
 	public void translate(String text,DocumentTranslatorEngine callback){
-		in.setText(text);
-		for(TextTranslator translator:translators){
-			translator.translate(text,callback);
+		if(resume&&text.startsWith(MAGIC)){
+			executor.shutdown();
+			executor=null;
+			resume=false;
+			translate(text.substring(MAGIC.length()),callback);
+			return;
+		}
+		if(executor!=null){
+			executor.execute(()->callback.textTranslated(text));
+		}else{
+			this.callback=callback;
+			in.setText(text);
+			for(TextTranslator translator:translators){
+				translator.translate(text,callback);
+			}
 		}
 	}
 	@Override
