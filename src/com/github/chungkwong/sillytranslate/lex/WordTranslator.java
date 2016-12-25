@@ -46,7 +46,7 @@ public class WordTranslator extends AbstractWordTranslator{
 		setLayout(new BorderLayout());
 		this.memory=memory;
 		this.dict=dict;
-		hintExtractor=new DictionaryHintExtractor(locale);
+		hintExtractor=new DictionaryHintExtractor(locale,true);
 		currIn.setFocusable(false);
 		MoreAction moreAction=new MoreAction();
 		LessAction lessAction=new LessAction();

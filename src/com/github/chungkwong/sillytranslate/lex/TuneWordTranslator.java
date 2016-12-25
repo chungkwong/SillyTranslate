@@ -29,7 +29,7 @@ public class TuneWordTranslator extends AbstractWordTranslator{
 	private final WordMemory memory;
 	public TuneWordTranslator(NavigableDictionary dict,WordMemory memory,Locale locale){
 		this.dict=dict;
-		this.hintExtractor=new DictionaryHintExtractor(locale);
+		this.hintExtractor=new DictionaryHintExtractor(locale,false);
 		this.memory=memory;
 	}
 	@Override
@@ -41,7 +41,25 @@ public class TuneWordTranslator extends AbstractWordTranslator{
 		Hint[] hints=hintExtractor.extractHint(word,"",dict,memory);
 		if(hints.length>0)
 			return hints[0].getInputText().substring(0,hints[0].getInputText().length()-1);
-		else
+		else if(!word.isEmpty()&&Character.isUpperCase(word.codePointAt(0))){
+			hints=hintExtractor.extractHint(toUsual(word),"",dict,memory);
+			if(hints.length>0)
+				return toFirst(hints[0].getInputText().substring(0,hints[0].getInputText().length()-1));
+			else
+				return word;
+		}else
 			return word;
+	}
+	private static String toUsual(String word){
+		int second=word.offsetByCodePoints(0,1);
+		return word.substring(0,second).toLowerCase()+word.substring(second);
+	}
+	private static String toFirst(String word){
+		if(word.isEmpty())
+			return "";
+		else{
+			int second=word.offsetByCodePoints(0,1);
+			return word.substring(0,second).toUpperCase()+word.substring(second);
+		}
 	}
 }

@@ -10,6 +10,17 @@ SillyTranslate support the following document format：
   - XML
   - ODF(e.g. odt, odp, ods)
   - OOXML(e.g. docx, pptx, xlsx)
+  - GNU gettext source(e.g. po)
+  - Roff(e.g. troff, groff)
+  - TeX
+
+The following translation packages are available now:
+  - Chinese conversion(based on the project HanLP)
+  - American and british english coversion(based on the project american-british-english-translator)
+
+Minor features
+  - resume-continue
+  - remember word translations
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,6 +32,7 @@ SillyTranslate是一个计算机辅助翻译系统。虽然它目前还几乎不
 SillyTranslate尝试整合多种计算机辅助翻译手段，以求提高翻译的准确度与效率：
   - 云翻译系统（如Yandex、Baidu）
   - 传统的语法分析方法
+  - 人手翻译
 
 SillyTranslate大致支持以下文档格式：
   - 纯文本
@@ -28,5 +40,16 @@ SillyTranslate大致支持以下文档格式：
   - XML
   - ODF（含odt、odp、ods）
   - OOXML（含docx、pptx、xlsx）
+  - GNU gettext源(po文件)
+  - Roff(含troff, groff)
+  - TeX
+
+SillyTranslate目前已经有以下翻译包：
+  - 繁简中文互换（基于HanLP项目）
+  - 英美式英文互换（基于american-british-english-translator项目）
+
+次要特性：
+  - 断点续译
+  - 记忆过去用过的单词翻译
 
 本软件为自由软件: 你可以在自由软件基金会的GNU通用公共许可，版本3或按你的意愿更新的版本，的条款下再分发它和/或修改它。

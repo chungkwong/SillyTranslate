@@ -27,8 +27,10 @@ import javax.swing.*;
  */
 public class DictionaryHintExtractor{
 	private final WordNormalizer[] normalizers;
-	public DictionaryHintExtractor(Locale locale){
+	private final boolean kept;
+	public DictionaryHintExtractor(Locale locale,boolean kept){
 		normalizers=Normalizers.getNormalizers(locale);
+		this.kept=kept;
 	}
 	public Hint[] extractHint(String word,String prefix,NavigableDictionary dict,WordMemory memory){
 		String normalizeWord=normalize(word);
@@ -67,7 +69,7 @@ public class DictionaryHintExtractor{
 			}
 		}
 	}
-	private static void split(String text,String word,String prefix,ArrayList<Hint> hints){
+	private void split(String text,String word,String prefix,ArrayList<Hint> hints){
 		int prefixLen=prefix.length();
 		String type="";
 		for(int i=0;i<text.length();i++){
@@ -97,7 +99,7 @@ public class DictionaryHintExtractor{
 					i=j-1;
 			}
 		}
-		if(word.startsWith(prefix)&&word.length()>prefixLen)
+		if(kept&&word.startsWith(prefix)&&word.length()>prefixLen)
 			hints.add(new SimpleHint(word,word.substring(prefixLen)+":",null,""));
 	}
 	private static void split(String text,String word,String prefix,ArrayList<Hint> hints,WordNormalizer normalizer){
@@ -138,7 +140,7 @@ public class DictionaryHintExtractor{
 		f.add(input,BorderLayout.NORTH);
 		JTextArea output=new JTextArea();
 		f.add(new JScrollPane(output),BorderLayout.CENTER);
-		DictionaryHintExtractor hintExtractor=new DictionaryHintExtractor(Locale.ENGLISH);
+		DictionaryHintExtractor hintExtractor=new DictionaryHintExtractor(Locale.ENGLISH,true);
 		input.addActionListener((e)->{
 			/*Predicate<String> patt=Pattern.compile(input.getText()).asPredicate();
 			output.setText(dict.getDictionary().keySet().stream().filter(patt).collect(Collectors.joining("\n")));*/
