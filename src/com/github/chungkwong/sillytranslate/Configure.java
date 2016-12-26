@@ -339,6 +339,15 @@ public class Configure extends JFrame{
 		}
 		return new CombinedTextTranslator(resume,translators.toArray(new TextTranslator[0]));
 	}
+	public Locale getInputLocale(){
+		return localeIn.getSelectedItem();
+	}
+	public Locale getOutputLocale(){
+		return localeIn.getSelectedItem();
+	}
+	public NavigableDictionary getDictionary(){
+		return dictionaryChooser.getDictionary();
+	}
 	public static File resolveFile(String path){
 		File file=new File(path);
 		return file.isAbsolute()?file:new File(BASE,path);

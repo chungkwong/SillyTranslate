@@ -16,7 +16,7 @@ SillyTranslate support the following document format：
 
 The following translation packages are available now:
   - Chinese conversion(based on the project HanLP)
-  - American and british english coversion(based on the project american-british-english-translator)
+  - American and british english conversion(based on the project american-british-english-translator)
 
 Minor features
   - resume-continue

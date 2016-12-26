@@ -54,19 +54,19 @@ public class DictionaryChooser extends JPanel{
 		add(new EditableList(dicts,this::loadDictionary),"");
 	}
 	private NavigableDictionary loadDictionary(){
-		fileChooser.showOpenDialog(this);
-		return loadDictionary(fileChooser.getSelectedFile());
-	}
-	private NavigableDictionary loadDictionary(File file){
 		try{
-			if(file.isDirectory())
-				return new StardictDictionary(file);
-			else
-				return new KeyValueDictionary(file);
+			if(fileChooser.showOpenDialog(this)==JFileChooser.APPROVE_OPTION)
+				return loadDictionary(fileChooser.getSelectedFile());
 		}catch(IOException ex){
 			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
-			throw new RuntimeException(ex);
 		}
+		throw new RuntimeException("No file is selected");
+	}
+	private NavigableDictionary loadDictionary(File file) throws IOException{
+		if(file.isDirectory())
+			return new StardictDictionary(file);
+		else
+			return new KeyValueDictionary(file);
 	}
 	public IntegratedDictionary getDictionary(){
 		return dict;
