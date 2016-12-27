@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.logging.*;
 import java.util.prefs.*;
 import javax.swing.*;
+import javax.swing.text.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
@@ -33,6 +34,7 @@ import javax.swing.*;
 public class Configure extends JFrame{
 	private static final File BASE=new File(System.getProperty("user.home"),".SillyTranslate");
 	private final Preferences pref=Preferences.userNodeForPackage(Configure.class);
+	private final JTextField name=new JTextField();
 	private final JCheckBox simple=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("MANUAL"));
 	private final JCheckBox staged=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STAGED"));
 	private final JCheckBox cloud=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CLOUD"));
@@ -61,7 +63,9 @@ public class Configure extends JFrame{
 	private final LocaleChooser localeOut=new LocaleChooser();
 	private final DictionaryChooser dictionaryChooser=new DictionaryChooser();
 	public Configure(){
+		super(ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CONFIGURE"));
 		Box box=Box.createVerticalBox();
+		box.add(name);
 		box.add(simple);
 		box.add(staged);
 		box.add(cloud);
@@ -185,9 +189,6 @@ public class Configure extends JFrame{
 		JButton exportPref=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("EXPORT"));
 		exportPref.addActionListener((e)->exportPref());
 		control.add(exportPref);
-		JButton savePref=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SAVE AS DEFAULT"));
-		savePref.addActionListener((e)->savePref());
-		control.add(savePref);
 		control.setAlignmentX(0);
 		box.add(control);
 		PackageManager pkg=new PackageManager(this);
@@ -199,6 +200,7 @@ public class Configure extends JFrame{
 		setType(Type.NORMAL);
 		pack();
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
+		Runtime.getRuntime().addShutdownHook(new Thread(()->savePref()));
 	}
 	private void importPref(){
 		JFileChooser jfc=new JFileChooser();
@@ -207,9 +209,12 @@ public class Configure extends JFrame{
 	}
 	void importPref(File file){
 		try(InputStream in=new FileInputStream(file)){
+			pref.put("Name","");
 			Preferences.importPreferences(in);
 			pref.sync();
 			load();
+			if(name.getText().isEmpty())
+				name.setText(file.getName().replace(".xml",""));
 		}catch(IOException|InvalidPreferencesFormatException|BackingStoreException ex){
 			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 		}
@@ -249,6 +254,7 @@ public class Configure extends JFrame{
 		pref.putBoolean("RuleBasedSentenceTranslator",ruleSentence.isSelected());
 		pref.putBoolean("AutoSelectSentence",autoSentence.isSelected());
 		pref.putBoolean("AutoSelectLex",autoLex.isSelected());
+		pref.put("Name",name.getText());
 		pref.put("InputLanguage",localeIn.getSelectedItem().toLanguageTag());
 		pref.put("OutputLanguage",localeOut.getSelectedItem().toLanguageTag());
 		pref.put("WordCache",wordCache.getText());
@@ -281,6 +287,7 @@ public class Configure extends JFrame{
 		naiveLimit.setValue(pref.getInt("NaiveLimit",6));
 		ruleLimit.setValue(pref.getInt("RuleLimit",6));
 		rules.setText(pref.get("RulesFile",""));
+		name.setText(pref.get("Name",""));
 		localeIn.setSelectedItem(Locale.forLanguageTag(pref.get("InputLanguage","en-US")));
 		localeOut.setSelectedItem(Locale.forLanguageTag(pref.get("OutputLanguage","zh-CN")));
 		wordCache.setText(pref.get("WordCache",System.getProperty("user.home")+"/.sillytranslatecache"));
@@ -338,6 +345,12 @@ public class Configure extends JFrame{
 			translators.add(cloudTextTranslator);
 		}
 		return new CombinedTextTranslator(resume,translators.toArray(new TextTranslator[0]));
+	}
+	Document getNameDocument(){
+		return name.getDocument();
+	}
+	public String getName(){
+		return name.getText();
 	}
 	public Locale getInputLocale(){
 		return localeIn.getSelectedItem();

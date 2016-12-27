@@ -91,6 +91,17 @@ public class Main extends JFrame{
 	private JPanel createInputCard(){
 		JPanel pane=new JPanel(new BorderLayout());
 		Box steps=Box.createVerticalBox();
+		Box step0=Box.createHorizontalBox();
+		step0.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STEP0")));
+		JTextField name=new JTextField();
+		name.setEditable(false);
+		name.setDocument(conf.getNameDocument());
+		step0.add(name);
+		JButton setting=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SETTINGS"));
+		setting.addActionListener((e)->conf.setVisible(true));
+		step0.add(setting);
+		step0.setAlignmentX(0);
+		steps.add(step0);
 		Box step1=Box.createHorizontalBox();
 		step1.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STEP1")));
 		JComboBox<DocumentTranslatorEngine> formats=new JComboBox<>(new DocumentTranslatorEngine[]{
@@ -98,9 +109,7 @@ public class Main extends JFrame{
 			new ODFTranslator(),new OOXMLTranslator(),new GroffTranslator(),new TeXTranslator()
 		});
 		step1.add(formats);
-		JButton setting=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SETTINGS"));
-		setting.addActionListener((e)->conf.setVisible(true));
-		step1.add(setting);
+		step1.setAlignmentX(0);
 		steps.add(step1);
 		JPanel step2=new JPanel(new FlowLayout(FlowLayout.LEFT));
 		step2.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STEP2")));
@@ -143,6 +152,7 @@ public class Main extends JFrame{
 		});
 		step2.add(resume);
 		step2.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("FROM_TEXT")));
+		step2.setAlignmentX(0);
 		steps.add(step2);
 		pane.add(steps,BorderLayout.NORTH);
 		JTextArea area=new ActionTextArea((text)->{

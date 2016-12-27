@@ -18,7 +18,9 @@ package com.github.chungkwong.sillytranslate.sentence;
 import com.github.chungkwong.sillytranslate.*;
 import com.github.chungkwong.sillytranslate.lex.*;
 import com.github.chungkwong.sillytranslate.ui.*;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.function.*;
 import java.util.logging.*;
 import java.util.stream.*;
@@ -44,12 +46,15 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 	private final boolean auto;
 	private SwingWorker<List<String>,Object> worker;
 	public SentenceTranslatorView(SentenceTranslatorEngine engine,boolean auto){
-		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		setLayout(new BorderLayout());
 		this.engine=engine;
 		this.auto=auto;
 		input.setFocusable(false);
 		input.setAlignmentX(0);
-		add(input);
+		add(input,BorderLayout.NORTH);
+		result.setAlignmentX(0);
+		add(result,BorderLayout.CENTER);
+		Box bottom=Box.createVerticalBox();
 		list.setAlignmentX(0);
 		list.addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -58,9 +63,7 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 			}
 		});
 		list.setAction((item)->next(item));
-		add(list);
-		result.setAlignmentX(0);
-		add(result);
+		bottom.add(list);
 		Box progress=Box.createHorizontalBox();
 		cancel.setEnabled(false);
 		progress.add(progressBar);
@@ -71,7 +74,9 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 			progressBar.setIndeterminate(false);
 		});
 		progress.add(cancel);
-		add(progress);
+		progress.setAlignmentX(0);
+		bottom.add(progress);
+		add(bottom,BorderLayout.SOUTH);
 	}
 	private void next(String text){
 		buf.append(text);
