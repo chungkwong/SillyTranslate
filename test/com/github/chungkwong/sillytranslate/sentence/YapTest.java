@@ -15,25 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.sentence;
-
 import com.github.chungkwong.sillytranslate.lex.*;
 import java.io.*;
 import java.util.*;
 import org.junit.*;
-
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class RuleBasedSentenceTranslatorTest{
-	public RuleBasedSentenceTranslatorTest(){
+public class YapTest{
+	public YapTest(){
 	}
 	private static void assertTranslations(String in,String... out){
-		RuleBasedSentenceTranslator translator=new RuleBasedSentenceTranslator(10,new File("src/com/github/chungkwong/sillytranslate/sentence/RULES.prolog"),Locale.CHINESE);
+		ExternalRuleBasedSentenceTranslator translator=new ExternalRuleBasedSentenceTranslator(10,new File("src/com/github/chungkwong/sillytranslate/sentence/RULES.prolog"),Locale.CHINESE);
 		String[] split=in.split(":");
 		ArrayList<Token> list=new ArrayList<>();
 		for(int i=0;i+1<split.length;i+=2)
 			list.add(new Token(Token.Type.WORD,split[i],split[i+1]));
+		System.out.println(Arrays.toString(out)+":"+translator.getTranslation(list));
 		Assert.assertArrayEquals(translator.getTranslation(list).toArray(),out);
 	}
 	@Test(timeout=8000)
@@ -55,7 +54,7 @@ public class RuleBasedSentenceTranslatorTest{
 		assertTranslations("\":pun.:老公:n.:的:prep.:大众:n.:\":pun.:恨:v.","\"大众的老公\"恨");
 		assertTranslations("数据库:n.:（:punct.:汇总:n.:的:prep.:事实:n.:）:punct.","数据库（事实的汇总）");
 	}
-	@Test(timeout=8000)
+	@Test(timeout=5000)
 	public void testNounPhrase(){
 		assertTranslations("我:n.","我");
 		assertTranslations("人道:n.:主义:n.","人道主义");

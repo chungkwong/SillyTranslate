@@ -48,6 +48,7 @@ public class Configure extends JFrame{
 	private final JRadioButton tuneWord=new JRadioButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("TUNE"));
 	private final JCheckBox naiveSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("BRUTE_FORCE"));
 	private final JCheckBox ruleSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("RULE BASED"));
+	private final JCheckBox yapSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("YAP"));
 	private final JCheckBox autoSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("AUTO_SELECT"));
 	private final JCheckBox autoLex=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("AUTO_SELECT"));
 	private final JTextField wordCache=new JTextField();
@@ -147,6 +148,7 @@ public class Configure extends JFrame{
 		sentenceBox.add(ruleLimit);
 		sentenceBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("RULES_FILE")));
 		sentenceBox.add(rules);
+		sentenceBox.add(yapSentence);
 		sentenceBox.add(autoSentence);
 		sentenceBox.setAlignmentX(0);
 		box.add(sentenceBox);
@@ -327,7 +329,10 @@ public class Configure extends JFrame{
 			if(naiveSentence.isSelected())
 				sentenceTranslators.add(new NaiveTranslator((int)naiveLimit.getValue(),output));
 			if(ruleSentence.isSelected())
-				sentenceTranslators.add(new RuleBasedSentenceTranslator((int)ruleLimit.getValue(),resolveFile(rules.getText()),output));
+				if(yapSentence.isSelected())
+					sentenceTranslators.add(new ExternalRuleBasedSentenceTranslator((int)ruleLimit.getValue(),resolveFile(rules.getText()),output));
+				else
+					sentenceTranslators.add(new RuleBasedSentenceTranslator((int)ruleLimit.getValue(),resolveFile(rules.getText()),output));
 			SentenceTranslatorEngine sentenceEngine=new IntegratedSentenceTranslator(sentenceTranslators.toArray(new SentenceTranslatorEngine[0]));
 			SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(sentenceEngine,autoSentence.isSelected());
 			translators.add(new StagedTextTranslator(lex,lexView,wordTranslator,sentenceTranslator));
