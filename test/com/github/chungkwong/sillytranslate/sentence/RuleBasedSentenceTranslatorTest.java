@@ -36,7 +36,7 @@ public class RuleBasedSentenceTranslatorTest{
 			list.add(new Token(Token.Type.WORD,split[i],split[i+1]));
 		Assert.assertArrayEquals(translator.getTranslation(list).toArray(),out);
 	}
-	@Test(timeout=8000)
+	@Test//(timeout=8000)
 	public void testSentence(){
 		assertTranslations("因为:conj.:你:n.","因为你");
 		assertTranslations("因为:conj.:你:n.:是:aux.:你:n.","因为你是你");
@@ -44,7 +44,7 @@ public class RuleBasedSentenceTranslatorTest{
 		assertTranslations("我:n.:是:aux.:我:n.:，:punct.:你:n.:是:aux.:你:n.","我是我，你是你");
 		assertTranslations("我:n.:是:aux.:我:n.:；:punct.:你:n.:是:aux.:你:n.","我是我；你是你");
 	}
-	@Test(timeout=8000)
+	@Test//(timeout=8000)
 	public void testClause(){
 		assertTranslations("我:xyz.","我");
 		assertTranslations("我:n.:恨:v.:你:n.","我恨你");
@@ -55,7 +55,7 @@ public class RuleBasedSentenceTranslatorTest{
 		assertTranslations("\":pun.:老公:n.:的:prep.:大众:n.:\":pun.:恨:v.","\"大众的老公\"恨");
 		assertTranslations("数据库:n.:（:punct.:汇总:n.:的:prep.:事实:n.:）:punct.","数据库（事实的汇总）");
 	}
-	@Test(timeout=8000)
+	@Test//(timeout=8000)
 	public void testNounPhrase(){
 		assertTranslations("我:n.","我");
 		assertTranslations("人道:n.:主义:n.","人道主义");
@@ -79,7 +79,7 @@ public class RuleBasedSentenceTranslatorTest{
 		assertTranslations("建筑:n.:从:prep.:东:n.:到:prep.:西:n.","从东到西的建筑","从到西的东的建筑","到西的从东的建筑");
 		assertTranslations("有名的:adj.:\":punct.:老公:n.:的:prep.:大众:n.:\":punct.","有名的\"大众的老公\"");
 	}
-	@Test(timeout=10000)
+	@Test//(timeout=10000)
 	public void testWhClause(){
 		assertTranslations("什么:n.::prep.:吃:vt.","吃的");
 		assertTranslations("什么:n.::prep.:吃:v.","吃的");
@@ -94,7 +94,7 @@ public class RuleBasedSentenceTranslatorTest{
 		assertTranslations("口子:n.:什么时候:pron.:你:pron.:恨:v.:我:n.","你恨我的口子","你的口子恨我","口子什么时候你恨我");
 		assertTranslations("什么:n.:你:pron.:看到:v.:是:aux.:什么:n.:你:pron.:得到:v.","你看到的是你得到的");
 	}
-	@Test(timeout=5000)
+	@Test//(timeout=5000)
 	public void testVerbPhrase(){
 		assertTranslations("是:aux.:你:n.","是你");
 		assertTranslations("恨:vbl.:你:n.","恨你");
@@ -114,14 +114,14 @@ public class RuleBasedSentenceTranslatorTest{
 		assertTranslations("是:aux.:杀死:vt.:快速地:adv.","被快速地杀死");
 		assertTranslations("是:aux.:快速地:adv.:杀死:vt.","快速地被杀死");
 	}
-	@Test(timeout=5000)
+	@Test//(timeout=5000)
 	public void testAdjectivePhrase(){
 		assertTranslations("好:adj.:人:n.","好人");
 		assertTranslations("老:adj.:好:adj.:人:n.","老好人");
 		assertTranslations("非常:adv.:好:adj.:人:n.","非常好人");
 		assertTranslations("两个:num.:非常:adv.:好:adj.:人:n.","两个非常好人");
 	}
-	@Test(timeout=5000)
+	@Test//(timeout=5000)
 	public void testIncomplete(){
 		assertTranslations("我:xyz.","我");
 	}

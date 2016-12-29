@@ -27,7 +27,7 @@ public class YapTest{
 	public YapTest(){
 	}
 	private static void assertTranslations(String in,String... out){
-		ExternalRuleBasedSentenceTranslator translator=new ExternalRuleBasedSentenceTranslator(10,new File("src/com/github/chungkwong/sillytranslate/sentence/RULES.prolog"),Locale.CHINESE);
+		ExternalRuleBasedSentenceTranslator translator=new ExternalRuleBasedSentenceTranslator(10,new File("src/com/github/chungkwong/sillytranslate/sentence/RULES2.prolog"),Locale.CHINESE);
 		String[] split=in.split(":");
 		ArrayList<Token> list=new ArrayList<>();
 		for(int i=0;i+1<split.length;i+=2)
