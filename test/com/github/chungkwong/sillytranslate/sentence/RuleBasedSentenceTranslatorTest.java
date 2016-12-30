@@ -17,7 +17,6 @@
 package com.github.chungkwong.sillytranslate.sentence;
 
 import com.github.chungkwong.sillytranslate.lex.*;
-import java.io.*;
 import java.util.*;
 import org.junit.*;
 
@@ -25,11 +24,12 @@ import org.junit.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class RuleBasedSentenceTranslatorTest{
+public abstract class RuleBasedSentenceTranslatorTest{
 	public RuleBasedSentenceTranslatorTest(){
 	}
-	private static void assertTranslations(String in,String... out){
-		RuleBasedSentenceTranslator translator=new RuleBasedSentenceTranslator(10,new File("src/com/github/chungkwong/sillytranslate/sentence/RULES.prolog"),Locale.CHINESE);
+	protected abstract SentenceTranslatorEngine getEngine();
+	private void assertTranslations(String in,String... out){
+		SentenceTranslatorEngine translator=getEngine();
 		String[] split=in.split(":");
 		ArrayList<Token> list=new ArrayList<>();
 		for(int i=0;i+1<split.length;i+=2)

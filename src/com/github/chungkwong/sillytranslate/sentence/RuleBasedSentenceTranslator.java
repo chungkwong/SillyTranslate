@@ -63,7 +63,7 @@ public class RuleBasedSentenceTranslator implements SentenceTranslatorEngine{
 		for(int i=0;i<words.size();i++){
 			db.addPredication(new CompoundTerm(words.get(i).getTag(),new Constant(BigInteger.valueOf(i))));
 			if(words.get(i).getType()!=Token.Type.FORMULA)
-				db.addPredication(new CompoundTerm("text",new Constant(BigInteger.valueOf(i)),new Constant(words.get(i).getText())));
+				db.addPredication(new CompoundTerm("text",new Constant(BigInteger.valueOf(i)),Lists.asCodeList(words.get(i).getText())));
 		}
 		return db;
 	}
@@ -76,8 +76,14 @@ public class RuleBasedSentenceTranslator implements SentenceTranslatorEngine{
 	private String extractTranslation(Substitution subst,List<Token> words){
 		List<Term> list=Lists.toJavaList(subst.findRoot(NEW));
 		return Sentences.build(list.stream().map((i)->{
-			Object val=((Constant)i).getValue();
-			return val instanceof Number?words.get(((Number)val).intValue()).getText():val.toString();
+			if(i instanceof Constant){
+				Object val=((Constant)i).getValue();
+				if(val instanceof Number)
+					return words.get(((Number)val).intValue()).getText();
+				else
+					return "";
+			}else
+				return Lists.codeListToString(i);
 		}),locale);
 	}
 	/**

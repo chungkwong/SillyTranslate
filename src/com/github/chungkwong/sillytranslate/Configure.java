@@ -326,13 +326,13 @@ public class Configure extends JFrame{
 				wordTranslator=new WordTranslator(dictionaryChooser.getDictionary(),WordMemory.getWordMemory(wordCache.getText()),input);
 			}
 			ArrayList<SentenceTranslatorEngine> sentenceTranslators=new ArrayList<>();
-			if(naiveSentence.isSelected())
-				sentenceTranslators.add(new NaiveTranslator((int)naiveLimit.getValue(),output));
 			if(ruleSentence.isSelected())
 				if(yapSentence.isSelected())
-					sentenceTranslators.add(new ExternalRuleBasedSentenceTranslator((int)ruleLimit.getValue(),resolveFile(rules.getText()),output));
+					sentenceTranslators.add(new YapSentenceTranslator((int)ruleLimit.getValue(),resolveFile(rules.getText()),output));
 				else
 					sentenceTranslators.add(new RuleBasedSentenceTranslator((int)ruleLimit.getValue(),resolveFile(rules.getText()),output));
+			if(naiveSentence.isSelected())
+				sentenceTranslators.add(new NaiveTranslator((int)naiveLimit.getValue(),output));
 			SentenceTranslatorEngine sentenceEngine=new IntegratedSentenceTranslator(sentenceTranslators.toArray(new SentenceTranslatorEngine[0]));
 			SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(sentenceEngine,autoSentence.isSelected());
 			translators.add(new StagedTextTranslator(lex,lexView,wordTranslator,sentenceTranslator));

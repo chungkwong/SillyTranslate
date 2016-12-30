@@ -25,12 +25,11 @@ import java.util.stream.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class ExternalRuleBasedSentenceTranslator implements SentenceTranslatorEngine{
-	private static final String COMMAND="yap";
+public class GprologSentenceTranslator implements SentenceTranslatorEngine{
 	private final int limit;
 	private final Locale locale;
 	private String rules;
-	public ExternalRuleBasedSentenceTranslator(int limit,File src,Locale locale){
+	public GprologSentenceTranslator(int limit,File src,Locale locale){
 		this.limit=limit;
 		this.locale=locale;
 		try{
@@ -45,6 +44,7 @@ public class ExternalRuleBasedSentenceTranslator implements SentenceTranslatorEn
 		String result;
 		try{
 			result=query(prepareQuery(words),prepareDatabase(words));
+			System.out.println(result);
 			if(!result.startsWith("[["))
 				return Collections.emptyList();
 			else
@@ -86,8 +86,9 @@ public class ExternalRuleBasedSentenceTranslator implements SentenceTranslatorEn
 	}
 	private String prepareDatabase(List<Token> words){
 		StringBuilder buf=new StringBuilder(rules);
-		buf.append('\n');
+		buf.append("\ndiscontiguous(text/2).\n");
 		for(int i=0;i<words.size();i++){
+			buf.append("discontiguous('").append(words.get(i).getTag()).append("'/1).\n");
 			buf.append('\'').append(words.get(i).getTag()).append("'(").append(i).append(").\n");
 			if(words.get(i).getType()!=Token.Type.FORMULA)
 				buf.append("text(").append(i).append(",").append(quoteString(words.get(i).getText())).append(").\n");
@@ -108,18 +109,22 @@ public class ExternalRuleBasedSentenceTranslator implements SentenceTranslatorEn
 		try(BufferedWriter out=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dataFile),"UTF-8"))){
 			out.append(data);
 		}
-		Process yap=Runtime.getRuntime().exec(new String[]{"yap","-l",dataFile.getAbsolutePath()});
+		Process yap=Runtime.getRuntime().exec(new String[]{"gprolog"});
 		BufferedReader in=new BufferedReader(new InputStreamReader(yap.getInputStream(),"UTF-8"));
 		OutputStreamWriter out=new OutputStreamWriter(yap.getOutputStream(),"UTF-8");
+		out.write("set_prolog_flag(unknown,fail).\n");
+		out.write("consult('"+dataFile.getAbsolutePath()+"').\n");
 		out.write(query+"\n");
 		out.close();
 		StringBuilder result=new StringBuilder();
 		String line;
 		while((line=in.readLine())!=null){
-			result.append(line).append('\n');
+			System.out.println(line);
+			if(line.startsWith("[["))
+				result.append(line).append('\n');
 		}
 		in.close();
-		dataFile.delete();
+		//dataFile.delete();
 		return result.toString();
 	}
 	@Override
@@ -131,7 +136,7 @@ public class ExternalRuleBasedSentenceTranslator implements SentenceTranslatorEn
 	}
 	public static void main(String[] args) throws IOException, InterruptedException{
 		//System.out.println(query("hate(X),write(X).","translate([0,1,2],[0,2,1]).\ntranslate([0,1,2],[2,1,0]).\n"));
-		ExternalRuleBasedSentenceTranslator translator=new ExternalRuleBasedSentenceTranslator(10,new File("src/com/github/chungkwong/sillytranslate/sentence/RULES2.prolog"),Locale.CHINESE);
+		GprologSentenceTranslator translator=new GprologSentenceTranslator(10,new File("src/com/github/chungkwong/sillytranslate/sentence/RULES2.prolog"),Locale.CHINESE);
 		Scanner in=new Scanner(System.in);
 		while(in.hasNextLine()){
 			String line=in.nextLine();
