@@ -21,8 +21,8 @@ import java.util.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class GprologTest extends RuleBasedSentenceTranslatorTest{
-	private final ExternalSentenceTranslator translator=new ExternalSentenceTranslator(10,new File("src/com/github/chungkwong/sillytranslate/sentence/RULES2.prolog"),Locale.CHINESE,"gprolog");
+public class SwiTest extends RuleBasedSentenceTranslatorTest{
+	private final ExternalSentenceTranslator translator=new ExternalSentenceTranslator(10,new File("src/com/github/chungkwong/sillytranslate/sentence/RULES2.prolog"),Locale.CHINESE,"swipl");
 	@Override
 	protected SentenceTranslatorEngine getEngine(){
 		return translator;

@@ -48,7 +48,6 @@ public class Configure extends JFrame{
 	private final JRadioButton tuneWord=new JRadioButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("TUNE"));
 	private final JCheckBox naiveSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("BRUTE_FORCE"));
 	private final JCheckBox ruleSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("RULE BASED"));
-	private final JCheckBox yapSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("YAP"));
 	private final JCheckBox autoSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("AUTO_SELECT"));
 	private final JCheckBox autoLex=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("AUTO_SELECT"));
 	private final JTextField wordCache=new JTextField();
@@ -58,6 +57,7 @@ public class Configure extends JFrame{
 	private final JTextField baiduSecret=new JTextField();
 	private final JTextField youdaoId=new JTextField();
 	private final JTextField youdaoSecret=new JTextField();
+	private final JComboBox<String> prologEngine=new JComboBox<>(new String[]{"JPrologMin","yap","swipl","gprolog"});
 	private final JSpinner naiveLimit=new JSpinner(new SpinnerNumberModel(6,0,Integer.MAX_VALUE,1));
 	private final JSpinner ruleLimit=new JSpinner(new SpinnerNumberModel(6,0,Integer.MAX_VALUE,1));
 	private final LocaleChooser localeIn=new LocaleChooser();
@@ -148,7 +148,7 @@ public class Configure extends JFrame{
 		sentenceBox.add(ruleLimit);
 		sentenceBox.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("RULES_FILE")));
 		sentenceBox.add(rules);
-		sentenceBox.add(yapSentence);
+		sentenceBox.add(prologEngine);
 		sentenceBox.add(autoSentence);
 		sentenceBox.setAlignmentX(0);
 		box.add(sentenceBox);
@@ -268,6 +268,7 @@ public class Configure extends JFrame{
 		pref.putInt("NaiveLimit",(Integer)naiveLimit.getValue());
 		pref.putInt("RuleBasedLimit",(Integer)ruleLimit.getValue());
 		pref.put("RulesFile",rules.getText());
+		pref.put("PrologEngine",prologEngine.getSelectedItem().toString());
 		pref.put("Dictionary",dictionaryChooser.toPaths());
 	}
 	private void load(){
@@ -289,6 +290,7 @@ public class Configure extends JFrame{
 		naiveLimit.setValue(pref.getInt("NaiveLimit",6));
 		ruleLimit.setValue(pref.getInt("RuleLimit",6));
 		rules.setText(pref.get("RulesFile",""));
+		prologEngine.setSelectedItem(pref.get("PrologEngine","JPrologMin"));
 		name.setText(pref.get("Name",""));
 		localeIn.setSelectedItem(Locale.forLanguageTag(pref.get("InputLanguage","en-US")));
 		localeOut.setSelectedItem(Locale.forLanguageTag(pref.get("OutputLanguage","zh-CN")));
@@ -327,14 +329,14 @@ public class Configure extends JFrame{
 			}
 			ArrayList<SentenceTranslatorEngine> sentenceTranslators=new ArrayList<>();
 			if(ruleSentence.isSelected())
-				if(yapSentence.isSelected())
-					sentenceTranslators.add(new YapSentenceTranslator((int)ruleLimit.getValue(),resolveFile(rules.getText()),output));
-				else
+				if(prologEngine.getSelectedItem().equals("JPrologMin"))
 					sentenceTranslators.add(new RuleBasedSentenceTranslator((int)ruleLimit.getValue(),resolveFile(rules.getText()),output));
+				else
+					sentenceTranslators.add(new ExternalSentenceTranslator((int)ruleLimit.getValue(),resolveFile(rules.getText()),output,prologEngine.getSelectedItem().toString()));
 			if(naiveSentence.isSelected())
 				sentenceTranslators.add(new NaiveTranslator((int)naiveLimit.getValue(),output));
 			SentenceTranslatorEngine sentenceEngine=new IntegratedSentenceTranslator(sentenceTranslators.toArray(new SentenceTranslatorEngine[0]));
-			SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(sentenceEngine,autoSentence.isSelected());
+			SentenceTranslatorView sentenceTranslator=new SentenceTranslatorView(sentenceEngine,autoSentence.isSelected(),output);
 			translators.add(new StagedTextTranslator(lex,lexView,wordTranslator,sentenceTranslator));
 		}
 		if(cloud.isSelected()){

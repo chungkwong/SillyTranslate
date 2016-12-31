@@ -14,17 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.chungkwong.sillytranslate.sentence;
-import java.io.*;
-import java.util.*;
+package com.github.chungkwong.sillytranslate;
+import javax.swing.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class GprologTest extends RuleBasedSentenceTranslatorTest{
-	private final ExternalSentenceTranslator translator=new ExternalSentenceTranslator(10,new File("src/com/github/chungkwong/sillytranslate/sentence/RULES2.prolog"),Locale.CHINESE,"gprolog");
-	@Override
-	protected SentenceTranslatorEngine getEngine(){
-		return translator;
-	}
+public interface Plugin{
+	void init();
+	JComponent getEditor();
 }

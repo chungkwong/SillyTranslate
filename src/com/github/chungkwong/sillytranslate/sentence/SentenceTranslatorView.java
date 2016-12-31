@@ -19,11 +19,11 @@ import com.github.chungkwong.sillytranslate.*;
 import com.github.chungkwong.sillytranslate.lex.*;
 import com.github.chungkwong.sillytranslate.ui.*;
 import java.awt.*;
-import java.util.*;
+import java.awt.event.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.*;
 import java.util.logging.*;
-import java.util.stream.*;
 import javax.swing.*;
 import javax.swing.event.*;
 /**
@@ -44,11 +44,13 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 	private Consumer<String> callback;
 	private Token curr;
 	private final boolean auto;
+	private final Locale locale;
 	private SwingWorker<List<String>,Object> worker;
-	public SentenceTranslatorView(SentenceTranslatorEngine engine,boolean auto){
+	public SentenceTranslatorView(SentenceTranslatorEngine engine,boolean auto,Locale locale){
 		setLayout(new BorderLayout());
 		this.engine=engine;
 		this.auto=auto;
+		this.locale=locale;
 		input.setFocusable(false);
 		input.setAlignmentX(0);
 		add(input,BorderLayout.NORTH);
@@ -73,6 +75,7 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 			progressBar.setString("");
 			progressBar.setIndeterminate(false);
 		});
+		cancel.setMnemonic(KeyEvent.VK_DELETE);
 		progress.add(cancel);
 		progress.setAlignmentX(0);
 		bottom.add(progress);
@@ -106,7 +109,7 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 			buf.setLength(0);
 			callback.accept(result);
 		}else{
-			input.setText(words.stream().map((t)->t.getText()).collect(Collectors.joining(" ")));
+			input.setText(Sentences.build(words.stream().map(Token::getText),locale));
 			result.setText(input.getText());
 			worker=new SwingWorker<List<String>,Object>(){
 				@Override
@@ -157,22 +160,5 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 		this.callback=callback;
 		this.iter=source;
 		next("");
-	}
-	public static void main(String[] args){
-		/*JOptionPane optionPane=new JOptionPane("正在生成候选",JOptionPane.INFORMATION_MESSAGE,JOptionPane.CANCEL_OPTION);
-		JDialog dialog=optionPane.createDialog("");
-		Thread t=new Thread(()->{
-			try{
-				Thread.sleep(5000);
-				dialog.setVisible(false);
-			}catch(InterruptedException ex){
-				System.out.println("oops");
-				Logger.getLogger(SentenceTranslatorView.class.getName()).log(Level.SEVERE,null,ex);
-			}
-		});
-		t.start();
-		dialog.setVisible(true);
-		t.interrupt();
-		System.exit(0);*/
 	}
 }

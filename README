@@ -1,7 +1,7 @@
 SillyTranslate is a document translation toolkit. It is not really usable right now, but it is in active development.
 
 SillyTranslate try to integrate different CAT technology to enhence accuracy and efficiency:
-  - Cloud translation services including Yandex and Baidu
+  - Cloud translation services including Yandex, Baidu and Youdao
   - Tranditional parsing approach
 
 SillyTranslate support the following document format：
@@ -30,7 +30,7 @@ the Free Software Foundation, either version 3 of the License, or
 SillyTranslate是一个计算机辅助翻译系统。虽然它目前还几乎不能用，但正在活跃开发中。
 
 SillyTranslate尝试整合多种计算机辅助翻译手段，以求提高翻译的准确度与效率：
-  - 云翻译系统（如Yandex、Baidu）
+  - 云翻译系统（如Yandex、百度、有道）
   - 传统的语法分析方法
   - 人手翻译
 
