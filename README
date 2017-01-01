@@ -31,7 +31,7 @@ SillyTranslate是一个计算机辅助翻译系统。虽然它目前还几乎不
 
 SillyTranslate尝试整合多种计算机辅助翻译手段，以求提高翻译的准确度与效率：
   - 云翻译系统（如Yandex、百度、有道）
-  - 传统的语法分析方法
+  - 传统的语法分析方法（字典+Prolog）
   - 人手翻译
 
 SillyTranslate大致支持以下文档格式：
