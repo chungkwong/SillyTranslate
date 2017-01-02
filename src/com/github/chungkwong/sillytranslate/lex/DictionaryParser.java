@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Chan Chung Kwong <1m02math@126.com>
+ * Copyright (C) 2017 Chan Chung Kwong <1m02math@126.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.lex;
+import com.github.chungkwong.sillytranslate.ui.*;
+import java.util.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public interface NavigableDictionary{
-	String getMeaning(String word);
-	String getCurrentWord(String word);
-	String getNextWord(String word);
-	String getSource();
+public interface DictionaryParser{
+	void parse(String text,String word,String prefix,List<Hint> hints);
 }

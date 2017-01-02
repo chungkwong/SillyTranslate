@@ -63,6 +63,8 @@ public class Configure extends JFrame{
 	private final LocaleChooser localeIn=new LocaleChooser();
 	private final LocaleChooser localeOut=new LocaleChooser();
 	private final DictionaryChooser dictionaryChooser=new DictionaryChooser();
+	private final JTextField pkgPlugin=new JTextField();
+	private final JTextField initPlugin=new JTextField();
 	public Configure(){
 		super(ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CONFIGURE"));
 		Box box=Box.createVerticalBox();
@@ -184,6 +186,13 @@ public class Configure extends JFrame{
 			f.setVisible(true);
 		});
 		box.add(dict);
+		Box plugin=Box.createHorizontalBox();
+		plugin.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("PKG_PLUGIN")));
+		plugin.add(pkgPlugin);
+		plugin.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("INIT_PLUGIN")));
+		plugin.add(initPlugin);
+		plugin.setAlignmentX(0);
+		box.add(plugin);
 		Box control=Box.createHorizontalBox();
 		JButton importPref=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("IMPORT"));
 		importPref.addActionListener((e)->importPref());
@@ -270,6 +279,8 @@ public class Configure extends JFrame{
 		pref.put("RulesFile",rules.getText());
 		pref.put("PrologEngine",prologEngine.getSelectedItem().toString());
 		pref.put("Dictionary",dictionaryChooser.toPaths());
+		pref.put("PackagePlugin",pkgPlugin.getText());
+		pref.put("GlobalPlugin",initPlugin.getText());
 	}
 	private void load(){
 		simple.setSelected(pref.getBoolean("NaiveTranslator",true));
@@ -300,6 +311,8 @@ public class Configure extends JFrame{
 		youdaoId.setText(pref.get("YoudaoID",""));
 		youdaoSecret.setText(pref.get("YoudaoSecret",""));
 		yandexKey.setText(pref.get("YandexKey",""));
+		pkgPlugin.setText(pref.get("PackagePlugin",""));
+		initPlugin.setText(pref.get("GlobalPlugin",""));
 		try{
 			dictionaryChooser.fromPaths(pref.get("Dictionary",""));
 		}catch(IOException ex){
@@ -307,6 +320,7 @@ public class Configure extends JFrame{
 		}
 	}
 	public TextTranslator getTranslator(boolean resume){
+		SillyTranslate.loadPlugIn(pkgPlugin.getText().split(":"));
 		ArrayList<TextTranslator> translators=new ArrayList<>();
 		Locale input=localeIn.getSelectedItem();
 		Locale output=localeOut.getSelectedItem();

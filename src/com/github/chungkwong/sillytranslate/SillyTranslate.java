@@ -17,17 +17,48 @@
 package com.github.chungkwong.sillytranslate;
 import com.github.chungkwong.sillytranslate.lex.*;
 import com.github.chungkwong.sillytranslate.surrounding.*;
+import java.io.*;
+import java.net.*;
 import java.util.*;
 import java.util.function.*;
+import java.util.logging.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class SillyTranslate{
+	private static final File BASE=new File(System.getProperty("user.home"),".SillyTranslate");
 	private static final Map<String,Function<Configure,Lex>> LEX_BUILDER=new LinkedHashMap<>();
 	private static final Map<String,DocumentTranslatorEngine> FORMATS=new LinkedHashMap<>();
 	static void init(){
 
+	}
+	static void loadPlugIn(String[] clssses){
+		if(clssses.length==0)
+			return;
+		ClassLoader loader=getPluginLoader();
+		for(String cls:clssses){
+			try{
+				loader.loadClass(cls).getMethod("init").invoke(null);
+			}catch(Exception ex){
+				Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
+			}
+		}
+	}
+	public static void bar(String str){
+		System.out.println(":::"+str);
+	}
+	static ClassLoader getPluginLoader(){
+		File[] jars=BASE.listFiles((dir,name)->name.endsWith(".jar"));
+		URL[] urls=Arrays.stream(jars).map((jar)->{
+			try{
+				return jar.toURI().toURL();
+			}catch(MalformedURLException ex){
+				Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
+				return null;
+			}
+		}).toArray(URL[]::new);
+		return new URLClassLoader(urls,SillyTranslate.class.getClassLoader());
 	}
 	public static Lex buildLex(String name,Configure conf){
 		return LEX_BUILDER.get(name).apply(conf);
@@ -46,6 +77,13 @@ public class SillyTranslate{
 	}
 	public static void registerDocumentTranslator(String name,DocumentTranslatorEngine engine){
 		FORMATS.put(name,engine);
+	}
+	private static DictionaryParser DICTIONARY_PARSER=new DefaultDictionaryParser();
+	public static DictionaryParser getDictionaryParser(){
+		return DICTIONARY_PARSER;
+	}
+	public static void setDictionaryParser(DictionaryParser parser){
+		DICTIONARY_PARSER=parser;
 	}
 	static{
 		registerLexBuilder("JavaLex",(conf)->new JavaLex(conf.getInputLocale()));

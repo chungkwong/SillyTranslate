@@ -26,7 +26,6 @@ import javax.swing.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class ConsoleMain{
-
 	public ConsoleMain(InputStream in,OutputStream out,DocumentTranslatorEngine format,TextTranslator translator){
 		format.setTextTranslator(translator);
 		format.setOnFinished(()->{

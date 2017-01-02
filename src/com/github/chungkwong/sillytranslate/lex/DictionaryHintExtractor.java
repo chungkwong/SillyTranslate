@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.lex;
+import com.github.chungkwong.sillytranslate.*;
 import com.github.chungkwong.sillytranslate.ui.*;
 import java.awt.*;
 import java.io.*;
@@ -33,14 +34,16 @@ public class DictionaryHintExtractor{
 		this.kept=kept;
 	}
 	public Hint[] extractHint(String word,String prefix,NavigableDictionary dict,WordMemory memory){
-		String normalizeWord=normalize(word);
 		ArrayList<Hint> hints=new ArrayList<>();
 		appendHistory(word,prefix,hints,memory);
-		split(dict.getMeaning(word),word,prefix,hints);
+		SillyTranslate.getDictionaryParser().parse(dict.getMeaning(word),word,prefix,hints);
+		reserve(word,prefix,hints);
 		boolean found=hints.size()>1;
+		String normalizeWord=normalize(word);
 		if(!normalizeWord.equals(word)){
 			appendHistory(normalizeWord,prefix,hints,memory);
-			split(dict.getMeaning(normalizeWord),normalizeWord,prefix,hints);
+			SillyTranslate.getDictionaryParser().parse(dict.getMeaning(normalizeWord),normalizeWord,prefix,hints);
+			reserve(normalizeWord,prefix,hints);
 			found=hints.size()>2;
 		}
 		if(!found)
@@ -69,36 +72,8 @@ public class DictionaryHintExtractor{
 			}
 		}
 	}
-	private void split(String text,String word,String prefix,ArrayList<Hint> hints){
+	private void reserve(String word,String prefix,ArrayList<Hint> hints){
 		int prefixLen=prefix.length();
-		String type="";
-		for(int i=0;i<text.length();i++){
-			char c=text.charAt(i);
-			if(c=='['){
-				while(++i<text.length()&&text.charAt(i)!=']');
-			}else if(c=='{'){
-				while(++i<text.length()&&text.charAt(i)!='}');
-			}else if(Character.isWhitespace(c)){
-
-			}else{
-				int j=i;
-				for(;j<text.length();j++){
-					int d=text.charAt(j);
-					if(d==','||d==';'||d=='\n'||d=='\r')
-						break;
-				}
-				String token=text.substring(i,j);
-				if(token.endsWith(".")&&!token.endsWith("...")){
-					type=token;
-				}else if(!token.isEmpty()&&token.startsWith(prefix)){
-					token+=":"+type;
-					if(token.length()>prefixLen)
-						hints.add(new SimpleHint(token,token.substring(prefixLen),null,""));
-				}
-				if(j>i)
-					i=j-1;
-			}
-		}
 		if(kept&&word.startsWith(prefix)&&word.length()>prefixLen)
 			hints.add(new SimpleHint(word,word.substring(prefixLen)+":",null,""));
 	}
