@@ -42,11 +42,11 @@ public class WordTranslator extends AbstractWordTranslator{
 	private int end;
 	private Token curr;
 	private Consumer<Iterator<Token>> callback;
-	public WordTranslator(NavigableDictionary dict,WordMemory memory,Locale locale){
+	public WordTranslator(NavigableDictionary dict,WordMemory memory,Locale from,Locale to){
 		setLayout(new BorderLayout());
 		this.memory=memory;
 		this.dict=dict;
-		hintExtractor=new DictionaryHintExtractor(locale,true);
+		hintExtractor=new DictionaryHintExtractor(from,to,true);
 		currIn.setFocusable(false);
 		MoreAction moreAction=new MoreAction();
 		LessAction lessAction=new LessAction();

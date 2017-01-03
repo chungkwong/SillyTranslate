@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Chan Chung Kwong <1m02math@126.com>
+ * Copyright (C) 2016-2017 Chan Chung Kwong <1m02math@126.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ public class SillyTranslate{
 
 	}
 	static void loadPlugIn(String[] clssses){
-		if(clssses.length==0)
+		if(clssses.length==0||(clssses.length==1&&clssses[0].isEmpty()))
 			return;
 		ClassLoader loader=getPluginLoader();
 		for(String cls:clssses){
@@ -44,9 +44,6 @@ public class SillyTranslate{
 				Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 			}
 		}
-	}
-	public static void bar(String str){
-		System.out.println(":::"+str);
 	}
 	static ClassLoader getPluginLoader(){
 		File[] jars=BASE.listFiles((dir,name)->name.endsWith(".jar"));
@@ -85,6 +82,16 @@ public class SillyTranslate{
 	public static void setDictionaryParser(DictionaryParser parser){
 		DICTIONARY_PARSER=parser;
 	}
+	private static final HashMap<String,WordNormalizer[]> NORMALIZERS=new HashMap<>();
+	public static WordNormalizer[] registerNormalizers(Locale from,Locale to,WordNormalizer[] normalizers){
+		return NORMALIZERS.put(encodeDirection(from,to),normalizers);
+	}
+	public static WordNormalizer[] getNormalizers(Locale from,Locale to){
+		return NORMALIZERS.getOrDefault(encodeDirection(from,to),new WordNormalizer[0]);
+	}
+	private static String encodeDirection(Locale in,Locale out){
+		return in.getLanguage()+":"+out.getLanguage();
+	}
 	static{
 		registerLexBuilder("JavaLex",(conf)->new JavaLex(conf.getInputLocale()));
 		registerLexBuilder("SimpleLex",(conf)->new SimpleLex());
@@ -97,5 +104,8 @@ public class SillyTranslate{
 		registerDocumentTranslator("ooxml",new OOXMLTranslator());
 		registerDocumentTranslator("groff",new GroffTranslator());
 		registerDocumentTranslator("tex",new TeXTranslator());
+	}
+	public static void main(String[] args) throws UnsupportedEncodingException{
+		System.out.println(URLDecoder.decode("%E8%87%AA%E5%8A%A8%E6%A3%80%E6%B5%8B","UTF-8"));
 	}
 }

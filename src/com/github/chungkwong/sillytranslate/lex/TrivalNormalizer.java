@@ -21,6 +21,10 @@ package com.github.chungkwong.sillytranslate.lex;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class TrivalNormalizer implements WordNormalizer{
+	public static final TrivalNormalizer INSTANCE=new TrivalNormalizer();
+	private TrivalNormalizer(){
+
+	}
 	@Override
 	public String toNormal(String word){
 		return word;
@@ -29,5 +33,4 @@ public class TrivalNormalizer implements WordNormalizer{
 	public String toSpecial(String word){
 		return word;
 	}
-
 }

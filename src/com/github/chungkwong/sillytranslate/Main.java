@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Chan Chung Kwong <1m02math@126.com>
+ * Copyright (C) 2016-2017 Chan Chung Kwong <1m02math@126.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,10 +104,7 @@ public class Main extends JFrame{
 		steps.add(step0);
 		Box step1=Box.createHorizontalBox();
 		step1.add(new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STEP1")));
-		JComboBox<DocumentTranslatorEngine> formats=new JComboBox<>(new DocumentTranslatorEngine[]{
-			new PlainTextTranslator(),new PropertiesTranslator(),new POTranslator(),new XMLTranslator(),
-			new ODFTranslator(),new OOXMLTranslator(),new GroffTranslator(),new TeXTranslator()
-		});
+		JComboBox<DocumentTranslatorEngine> formats=new JComboBox<>(SillyTranslate.getDocumentTranslatorEngines().toArray(new DocumentTranslatorEngine[0]));
 		step1.add(formats);
 		step1.setAlignmentX(0);
 		steps.add(step1);

@@ -27,9 +27,9 @@ public class TuneWordTranslator extends AbstractWordTranslator{
 	private final NavigableDictionary dict;
 	private final DictionaryHintExtractor hintExtractor;
 	private final WordMemory memory;
-	public TuneWordTranslator(NavigableDictionary dict,WordMemory memory,Locale locale){
+	public TuneWordTranslator(NavigableDictionary dict,WordMemory memory,Locale from,Locale to){
 		this.dict=dict;
-		this.hintExtractor=new DictionaryHintExtractor(locale,false);
+		this.hintExtractor=new DictionaryHintExtractor(from,to,false);
 		this.memory=memory;
 	}
 	@Override

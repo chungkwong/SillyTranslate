@@ -22,5 +22,5 @@ import java.util.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public interface DictionaryParser{
-	void parse(String text,String word,String prefix,List<Hint> hints);
+	void parse(String text,String word,String prefix,WordNormalizer normalizer,List<Hint> hints);
 }

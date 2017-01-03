@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Chan Chung Kwong <1m02math@126.com>
+ * Copyright (C) 2016-2017 Chan Chung Kwong <1m02math@126.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,20 +29,20 @@ import javax.swing.*;
 public class DictionaryHintExtractor{
 	private final WordNormalizer[] normalizers;
 	private final boolean kept;
-	public DictionaryHintExtractor(Locale locale,boolean kept){
-		normalizers=Normalizers.getNormalizers(locale);
+	public DictionaryHintExtractor(Locale from,Locale to,boolean kept){
+		normalizers=SillyTranslate.getNormalizers(from,to);
 		this.kept=kept;
 	}
 	public Hint[] extractHint(String word,String prefix,NavigableDictionary dict,WordMemory memory){
 		ArrayList<Hint> hints=new ArrayList<>();
 		appendHistory(word,prefix,hints,memory);
-		SillyTranslate.getDictionaryParser().parse(dict.getMeaning(word),word,prefix,hints);
+		SillyTranslate.getDictionaryParser().parse(dict.getMeaning(word),word,prefix,TrivalNormalizer.INSTANCE,hints);
 		reserve(word,prefix,hints);
 		boolean found=hints.size()>1;
 		String normalizeWord=normalize(word);
 		if(!normalizeWord.equals(word)){
 			appendHistory(normalizeWord,prefix,hints,memory);
-			SillyTranslate.getDictionaryParser().parse(dict.getMeaning(normalizeWord),normalizeWord,prefix,hints);
+			SillyTranslate.getDictionaryParser().parse(dict.getMeaning(normalizeWord),normalizeWord,prefix,TrivalNormalizer.INSTANCE,hints);
 			reserve(normalizeWord,prefix,hints);
 			found=hints.size()>2;
 		}
@@ -52,7 +52,7 @@ public class DictionaryHintExtractor{
 				if(normalizedWord.equals(normalizeWord))
 					continue;
 				appendHistory(normalizedWord,prefix,hints,memory);
-				split(dict.getMeaning(normalizedWord),normalizedWord,prefix,hints,normalizer);
+				SillyTranslate.getDictionaryParser().parse(dict.getMeaning(normalizedWord),normalizedWord,prefix,normalizer,hints);
 				if(hints.size()>2)
 					break;
 			}
@@ -67,7 +67,7 @@ public class DictionaryHintExtractor{
 			int prefixLen=prefix.length();
 			for(Meaning meaning:meanings){
 				String token=meaning.getText()+":"+meaning.getTag();
-				if(token.length()>prefixLen)
+				if(token.length()>prefixLen&&token.startsWith(prefix))
 					hints.add(new SimpleHint(token+meaning.getCount(),token.substring(prefixLen),null,""));
 			}
 		}
@@ -77,36 +77,6 @@ public class DictionaryHintExtractor{
 		if(kept&&word.startsWith(prefix)&&word.length()>prefixLen)
 			hints.add(new SimpleHint(word,word.substring(prefixLen)+":",null,""));
 	}
-	private static void split(String text,String word,String prefix,ArrayList<Hint> hints,WordNormalizer normalizer){
-		int prefixLen=prefix.length();
-		String type="";
-		for(int i=0;i<text.length();i++){
-			char c=text.charAt(i);
-			if(c=='['){
-				while(++i<text.length()&&text.charAt(i)!=']');
-			}else if(c=='{'){
-				while(++i<text.length()&&text.charAt(i)!='}');
-			}else if(Character.isWhitespace(c)){
-
-			}else{
-				int j=i;
-				for(;j<text.length();j++){
-					int d=text.charAt(j);
-					if(d==','||d==';'||d=='\n'||d=='\r')
-						break;
-				}
-				String token=text.substring(i,j);
-				if(token.endsWith("."))
-					type=token;
-				else if(!token.isEmpty()&&token.startsWith(prefix)){
-					token=normalizer.toSpecial(token)+":"+type;
-					hints.add(new SimpleHint(token,token.substring(prefixLen),null,""));
-				}
-				if(j>i)
-					i=j-1;
-			}
-		}
-	}
 	public static void main(String[] args) throws IOException{
 		StardictDictionary dict=new StardictDictionary(new File("/home/kwong/下载/stardict-lazyworm-ec-2.4.2"));
 		WordMemory memory=new WordMemory();
@@ -115,7 +85,7 @@ public class DictionaryHintExtractor{
 		f.add(input,BorderLayout.NORTH);
 		JTextArea output=new JTextArea();
 		f.add(new JScrollPane(output),BorderLayout.CENTER);
-		DictionaryHintExtractor hintExtractor=new DictionaryHintExtractor(Locale.ENGLISH,true);
+		DictionaryHintExtractor hintExtractor=new DictionaryHintExtractor(Locale.ENGLISH,Locale.CHINESE,true);
 		input.addActionListener((e)->{
 			/*Predicate<String> patt=Pattern.compile(input.getText()).asPredicate();
 			output.setText(dict.getDictionary().keySet().stream().filter(patt).collect(Collectors.joining("\n")));*/

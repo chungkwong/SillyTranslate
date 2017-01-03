@@ -23,7 +23,7 @@ import java.util.*;
  */
 public class DefaultDictionaryParser implements DictionaryParser{
 	@Override
-	public void parse(String text,String word,String prefix,List<Hint> hints){
+	public void parse(String text,String word,String prefix,WordNormalizer normalizer,List<Hint> hints){
 		int prefixLen=prefix.length();
 		String type="";
 		for(int i=0;i<text.length();i++){
@@ -44,9 +44,9 @@ public class DefaultDictionaryParser implements DictionaryParser{
 				String token=text.substring(i,j);
 				if(token.endsWith(".")&&!token.endsWith("...")){
 					type=token;
-				}else if(!token.isEmpty()&&token.startsWith(prefix)){
-					token+=":"+type;
-					if(token.length()>prefixLen)
+				}else if(!token.isEmpty()){
+					token=normalizer.toSpecial(token)+":"+type;
+					if(token.length()>prefixLen&&token.startsWith(prefix))
 						hints.add(new SimpleHint(token,token.substring(prefixLen),null,""));
 				}
 				if(j>i)

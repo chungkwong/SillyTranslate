@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Chan Chung Kwong <1m02math@126.com>
+ * Copyright (C) 2016-2017 Chan Chung Kwong <1m02math@126.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,6 +67,7 @@ public class Configure extends JFrame{
 	private final JTextField initPlugin=new JTextField();
 	public Configure(){
 		super(ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("CONFIGURE"));
+		SillyTranslate.loadPlugIn(pref.get("GlobalPlugin","").split(":"));
 		Box box=Box.createVerticalBox();
 		box.add(name);
 		box.add(simple);
@@ -337,9 +338,9 @@ public class Configure extends JFrame{
 			}
 			AbstractWordTranslator wordTranslator;
 			if(tuneWord.isSelected()){
-				wordTranslator=new TuneWordTranslator(dictionaryChooser.getDictionary(),WordMemory.getWordMemory(wordCache.getText()),input);
+				wordTranslator=new TuneWordTranslator(dictionaryChooser.getDictionary(),WordMemory.getWordMemory(wordCache.getText()),input,output);
 			}else{
-				wordTranslator=new WordTranslator(dictionaryChooser.getDictionary(),WordMemory.getWordMemory(wordCache.getText()),input);
+				wordTranslator=new WordTranslator(dictionaryChooser.getDictionary(),WordMemory.getWordMemory(wordCache.getText()),input,output);
 			}
 			ArrayList<SentenceTranslatorEngine> sentenceTranslators=new ArrayList<>();
 			if(ruleSentence.isSelected())
