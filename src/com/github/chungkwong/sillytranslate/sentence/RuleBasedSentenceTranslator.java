@@ -16,6 +16,7 @@
  */
 package com.github.chungkwong.sillytranslate.sentence;
 import com.github.chungkwong.jprologmin.*;
+import com.github.chungkwong.sillytranslate.*;
 import com.github.chungkwong.sillytranslate.lex.*;
 import java.io.*;
 import java.math.*;
@@ -75,7 +76,7 @@ public class RuleBasedSentenceTranslator implements SentenceTranslatorEngine{
 	}
 	private String extractTranslation(Substitution subst,List<Token> words){
 		List<Term> list=Lists.toJavaList(subst.findRoot(NEW));
-		return Sentences.build(list.stream().map((i)->{
+		return SillyTranslate.buildSentence(list.stream().map((i)->{
 			if(i instanceof Constant){
 				Object val=((Constant)i).getValue();
 				if(val instanceof Number)

@@ -22,6 +22,7 @@ import java.net.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.logging.*;
+import java.util.stream.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
@@ -92,6 +93,58 @@ public class SillyTranslate{
 	private static String encodeDirection(Locale in,Locale out){
 		return in.getLanguage()+":"+out.getLanguage();
 	}
+	private static final HashMap<String,Function<Stream<String>,String>> SENTENCE_BUILDER=new HashMap<>();
+	public static Function<Stream<String>,String> registerSentenceBuilder(String language,Function<Stream<String>,String> builder){
+		return SENTENCE_BUILDER.put(language,builder);
+	}
+	public static String buildSentence(Stream<String> tokens,Locale locale){
+		Function<Stream<String>,String> builder=SENTENCE_BUILDER.get(locale.getLanguage());
+		if(builder!=null){
+			return builder.apply(tokens);
+		}else{
+			return tokens.collect(Collectors.joining());
+		}
+	}
+	private static String buildEnglish(Stream<String> tokens){
+		String sentence=tokens.collect(Collectors.joining(" "));
+		StringBuilder buf=new StringBuilder();
+		if(!sentence.isEmpty()){
+			Stack<Integer> quote=new Stack<>();
+			int i=sentence.offsetByCodePoints(0,1);
+			int c=sentence.codePointAt(0);
+			buf.appendCodePoint(Character.toUpperCase(c));
+			if(c=='\''||c=='\"'){
+				quote.push(c);
+				if(i<sentence.length()&&sentence.charAt(i)==' '){
+					i=sentence.offsetByCodePoints(i,1);
+				}
+			}
+			for(;i<sentence.length();i=sentence.offsetByCodePoints(i,1)){
+				c=sentence.codePointAt(i);
+				boolean rmLeft=c==','||c=='.'||c==';'||c=='?'||c=='!'||c==':'||c==')'||c=='/';
+				boolean rmRight=c=='('||c=='/';
+				if(c=='\"'||(c=='\''&&buf.charAt(buf.length()-1)==' ')){
+					if(quote.isEmpty()||quote.peek().intValue()!=c){
+						rmRight=true;
+						quote.push(c);
+					}else{
+						rmLeft=true;
+						quote.pop();
+					}
+				}
+				if(rmLeft&&buf.charAt(buf.length()-1)==' ')
+					buf.deleteCharAt(buf.length()-1);
+				buf.appendCodePoint(c);
+				if(rmRight){
+					int j=sentence.offsetByCodePoints(i,1);
+					if(j<sentence.length()&&sentence.charAt(j)==' '){
+						i=j;
+					}
+				}
+			}
+		}
+		return buf.toString();
+	}
 	static{
 		registerLexBuilder("JavaLex",(conf)->new JavaLex(conf.getInputLocale()));
 		registerLexBuilder("SimpleLex",(conf)->new SimpleLex());
@@ -104,8 +157,6 @@ public class SillyTranslate{
 		registerDocumentTranslator("ooxml",new OOXMLTranslator());
 		registerDocumentTranslator("groff",new GroffTranslator());
 		registerDocumentTranslator("tex",new TeXTranslator());
-	}
-	public static void main(String[] args) throws UnsupportedEncodingException{
-		System.out.println(URLDecoder.decode("%E8%87%AA%E5%8A%A8%E6%A3%80%E6%B5%8B","UTF-8"));
+		registerSentenceBuilder("en",SillyTranslate::buildEnglish);
 	}
 }

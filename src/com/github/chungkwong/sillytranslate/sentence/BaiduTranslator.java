@@ -51,8 +51,8 @@ public class BaiduTranslator extends CloudTranslator{
 	protected String getLanguageCode(Locale locale){
 		if(locale==null)
 			return "auto";
-		else if(BUNDLE.containsKey(locale.toLanguageTag()))
-			return BUNDLE.getString(locale.toLanguageTag());
+		else if(BUNDLE.containsKey(locale.toString()))
+			return BUNDLE.getString(locale.toString());
 		else if(BUNDLE.containsKey(locale.getLanguage()))
 			return BUNDLE.getString(locale.getLanguage());
 		else

@@ -109,7 +109,7 @@ public class SentenceTranslatorView extends JPanel implements TranslatorStage<It
 			buf.setLength(0);
 			callback.accept(result);
 		}else{
-			input.setText(Sentences.build(words.stream().map(Token::getText),locale));
+			input.setText(SillyTranslate.buildSentence(words.stream().map(Token::getText),locale));
 			result.setText(input.getText());
 			worker=new SwingWorker<List<String>,Object>(){
 				@Override

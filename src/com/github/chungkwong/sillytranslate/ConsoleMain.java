@@ -19,6 +19,7 @@ import com.github.chungkwong.sillytranslate.surrounding.*;
 import com.github.chungkwong.sillytranslate.util.*;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.logging.*;
 import javax.swing.*;
 /**
@@ -26,6 +27,7 @@ import javax.swing.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class ConsoleMain{
+	private static final ExecutorService executor=Executors.newSingleThreadExecutor();
 	public ConsoleMain(InputStream in,OutputStream out,DocumentTranslatorEngine format,TextTranslator translator){
 		format.setTextTranslator(translator);
 		format.setOnFinished(()->{
@@ -56,27 +58,27 @@ public class ConsoleMain{
 			}
 		}
 	}
-}
-class ConsoleSimpleTextTranslator implements TextTranslator{
-	private final Scanner in;
-	public ConsoleSimpleTextTranslator(Scanner in){
-		this.in=in;
-	}
-	@Override
-	public void translate(String text,DocumentTranslatorEngine callback){
-		System.err.println(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("ENTER_TRANSLATION")+text);
-		callback.textTranslated(in.nextLine());
-	}
-	@Override
-	public JComponent getUserInterface(){
-		return null;
-	}
-	@Override
-	public String getName(){
-		return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("MANUAL");
-	}
-	@Override
-	public String getUsage(){
-		return "";
+	static class ConsoleSimpleTextTranslator implements TextTranslator{
+		private final Scanner in;
+		public ConsoleSimpleTextTranslator(Scanner in){
+			this.in=in;
+		}
+		@Override
+		public void translate(String text,DocumentTranslatorEngine callback){
+			System.err.println(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("ENTER_TRANSLATION")+text);
+			executor.submit(()->callback.textTranslated(in.nextLine()));
+		}
+		@Override
+		public JComponent getUserInterface(){
+			return null;
+		}
+		@Override
+		public String getName(){
+			return java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("MANUAL");
+		}
+		@Override
+		public String getUsage(){
+			return "";
+		}
 	}
 }

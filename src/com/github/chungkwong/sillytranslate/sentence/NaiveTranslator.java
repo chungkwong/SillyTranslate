@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.sentence;
+import com.github.chungkwong.sillytranslate.*;
 import com.github.chungkwong.sillytranslate.lex.*;
 import com.github.chungkwong.sillytranslate.util.*;
 import java.util.*;
@@ -36,7 +37,7 @@ public class NaiveTranslator implements SentenceTranslatorEngine{
 		List<Token> p=words;
 		int i=0;
 		while(p!=null&&++i<=limit){
-			list.add(Sentences.build(p.stream().map((t)->t.getText()),locale));
+			list.add(SillyTranslate.buildSentence(p.stream().map((t)->t.getText()),locale));
 			p=perm.nextPermutation();
 		}
 		return list;
