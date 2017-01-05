@@ -51,19 +51,18 @@ public class WordTranslator extends AbstractWordTranslator{
 		MoreAction moreAction=new MoreAction();
 		LessAction lessAction=new LessAction();
 		Box inBox=Box.createHorizontalBox();
-		JButton less=new JButton("<");
+		JButton less=new JButton(lessAction);
 		less.setToolTipText(ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("POP_TIPS"));
-		less.setAction(lessAction);
 		inBox.add(less);
 		inBox.add(currIn);
-		JButton more=new JButton(">");
+		JButton more=new JButton(moreAction);
 		more.setToolTipText(ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("PUSH_TIPS"));
-		more.addActionListener(moreAction);
 		inBox.add(more);
-		add(currIn,BorderLayout.NORTH);
-		getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP,0),"less");
+		inBox.add(new JLabel(ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("SAVE_DEFAULT")));
+		add(inBox,BorderLayout.NORTH);
+		getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP,KeyEvent.ALT_DOWN_MASK),"less");
 		getActionMap().put("less",lessAction);
-		getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN,0),"more");
+		getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN,KeyEvent.ALT_DOWN_MASK),"more");
 		getActionMap().put("more",moreAction);
 		getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,KeyEvent.ALT_DOWN_MASK),"default");
 		getActionMap().put("default",new SaveAction());
@@ -157,6 +156,9 @@ public class WordTranslator extends AbstractWordTranslator{
 		}
 	}
 	private class LessAction extends AbstractAction{
+		public LessAction(){
+			super("<");
+		}
 		@Override
 		public void actionPerformed(ActionEvent e){
 			if(end>index+1){
@@ -167,6 +169,9 @@ public class WordTranslator extends AbstractWordTranslator{
 		}
 	}
 	private class MoreAction extends AbstractAction{
+		public MoreAction(){
+			super(">");
+		}
 		@Override
 		public void actionPerformed(ActionEvent e){
 			if(end<in.size()){

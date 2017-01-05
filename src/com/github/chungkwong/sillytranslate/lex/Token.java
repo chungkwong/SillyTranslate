@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.lex;
+import com.github.chungkwong.sillytranslate.*;
 import java.awt.*;
 import java.util.*;
 import static java.util.ResourceBundle.getBundle;
@@ -71,10 +72,10 @@ public class Token{
 	public static Type guessType(String text,Locale locale){
 		Token.Type type=Token.Type.WORD;
 		if(text.codePointCount(0,text.length())==1){
-			ResourceBundle bundle=ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/lex/LANGUAGE",locale);
-			for(String key:bundle.keySet())
-				if(bundle.getString(key).contains(text))
-					type=Token.Type.valueOf(key);
+			Properties prop=SillyTranslate.getLanguageLex(locale);
+			for(Object key:prop.keySet())
+				if(prop.get(key).toString().contains(text))
+					type=Token.Type.valueOf(key.toString());
 		}
 		return type;
 	}

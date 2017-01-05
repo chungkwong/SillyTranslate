@@ -145,6 +145,23 @@ public class SillyTranslate{
 		}
 		return buf.toString();
 	}
+	private static final HashMap<String,Properties> LANGUAGE_LEX=new HashMap<>();
+	private static final Properties DEFAULT_LANGUAGE_LEX=loadProperties("/com/github/chungkwong/sillytranslate/lex/LANGUAGE.properties");
+	public static void registerLanguageLex(Locale locale,Properties prop){
+		LANGUAGE_LEX.put(locale.toString(),prop);
+	}
+	public static Properties getLanguageLex(Locale locale){
+		return LANGUAGE_LEX.getOrDefault(locale.toString(),LANGUAGE_LEX.getOrDefault(locale.getLanguage(),DEFAULT_LANGUAGE_LEX));
+	}
+	private static Properties loadProperties(String path){
+		Properties prop=new Properties();
+		try{
+			prop.load(SillyTranslate.class.getResourceAsStream(path));
+		}catch(IOException ex){
+			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
+		}
+		return prop;
+	}
 	static{
 		registerLexBuilder("JavaLex",(conf)->new JavaLex(conf.getInputLocale()));
 		registerLexBuilder("SimpleLex",(conf)->new SimpleLex());
@@ -158,5 +175,7 @@ public class SillyTranslate{
 		registerDocumentTranslator("groff",new GroffTranslator());
 		registerDocumentTranslator("tex",new TeXTranslator());
 		registerSentenceBuilder("en",SillyTranslate::buildEnglish);
+		registerLanguageLex(Locale.ENGLISH,loadProperties("/com/github/chungkwong/sillytranslate/lex/LANGUAGE_en.properties"));
+		registerLanguageLex(Locale.CHINESE,loadProperties("/com/github/chungkwong/sillytranslate/lex/LANGUAGE_zh.properties"));
 	}
 }
