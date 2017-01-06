@@ -50,6 +50,7 @@ public class Configure extends JFrame{
 	private final JCheckBox ruleSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("RULE BASED"));
 	private final JCheckBox autoSentence=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("AUTO_SELECT"));
 	private final JCheckBox autoLex=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("AUTO_SELECT"));
+	private final JCheckBox numberWord=new JCheckBox(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("NUMBER_TRANSLATE"));
 	private final JTextField wordCache=new JTextField();
 	private final JTextField rules=new JTextField();
 	private final JTextField yandexKey=new JTextField();
@@ -141,6 +142,7 @@ public class Configure extends JFrame{
 		wordBox.add(dictWord);
 		wordType.add(tuneWord);
 		wordBox.add(tuneWord);
+		wordBox.add(numberWord);
 		wordBox.setAlignmentX(0);
 		box.add(wordBox);
 		Box sentenceBox=Box.createHorizontalBox();
@@ -182,7 +184,7 @@ public class Configure extends JFrame{
 		dict.setAlignmentX(0);
 		dict.addActionListener((e)->{
 			JFrame f=new JFrame(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("DICTIONARY VIEWER"));
-			f.add(new DictionaryViewer(dictionaryChooser.getDictionary()));
+			f.add(new DictionaryViewer(getDictionary()));
 			f.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			f.setVisible(true);
 		});
@@ -262,6 +264,7 @@ public class Configure extends JFrame{
 		pref.putBoolean("JavaLex",javaLex.isSelected());
 		pref.putBoolean("DictionaryTranslator",dictWord.isSelected());
 		pref.putBoolean("TuneTranslator",tuneWord.isSelected());
+		pref.putBoolean("NumberTranslator",numberWord.isSelected());
 		pref.putBoolean("NaiveSentenceTranslator",naiveSentence.isSelected());
 		pref.putBoolean("RuleBasedSentenceTranslator",ruleSentence.isSelected());
 		pref.putBoolean("AutoSelectSentence",autoSentence.isSelected());
@@ -295,6 +298,7 @@ public class Configure extends JFrame{
 		javaLex.setSelected(pref.getBoolean("JavaLex",false));
 		dictWord.setSelected(pref.getBoolean("DictionaryTranslator",true));
 		tuneWord.setSelected(pref.getBoolean("TuneTranslator",false));
+		numberWord.setSelected(pref.getBoolean("NumberTranslator",false));
 		naiveSentence.setSelected(pref.getBoolean("NaiveSentenceTranslator",true));
 		ruleSentence.setSelected(pref.getBoolean("RuleBasedSentenceTranslator",false));
 		autoSentence.setSelected(pref.getBoolean("AutoSelectSentence",false));
@@ -329,7 +333,7 @@ public class Configure extends JFrame{
 			translators.add(new SimpleTextTranslator());
 		if(staged.isSelected()){
 			Lex lex=simpleLex.isSelected()?new SimpleLex():
-					(prefixLex.isSelected()?new PrefixLex(dictionaryChooser.getDictionary(),input):new JavaLex(input));
+					(prefixLex.isSelected()?new PrefixLex(getDictionary(),input):new JavaLex(input));
 			AbstractLexView lexView;
 			if(autoLex.isSelected()){
 				lexView=new BypassLexView();
@@ -338,9 +342,9 @@ public class Configure extends JFrame{
 			}
 			AbstractWordTranslator wordTranslator;
 			if(tuneWord.isSelected()){
-				wordTranslator=new TuneWordTranslator(dictionaryChooser.getDictionary(),WordMemory.getWordMemory(wordCache.getText()),input,output);
+				wordTranslator=new TuneWordTranslator(getDictionary(),WordMemory.getWordMemory(wordCache.getText()),input,output);
 			}else{
-				wordTranslator=new WordTranslator(dictionaryChooser.getDictionary(),WordMemory.getWordMemory(wordCache.getText()),input,output);
+				wordTranslator=new WordTranslator(getDictionary(),WordMemory.getWordMemory(wordCache.getText()),input,output);
 			}
 			ArrayList<SentenceTranslatorEngine> sentenceTranslators=new ArrayList<>();
 			if(ruleSentence.isSelected())
@@ -378,10 +382,17 @@ public class Configure extends JFrame{
 		return localeIn.getSelectedItem();
 	}
 	public Locale getOutputLocale(){
-		return localeIn.getSelectedItem();
+		return localeOut.getSelectedItem();
 	}
 	public NavigableDictionary getDictionary(){
-		return dictionaryChooser.getDictionary();
+		IntegratedDictionary dictionary=dictionaryChooser.getDictionary();
+		if(numberWord.isSelected()){
+			IntegratedDictionary modDictionary=new IntegratedDictionary();
+			modDictionary.addDictionary(dictionary);
+			modDictionary.addDictionary(new NumberTranslator(getInputLocale(),getOutputLocale()));
+			return modDictionary;
+		}else
+			return dictionary;
 	}
 	public static File resolveFile(String path){
 		File file=new File(path);

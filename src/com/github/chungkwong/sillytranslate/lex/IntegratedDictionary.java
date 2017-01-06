@@ -47,7 +47,7 @@ public class IntegratedDictionary implements NavigableDictionary{
 		StringBuilder buf=new StringBuilder();
 		for(NavigableDictionary dictionary:dictionarys){
 			String curr=dictionary.getMeaning(word);
-			if(curr!=null)
+			if(curr!=null&&!curr.isEmpty())
 				buf.append(dictionary).append('\n').append(curr).append('\n').append('\n');
 		}
 		return buf.toString();
@@ -78,6 +78,6 @@ public class IntegratedDictionary implements NavigableDictionary{
 	}
 	@Override
 	public String toString(){
-		return dictionarys.toString();
+		return "";
 	}
 }
