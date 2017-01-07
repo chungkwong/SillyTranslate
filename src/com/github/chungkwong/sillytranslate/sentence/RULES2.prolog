@@ -24,7 +24,7 @@ prep(A):-'prep.'(A),text(A,B),'\\=='(B,[30340]).
 separator(A):-text(A,[65292]).
 separator(A):-text(A,[65307]).
 
-translate_quote([C|X],[C|Y],E,F):-text(C,E),text(D,F),append(A,[D],X),translate(A,AA),append(AA,[D],Y).
+translate_quote([C|X],[G|Y],E,F,G,H):-text(C,E),text(D,F),append(A,[D],X),translate(A,AA),append(AA,[H],Y).
 
 translate_basic_prepositional_phrase([H|T],[H|S]):-prep(H),translate_noun_phrase(T,S).
 translate_prepositional_phrase(X,Y):-translate_basic_prepositional_phrase(X,Y).
@@ -41,8 +41,8 @@ translate_adjective(X,Y):-append(A,[C|B],X),text(C,E),translate_conjection(E,D),
 
 basic_noun_phrase([A],[A]):-noun(A).
 basic_noun_phrase([H|L],[H|LL]):-noun(H),basic_noun_phrase(L,LL).
-basic_noun_phrase([H|L],[H|LL]):-noun(H),translate_quote(L,LL,[65288],[65289]).
-basic_noun_phrase(X,Y):-translate_quote(X,Y,[34],[34]).
+basic_noun_phrase([H|L],[H|LL]):-noun(H),translate_quote(L,LL,[40],[41],[65288],[65289]).
+basic_noun_phrase(X,Y):-translate_quote(X,Y,[34],[34],[8220],[8221]).
 translate_basic_noun_phrase(X,Y):-basic_noun_phrase(X,Y).
 translate_basic_noun_phrase(X,Y):-append(A,B,X),translate_adjective(A,AA),basic_noun_phrase(B,BB),append(AA,BB,Y).
 translate_basic_noun_phrase([W|X],Y):-text(W,T),wh(T,WW),translate_to_infinitive(X,XX),append(XX,[WW],Y).
@@ -66,9 +66,9 @@ wh([20026,20160,20040],[30340,21407,22240]).
 wh([22914,20309],[30340,26041,27861]).
 wh([35841],[30340,20154]).
 
-translate_to_infinitive([T|L],LL):-text(T,[]),translate_verb_phrase(L,LL).
-translate_to_infinitive([T,V],[V]):-text(T,[]),transitive_verb(V).
-translate_to_infinitive([T,V|X],[V|Y]):-text(T,[]),transitive_verb(V),translate_adjective(X,Y).
+translate_to_infinitive([T|L],LL):-text(T,[21435]),translate_verb_phrase(L,LL).
+translate_to_infinitive([T,V],[V]):-text(T,[21435]),transitive_verb(V).
+translate_to_infinitive([T,V|X],[V|Y]):-text(T,[21435]),transitive_verb(V),translate_adjective(X,Y).
 translate_basic_verb_phrase([A],[A]):-intransitive_verb(A).
 translate_basic_verb_phrase([V|N],[V|M]):-transitive_verb(V),translate_noun_phrase(N,M).
 translate_basic_verb_phrase([A|J],[A|JJ]):-intransitive_verb(A),translate_adjective(J,JJ).

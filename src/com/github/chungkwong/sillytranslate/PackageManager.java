@@ -31,30 +31,28 @@ public class PackageManager extends JPanel{
 	private static final String URL="https://raw.githubusercontent.com/chungkwong/SillyTranslate/master/PACKAGES";
 	private static final File PATH=new File(System.getProperty("user.home"),".SillyTranslate");
 	private static final Charset UTF8=Charset.forName("UTF-8");
-	private final JPanel installed=new JPanel(new FlowLayout(FlowLayout.LEFT));
-	private final JPanel downloadable=new JPanel(new FlowLayout(FlowLayout.LEFT));
+	private final Box installed=Box.createVerticalBox();
+	private final Box downloadable=Box.createVerticalBox();
 	private final Configure conf;
 	public PackageManager(Configure conf){
+		super(new BorderLayout());
 		this.conf=conf;
-		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+		Box oldBox=Box.createVerticalBox();
+		Box newBox=Box.createVerticalBox();
 		JLabel pkgLabel=new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("PACKAGE"));
-		pkgLabel.setAlignmentX(0);
-		add(pkgLabel);
+		add(pkgLabel,BorderLayout.NORTH);
 		JLabel installedLabel=new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("INSTALLED"));
-		installedLabel.setAlignmentX(0);
-		add(installedLabel);
+		oldBox.add(installedLabel);
 		listInstalled();
-		installed.setAlignmentX(0);
-		add(installed);
+		oldBox.add(installed);
 		JLabel downloadableLabel=new JLabel(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("DOWNLOADABLE"));
-		downloadableLabel.setAlignmentX(0);
-		add(downloadableLabel);
+		newBox.add(downloadableLabel);
 		JButton refreshLabel=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("REFRESH"));
-		refreshLabel.setAlignmentX(0);
 		refreshLabel.addActionListener((e)->listDownloadable());
-		add(refreshLabel);
-		downloadable.setAlignmentX(0);
-		add(downloadable);
+		newBox.add(refreshLabel);
+		newBox.add(downloadable);
+		add(oldBox,BorderLayout.WEST);
+		add(newBox,BorderLayout.EAST);
 	}
 	public void listInstalled(){
 		if(PATH.exists()){

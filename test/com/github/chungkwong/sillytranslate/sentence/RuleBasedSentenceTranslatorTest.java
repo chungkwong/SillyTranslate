@@ -52,8 +52,8 @@ public abstract class RuleBasedSentenceTranslatorTest{
 		assertTranslations("我:n.:恨:v.:你:n.:和::他:n.","我恨你和他");
 		assertTranslations("我:n.:跑:vi.:开心地:adv.:慢:adv.","我开心地慢跑");
 		assertTranslations("我:n.:走:vi.:从:prep.:左:n.:到:prep.:右:n.","我从到右的左走","我从左到右走");
-		assertTranslations("\":pun.:老公:n.:的:prep.:大众:n.:\":pun.:恨:v.","\"大众的老公\"恨");
-		assertTranslations("数据库:n.:（:punct.:汇总:n.:的:prep.:事实:n.:）:punct.","数据库（事实的汇总）");
+		assertTranslations("\":pun.:老公:n.:的:prep.:大众:n.:\":pun.:恨:v.","“大众的老公”恨");
+		assertTranslations("数据库:n.:(:punct.:汇总:n.:的:prep.:事实:n.:):punct.","数据库（事实的汇总）");
 	}
 	@Test//(timeout=8000)
 	public void testNounPhrase(){
@@ -77,18 +77,18 @@ public abstract class RuleBasedSentenceTranslatorTest{
 		assertTranslations("可靠:adj.:，::及时:adj.:和:conj.:全面:adj.:服务:n.","可靠、及时和全面服务");
 		assertTranslations("学校:n.:后:prep.:战乱:n.","后战乱的学校");
 		assertTranslations("建筑:n.:从:prep.:东:n.:到:prep.:西:n.","从东到西的建筑","从到西的东的建筑","到西的从东的建筑");
-		assertTranslations("有名的:adj.:\":punct.:老公:n.:的:prep.:大众:n.:\":punct.","有名的\"大众的老公\"");
+		assertTranslations("有名的:adj.:\":punct.:老公:n.:的:prep.:大众:n.:\":punct.","有名的“大众的老公”");
 	}
 	@Test//(timeout=10000)
 	public void testWhClause(){
-		assertTranslations("什么:n.::prep.:吃:vt.","吃的");
-		assertTranslations("什么:n.::prep.:吃:v.","吃的");
-		assertTranslations("什么时候:n.::prep.:吃:v.","吃的时候");
-		assertTranslations("什么地方:n.::prep.:吃:v.","吃的地方");
-		assertTranslations("如何:n.::prep.:吃:v.","吃的方法");
-		assertTranslations("谁:n.::prep.:负责:v.","负责的人");
-		assertTranslations("哪个:n.::prep.:选择:v.","选择的哪个");
-		assertTranslations("为什么:n.::prep.:开始:v.","开始的原因");
+		assertTranslations("什么:n.:去:prep.:吃:vt.","吃的");
+		assertTranslations("什么:n.:去:prep.:吃:v.","吃的");
+		assertTranslations("什么时候:n.:去:prep.:吃:v.","吃的时候");
+		assertTranslations("什么地方:n.:去:prep.:吃:v.","吃的地方");
+		assertTranslations("如何:n.:去:prep.:吃:v.","吃的方法");
+		assertTranslations("谁:n.:去:prep.:负责:v.","负责的人");
+		assertTranslations("哪个:n.:去:prep.:选择:v.","选择的哪个");
+		assertTranslations("为什么:n.:去:prep.:开始:v.","开始的原因");
 		assertTranslations("什么:n.:你:pron.:看到:v.","什么你看到","你看到的");
 		assertTranslations("车:n.:那:pron.:你:pron.:喜欢:v.","你喜欢的车","你的车喜欢","车那你喜欢");
 		assertTranslations("口子:n.:什么时候:pron.:你:pron.:恨:v.:我:n.","你恨我的口子","你的口子恨我","口子什么时候你恨我");
@@ -104,7 +104,7 @@ public abstract class RuleBasedSentenceTranslatorTest{
 		assertTranslations("玩:vi.:开心地:adv.","开心地玩");
 		assertTranslations("看似:vi.:真:adv.:好:adj.","看似真好");
 		assertTranslations("去:vi.:到:prep.:学校:n.","到学校去");
-		assertTranslations("想:vi.::prep.:吃:vt.:饭:n.","想吃饭");
+		assertTranslations("想:vi.:去:prep.:吃:vt.:饭:n.","想吃饭");
 		assertTranslations("看:vt.:电影:n.:最近:adv.","最近看电影");
 		assertTranslations("是:aux.:玩耍:vi.","玩耍");
 		assertTranslations("是:aux.:杀死:vt.","被杀死");

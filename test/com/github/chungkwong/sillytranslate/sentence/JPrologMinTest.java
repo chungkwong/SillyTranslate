@@ -22,7 +22,7 @@ import java.util.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class JPrologMinTest extends RuleBasedSentenceTranslatorTest{
-	private final RuleBasedSentenceTranslator translator=new RuleBasedSentenceTranslator(10,new File("/home/kwong/.SillyTranslate/en_US-zh_CN/RULES3.prolog"),Locale.CHINESE);
+	private final RuleBasedSentenceTranslator translator=new RuleBasedSentenceTranslator(10,new File("src/com/github/chungkwong/sillytranslate/sentence/RULES2.prolog"),Locale.CHINESE);
 	@Override
 	protected SentenceTranslatorEngine getEngine(){
 		return translator;

@@ -31,7 +31,7 @@ public class WordMemoryEditor extends JPanel{
 		super(new BorderLayout());
 		this.memory=memory;
 		updateText();
-		add(area,BorderLayout.CENTER);
+		add(new JScrollPane(area),BorderLayout.CENTER);
 		apply.addActionListener((e)->{
 			memory.clear();
 			try{
