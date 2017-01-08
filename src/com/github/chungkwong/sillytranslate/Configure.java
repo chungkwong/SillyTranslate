@@ -169,7 +169,7 @@ public class Configure extends JFrame{
 		cacheBox.add(wordCache);
 		JButton view=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("VIEW"));
 		view.addActionListener((e)->{
-			JFrame dia=new JFrame();
+			JFrame dia=new JFrame(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("MEMORY"));
 			WordMemory memory=WordMemory.getWordMemory(wordCache.getText());
 			dia.add(new WordMemoryEditor(memory));
 			dia.setExtendedState(JFrame.MAXIMIZED_BOTH);

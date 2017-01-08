@@ -24,7 +24,7 @@ prep(A):-'prep.'(A),text(A,B),'\\=='(B,[30340]).
 separator(A):-text(A,[65292]).
 separator(A):-text(A,[65307]).
 
-translate_quote([C|X],[G|Y],E,F,G,H):-text(C,E),text(D,F),append(A,[D],X),translate(A,AA),append(AA,[H],Y).
+translate_quote([C|X],[G|Y],E,F,G,H):-text(C,E),append(A,[D],X),text(D,F),translate(A,AA),append(AA,[H],Y).
 
 translate_basic_prepositional_phrase([H|T],[H|S]):-prep(H),translate_noun_phrase(T,S).
 translate_prepositional_phrase(X,Y):-translate_basic_prepositional_phrase(X,Y).
@@ -48,7 +48,7 @@ translate_basic_noun_phrase(X,Y):-append(A,B,X),translate_adjective(A,AA),basic_
 translate_basic_noun_phrase([W|X],Y):-text(W,T),wh(T,WW),translate_to_infinitive(X,XX),append(XX,[WW],Y).
 translate_basic_noun_phrase([W,A,B|X],Y):-text(W,T),wh(T,WW),translate_clause([A,B|X],XX),append(XX,[WW],Y).
 translate_noun_phrase(X,Y):-translate_basic_noun_phrase(X,Y).
-translate_noun_phrase(X,Y):-append(A,[C|B],X),text(C,[30340]),translate_noun_phrase(A,AA),translate_basic_noun_phrase(B,BB),append(BB,[C|AA],Y).
+translate_noun_phrase(X,Y):-append(A,[C|B],X),text(C,[30340]),translate_basic_noun_phrase(A,AA),translate_noun_phrase(B,BB),append(BB,[C|AA],Y).
 translate_noun_phrase(X,Y):-append(A,[C|B],X),text(C,E),wh(E,_),translate_noun_phrase(A,AA),translate_clause(B,BB),append(BB,[[30340]|AA],Y).
 translate_noun_phrase(X,Y):-append(A,[C|B],X),text(C,[37027]),translate_noun_phrase(A,AA),translate_clause(B,BB),append(BB,[[30340]|AA],Y).
 translate_noun_phrase(X,Y):-append(A,[C|B],X),text(C,E),translate_conjection(E,D),translate_noun_phrase(A,AA),translate_basic_noun_phrase(B,BB),append(AA,[D|BB],Y).
@@ -73,7 +73,7 @@ translate_basic_verb_phrase([A],[A]):-intransitive_verb(A).
 translate_basic_verb_phrase([V|N],[V|M]):-transitive_verb(V),translate_noun_phrase(N,M).
 translate_basic_verb_phrase([A|J],[A|JJ]):-intransitive_verb(A),translate_adjective(J,JJ).
 translate_verb_phrase(X,Y):-translate_basic_verb_phrase(X,Y).
-translate_verb_phrase(X,Y):-append(A,B,X),translate_basic_verb_phrase(A,AA),translate_to_infinitive(B,BB),append(AA,BB,Y).
+translate_verb_phrase(X,Y):-append(A,B,X),translate_to_infinitive(B,BB),translate_basic_verb_phrase(A,AA),append(AA,BB,Y).
 translate_verb_phrase(X,Y):-append(A,B,X),translate_basic_verb_phrase(A,AA),translate_adverbial(B,BB),append(BB,AA,Y).
 translate_verb_phrase([A,V],[[34987],V]):-aux(A),transitive_verb(V).
 translate_verb_phrase([A,V|J],[[34987]|Y]):-aux(A),transitive_verb(V),translate_adverbial(J,JJ),append(JJ,[V],Y).
@@ -81,7 +81,7 @@ translate_verb_phrase([A,B,V],[B,[34987],V]):-aux(A),adverb(B),transitive_verb(V
 translate_verb_phrase([A,B,V|J],[B,[34987]|Y]):-aux(A),adverb(B),transitive_verb(V),translate_adverbial(J,JJ),append(JJ,[V],Y).
 translate_verb_phrase([A|J],JJ):-aux(A),translate_verb_phrase(J,JJ).
 
-translate_clause(X,XX):-append(N,V,X),translate_noun_phrase(N,NN),translate_verb_phrase(V,VV),append(NN,VV,XX).
+translate_clause(X,XX):-append(N,V,X),translate_verb_phrase(V,VV),translate_noun_phrase(N,NN),append(NN,VV,XX).
 translate_clause([X],[X]).
 
 translate_sentence(X,Y):-translate_clause(X,Y).

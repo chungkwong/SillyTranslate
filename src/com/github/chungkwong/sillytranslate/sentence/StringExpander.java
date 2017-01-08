@@ -24,7 +24,7 @@ import java.io.*;
 public class StringExpander{
 	public static void main(String[] args) throws IOException{
 		args=new String[]{"/home/kwong/NetBeansProjects/SillyTranslate/src/com/github/chungkwong/sillytranslate/sentence/RULES.prolog",
-			"/home/kwong/NetBeansProjects/SillyTranslate/src/com/github/chungkwong/sillytranslate/sentence/RULES3.prolog"};
+			"/home/kwong/NetBeansProjects/SillyTranslate/src/com/github/chungkwong/sillytranslate/sentence/RULES2.prolog"};
 		CodePointReader in=new CodePointReader(new InputStreamReader(new FileInputStream(args[0]),"UTF-8"));
 		CodePointWriter out=new CodePointWriter(new OutputStreamWriter(new FileOutputStream(args[1]),"UTF-8"));
 		expand(in,out);
