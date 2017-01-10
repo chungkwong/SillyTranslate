@@ -27,11 +27,14 @@ public class WordMemoryEditor extends JPanel{
 	private final WordMemory memory;
 	private final JTextArea area=new JTextArea();
 	private final JButton apply=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("APPLY"));
+	private final JButton merge=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("MERGE"));
+	private final JButton diff=new JButton(java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("DIFF"));
 	public WordMemoryEditor(WordMemory memory){
 		super(new BorderLayout());
 		this.memory=memory;
 		updateText();
 		add(new JScrollPane(area),BorderLayout.CENTER);
+		Box action=Box.createHorizontalBox();
 		apply.addActionListener((e)->{
 			memory.clear();
 			try{
@@ -41,7 +44,24 @@ public class WordMemoryEditor extends JPanel{
 			}
 			updateText();
 		});
-		add(apply,BorderLayout.SOUTH);
+		action.add(apply);
+		merge.addActionListener((e)->{
+			JFileChooser jfc=new JFileChooser();
+			if(jfc.showOpenDialog(null)==JFileChooser.APPROVE_OPTION){
+				memory.merge(WordMemory.getWordMemory(jfc.getSelectedFile().getPath()));
+				updateText();
+			}
+		});
+		action.add(merge);
+		diff.addActionListener((e)->{
+			JFileChooser jfc=new JFileChooser();
+			if(jfc.showOpenDialog(null)==JFileChooser.APPROVE_OPTION){
+				memory.diff(WordMemory.getWordMemory(jfc.getSelectedFile().getPath()));
+				updateText();
+			}
+		});
+		action.add(diff);
+		add(action,BorderLayout.SOUTH);
 	}
 	public void updateText(){
 		try{

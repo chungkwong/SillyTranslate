@@ -25,7 +25,6 @@ import javax.swing.*;
  * @author Chan Chung Kwong <1m02math@126.com>
  */
 public class WordMemory{
-
 	private static final HashMap<String,WordMemory> pool=new HashMap<>();
 	private final HashMap<String,Candidates> map=new HashMap<>();
 	private final File cache;
@@ -173,6 +172,41 @@ public class WordMemory{
 		boolean def=end+1!=line.length();
 		useMeaning(word,translation,tag,def,count);
 	}
+	void merge(WordMemory memory){
+		memory.map.forEach((word,cand)->{
+			cand.candidates.forEach((m)->useMeaning(word,m.getText(),m.getTag(),cand.hasDefault(),m.getCount()));
+		});
+	}
+	void diff(WordMemory memory){
+		Iterator<Map.Entry<String,Candidates>> iter=map.entrySet().iterator();
+		while(iter.hasNext()){
+			Map.Entry<String,Candidates> entry=iter.next();
+			String word=entry.getKey();
+			Candidates cand=entry.getValue();
+			List<Meaning> thatMeanings=memory.getMeanings(word);
+			if(thatMeanings!=null){
+				List<Meaning> thisMeanings=cand.candidates;
+				for(int i=thisMeanings.size()-1;i>=0;i--){
+					Meaning thisMeaning=thisMeanings.get(i);
+					for(int j=thatMeanings.size()-1;j>=0;j--){
+						Meaning thatMeaning=thatMeanings.get(j);
+						if(thisMeaning.getText().equals(thatMeaning.getText())&&thisMeaning.getTag().equals(thatMeaning.getTag())){
+							thisMeaning.used(-thatMeaning.getCount());
+							if(thatMeaning.getCount()<=0){
+								thisMeanings.remove(i);
+								if(i==0)
+									cand.setDefault(false);
+							}
+							break;
+						}
+					}
+				}
+				if(thisMeanings.isEmpty()){
+					iter.remove();
+				}
+			}
+		};
+	}
 	@Override
 	public String toString(){
 		return map.toString();
@@ -205,6 +239,5 @@ public class WordMemory{
 		public List<Meaning> getCandidates(){
 			return candidates;
 		}
-
 	}
 }
