@@ -26,7 +26,7 @@ import javax.swing.*;
  */
 public class WordMemory{
 	private static final HashMap<String,WordMemory> pool=new HashMap<>();
-	private final HashMap<String,Candidates> map=new HashMap<>();
+	private final TreeMap<String,Candidates> map=new TreeMap<>();
 	private final File cache;
 	public WordMemory(){
 		this.cache=null;
@@ -207,9 +207,12 @@ public class WordMemory{
 			}
 		};
 	}
+	String getCurrentWord(String word){
+		return map.ceilingKey(word);
+	}
 	@Override
 	public String toString(){
-		return map.toString();
+		return cache.getName();
 	}
 	public static void main(String[] args) throws FileNotFoundException, IOException{
 		JFrame f=new JFrame();

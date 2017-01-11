@@ -63,7 +63,7 @@ public class LexEditor extends AbstractLexView implements ActionListener,Documen
 			Token next=source.next();
 			while(next!=null){
 				int pos=pane.getText().length();
-				pane.append(next.getText()+" ");
+				pane.append(escape(next.getText())+" ");
 				tokens.put(pos,next);
 				next=source.next();
 			}
@@ -174,6 +174,9 @@ public class LexEditor extends AbstractLexView implements ActionListener,Documen
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
 	}*/
+	private static String escape(String str){
+		return str.replace(' ','\u00A0');
+	}
 	@Override
 	public void actionPerformed(ActionEvent e){
 		Map.Entry<Integer,Token> entry=tokens.floorEntry(pane.getCaretPosition());

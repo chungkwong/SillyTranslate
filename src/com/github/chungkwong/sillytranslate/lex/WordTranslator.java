@@ -94,15 +94,24 @@ public class WordTranslator extends AbstractWordTranslator{
 					do{
 						trying+=" "+in.get(j++).getText();
 						next=dict.getCurrentWord(trying);
-						if(!next.startsWith(trying)){
-							trying=trying.toLowerCase();
-							next=dict.getCurrentWord(trying);
+						if(next==null||!next.startsWith(trying)){
+							next=memory.getCurrentWord(trying);
+							if(next==null||!next.startsWith(trying)){
+								trying=trying.toLowerCase();
+								next=dict.getCurrentWord(trying);
+								if(next==null||!next.startsWith(trying)){
+									next=memory.getCurrentWord(trying);
+									if(next==null||!next.startsWith(trying)){
+										break;
+									}
+								}
+							}
 						}
 						if(trying.equals(next)){
 							lastMatch=trying;
 							end=j;
 						}
-					}while(j<in.size()&&next.startsWith(trying));
+					}while(j<in.size());
 				Meaning defaultMeaning=memory.getDefaultMeaning(lastMatch);
 				currIn.setText(lastMatch);
 				if(defaultMeaning!=null){
