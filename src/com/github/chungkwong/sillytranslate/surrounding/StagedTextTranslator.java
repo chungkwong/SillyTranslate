@@ -31,9 +31,9 @@ public class StagedTextTranslator extends JPanel implements TextTranslator{
 	private final AbstractLexView lexView;
 	private final Lex lex;
 	private final AbstractWordTranslator wordTranslator;
-	private final SentenceTranslatorView sentenceTranslator;
+	private final AbstractSentenceTranslatorView sentenceTranslator;
 	private DocumentTranslatorEngine callback;
-	public StagedTextTranslator(Lex lex,AbstractLexView lexView,AbstractWordTranslator wordTranslator,SentenceTranslatorView sentenceTranslator){
+	public StagedTextTranslator(Lex lex,AbstractLexView lexView,AbstractWordTranslator wordTranslator,AbstractSentenceTranslatorView sentenceTranslator){
 		setLayout(card);
 		this.lex=lex;
 		this.lexView=lexView;

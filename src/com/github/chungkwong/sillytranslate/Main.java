@@ -182,6 +182,14 @@ public class Main extends JFrame{
 	}
 	public static void main(String[] args) throws IOException{
 		//Locale.setDefault(Locale.FRANCE);
+		File lock=Configure.resolveFile("RUNNING");
+		if(lock.exists()){
+			if(JOptionPane.showConfirmDialog(null,java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("STARTED"))!=JOptionPane.YES_OPTION)
+				return;
+		}else{
+			lock.createNewFile();
+		}
+		lock.deleteOnExit();
 		Logger.getGlobal().setLevel(Level.SEVERE);
 		Logger.getGlobal().addHandler(OptionPaneHandler.INSTANCE);
 		new Main();

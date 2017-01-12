@@ -288,14 +288,14 @@ public class Configure extends JFrame{
 	}
 	private void load(){
 		simple.setSelected(pref.getBoolean("NaiveTranslator",true));
-		staged.setSelected(pref.getBoolean("StagedTranslator",true));
+		staged.setSelected(pref.getBoolean("StagedTranslator",false));
 		cloud.setSelected(pref.getBoolean("CloudTranslator",true));
 		baidu.setSelected(pref.getBoolean("useBaidu",false));
 		yandex.setSelected(pref.getBoolean("useYandex",false));
 		youdao.setSelected(pref.getBoolean("useYoudao",false));
-		simpleLex.setSelected(pref.getBoolean("SimpleLex",true));
+		simpleLex.setSelected(pref.getBoolean("SimpleLex",false));
 		prefixLex.setSelected(pref.getBoolean("PrefixLex",false));
-		javaLex.setSelected(pref.getBoolean("JavaLex",false));
+		javaLex.setSelected(pref.getBoolean("JavaLex",true));
 		dictWord.setSelected(pref.getBoolean("DictionaryTranslator",true));
 		tuneWord.setSelected(pref.getBoolean("TuneTranslator",false));
 		numberWord.setSelected(pref.getBoolean("NumberTranslator",false));

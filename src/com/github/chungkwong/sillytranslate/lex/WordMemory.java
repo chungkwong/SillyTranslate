@@ -17,9 +17,9 @@
 package com.github.chungkwong.sillytranslate.lex;
 import com.github.chungkwong.sillytranslate.*;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.logging.*;
-import javax.swing.*;
 /**
  *
  * @author Chan Chung Kwong <1m02math@126.com>
@@ -215,16 +215,12 @@ public class WordMemory{
 		return cache.getName();
 	}
 	public static void main(String[] args) throws FileNotFoundException, IOException{
-		JFrame f=new JFrame();
-		JTextArea area=new JTextArea();
-		WordMemory memory=WordMemory.getWordMemory("/home/kwong/.sillytranslatecache");
-		StringWriter out=new StringWriter();
-		memory.writeAsText(out);
-		area.setText(out.getBuffer().toString());
-		f.add(area);
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		f.setVisible(true);
+		File tmp=File.createTempFile("silly","cache");
+		Files.copy(new File(args[0]).toPath(),tmp.toPath(),StandardCopyOption.REPLACE_EXISTING);
+		WordMemory memory=WordMemory.getWordMemory(args[0]);
+		memory.merge(WordMemory.getWordMemory(args[1]));
+		memory.merge(WordMemory.getWordMemory(args[2]));
+		memory.merge(WordMemory.getWordMemory(tmp.getAbsolutePath()));
 	}
 	private static class Candidates{
 		private boolean def;

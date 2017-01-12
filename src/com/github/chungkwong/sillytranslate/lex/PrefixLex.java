@@ -15,10 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.github.chungkwong.sillytranslate.lex;
+import com.github.chungkwong.sillytranslate.*;
 import com.github.chungkwong.sillytranslate.util.*;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.function.*;
 import java.util.logging.*;
 import java.util.stream.*;
 import javax.swing.*;
@@ -30,9 +32,11 @@ public class PrefixLex implements Lex{
 	private CodePointReader in;
 	private final NavigableDictionary dict;
 	private final Locale locale;
+	private final IntPredicate classifier;
 	public PrefixLex(NavigableDictionary dict,Locale locale){
 		this.dict=dict;
 		this.locale=locale;
+		this.classifier=SillyTranslate.getCharacterClassifier(locale);
 	}
 	@Override
 	public void setInput(String text){
@@ -43,6 +47,7 @@ public class PrefixLex implements Lex{
 		StringBuilder buf=new StringBuilder();
 		int c;
 		String last=null;
+		boolean nonlocal=false;
 		while((c=in.read())!=-1){
 			buf.appendCodePoint(c);
 			String curr=buf.toString();
@@ -50,6 +55,11 @@ public class PrefixLex implements Lex{
 			if(geuss!=null&&geuss.startsWith(curr)){
 				if(geuss.equals(curr))
 					last=curr;
+			}else if(classifier.test(c)){
+				break;
+			}else if(nonlocal||buf.length()==1){
+				nonlocal=true;
+				last=curr;
 			}else{
 				break;
 			}

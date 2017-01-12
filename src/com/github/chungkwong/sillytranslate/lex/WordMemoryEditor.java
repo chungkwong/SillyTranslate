@@ -71,8 +71,7 @@ public class WordMemoryEditor extends JPanel{
 		}catch(IOException ex){
 			Logger.getGlobal().log(Level.SEVERE,ex.getLocalizedMessage(),ex);
 		}
-	}
-	public static void main(String[] args){
+	}public static void main(String[] args){
 		JFrame f=new JFrame();
 		WordMemory memory=WordMemory.getWordMemory("/home/kwong/.sillytranslatecache");
 		f.add(new WordMemoryEditor(memory));

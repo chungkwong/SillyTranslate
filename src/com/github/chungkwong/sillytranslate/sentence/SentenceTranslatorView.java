@@ -30,7 +30,7 @@ import javax.swing.event.*;
  *
  * @author Chan Chung Kwong <1m02math@126.com>
  */
-public class SentenceTranslatorView extends JPanel implements TranslatorStage<Iterator<Token>,String>{
+public class SentenceTranslatorView extends AbstractSentenceTranslatorView{
 	private static final String WAITING=java.util.ResourceBundle.getBundle("com/github/chungkwong/sillytranslate/Words").getString("GENERATING");
 	private final JLabel input=new JLabel();
 	private final DefaultListModel<String> choices=new DefaultListModel<>();

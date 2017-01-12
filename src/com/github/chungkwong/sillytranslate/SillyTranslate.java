@@ -153,6 +153,14 @@ public class SillyTranslate{
 	public static Properties getLanguageLex(Locale locale){
 		return LANGUAGE_LEX.getOrDefault(locale.toString(),LANGUAGE_LEX.getOrDefault(locale.getLanguage(),DEFAULT_LANGUAGE_LEX));
 	}
+	private static final HashMap<String,IntPredicate> LANGUAGE_CHARACTER=new HashMap<>();
+	private static final IntPredicate DEFAULT_LANGUAGE_CHARACTER=(i)->true;
+	public static void registerCharacterClassifier(Locale locale,IntPredicate pred){
+		LANGUAGE_CHARACTER.put(locale.toString(),pred);
+	}
+	public static IntPredicate getCharacterClassifier(Locale locale){
+		return LANGUAGE_CHARACTER.getOrDefault(locale.toString(),LANGUAGE_CHARACTER.getOrDefault(locale.getLanguage(),DEFAULT_LANGUAGE_CHARACTER));
+	}
 	private static Properties loadProperties(String path){
 		Properties prop=new Properties();
 		try{
@@ -177,5 +185,6 @@ public class SillyTranslate{
 		registerSentenceBuilder("en",SillyTranslate::buildEnglish);
 		registerLanguageLex(Locale.ENGLISH,loadProperties("/com/github/chungkwong/sillytranslate/lex/LANGUAGE_en.properties"));
 		registerLanguageLex(Locale.CHINESE,loadProperties("/com/github/chungkwong/sillytranslate/lex/LANGUAGE_zh.properties"));
+		registerCharacterClassifier(Locale.CHINESE,(i)->!Character.UnicodeBlock.of(i).equals(Character.UnicodeBlock.BASIC_LATIN));
 	}
 }
