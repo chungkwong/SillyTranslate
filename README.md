@@ -22,6 +22,9 @@ Minor features
   - resume-continue
   - remember word translations
 
+For the usage of SillyTranslate, please read
+https://github.com/chungkwong/SillyTranslate/wiki/Get-started/
+
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -51,5 +54,8 @@ SillyTranslate目前已经有以下翻译包：
 次要特性：
   - 断点续译
   - 记忆过去用过的单词翻译
+
+关于SillyTranslate的用法，请参阅
+https://github.com/chungkwong/SillyTranslate/wiki/Get-started/
 
 本软件为自由软件: 你可以在自由软件基金会的GNU通用公共许可，版本3或按你的意愿更新的版本，的条款下再分发它和/或修改它。
